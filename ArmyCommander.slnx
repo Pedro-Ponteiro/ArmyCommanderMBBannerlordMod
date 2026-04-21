@@ -1,0 +1,9 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+  </Configurations>
+  <Project Path="ArmyCommander.csproj" Id="5fd22ba2-6f50-44e2-9f57-4c8ad47b9127">
+    <Platform Solution="*|x64" Project="x64" />
+  </Project>
+</Solution>
