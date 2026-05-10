@@ -39,8 +39,48 @@
     <OutputPath>bin\x64\Release\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="0Harmony">
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\Modules\Bannerlord.Harmony\bin\Win64_Shipping_Client\0Harmony.dll</HintPath>
+    </Reference>
+    <Reference Include="Bannerlord.Harmony">
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\Modules\Bannerlord.Harmony\bin\Win64_Shipping_Client\Bannerlord.Harmony.dll</HintPath>
+    </Reference>
+    <Reference Include="Bannerlord.UIExtenderEx">
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\Modules\Bannerlord.UIExtenderEx\bin\Win64_Shipping_Client\Bannerlord.UIExtenderEx.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil">
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\Modules\Bannerlord.Harmony\bin\Win64_Shipping_Client\Mono.Cecil.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.Mdb">
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\Modules\Bannerlord.Harmony\bin\Win64_Shipping_Client\Mono.Cecil.Mdb.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.Pdb">
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\Modules\Bannerlord.Harmony\bin\Win64_Shipping_Client\Mono.Cecil.Pdb.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.Rocks">
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\Modules\Bannerlord.Harmony\bin\Win64_Shipping_Client\Mono.Cecil.Rocks.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoMod.Backports">
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\Modules\Bannerlord.Harmony\bin\Win64_Shipping_Client\MonoMod.Backports.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoMod.Core">
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\Modules\Bannerlord.Harmony\bin\Win64_Shipping_Client\MonoMod.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoMod.Iced">
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\Modules\Bannerlord.Harmony\bin\Win64_Shipping_Client\MonoMod.Iced.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoMod.ILHelpers">
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\Modules\Bannerlord.Harmony\bin\Win64_Shipping_Client\MonoMod.ILHelpers.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoMod.Utils">
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\Modules\Bannerlord.Harmony\bin\Win64_Shipping_Client\MonoMod.Utils.dll</HintPath>
+    </Reference>
+    <Reference Include="SandBox.View">
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\Modules\SandBox\bin\Win64_Shipping_Client\SandBox.View.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.ValueTuple" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -155,12 +195,44 @@
     <Reference Include="TaleWorlds.ObjectSystem">
       <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\bin\Win64_Shipping_Client\TaleWorlds.ObjectSystem.dll</HintPath>
     </Reference>
+    <Reference Include="TaleWorlds.ScreenSystem">
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\bin\Win64_Shipping_Client\TaleWorlds.ScreenSystem.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Actions\ArmyCommanderActions.cs" />
+    <Compile Include="CalculationModels\ACCalculationModel.cs" />
     <Compile Include="Core\ArmyCommander.cs" />
     <Compile Include="Core\PartyCommander.cs" />
+    <Compile Include="HarmonyPatches\ArmyMenuOverlayVMPatch.cs" />
+    <Compile Include="HarmonyPatches\ArmyPatch.cs" />
+    <Compile Include="HarmonyPatches\CampaignUIHelperPatch.cs" />
+    <Compile Include="HarmonyPatches\DefaultArmyManagementCalculationModelPatch.cs" />
+    <Compile Include="HarmonyPatches\MapBarVMPatch.cs" />
+    <Compile Include="HarmonyPatches\MapScreenPatch.cs" />
+    <Compile Include="UIExtension\MixIns\VMItems\ACArmyOverlayArmyList.cs" />
+    <Compile Include="UIExtension\MixIns\VMItems\SelectableArmyPropertiesRow.cs" />
+    <Compile Include="UIExtension\UIPatches\ACArmyOverlayArmyListPatch.cs" />
+    <Compile Include="Helpers\ACHelpers.cs" />
     <Compile Include="MySubModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="HarmonyPatches\ArmyManagementVMOriginalMethods.cs" />
+    <Compile Include="UIExtension\MixIns\VMContext\ACArmyButtonsWindowUIContext.cs" />
+    <Compile Include="UIExtension\MixIns\VMContext\ACArmyLineUIContext.cs" />
+    <Compile Include="UIExtension\MixIns\VMContext\ACArmyManagementUIContext.cs" />
+    <Compile Include="UIExtension\MixIns\ACArmyManagementVMMixIn.cs" />
+    <Compile Include="UIExtension\MixIns\VMContext\bkp_ACArmyOverlayUIContext.cs" />
+    <Compile Include="UIExtension\MixIns\VMContext\ACArmyOverlayUIContext.cs" />
+    <Compile Include="UIExtension\MixIns\VMItems\SelectableArmyLineVM.cs" />
+    <Compile Include="UIExtension\UIPatches\ArmyCommanderInsertBtnPatch.cs" />
+    <Compile Include="UIExtension\UIPatches\bkp_ACArmyOverlayArmyListPatch.cs" />
+    <Compile Include="UIExtension\MixIns\ACOverlayMenuVMMixIn.cs" />
+    <Compile Include="UIExtension\MixIns\WidgetBuilders\ACArmyButtonsWindowWidgetBuilder.cs" />
+    <Compile Include="UIExtension\MixIns\WidgetBuilders\ACArmyLineWidgetBuilders.cs" />
+    <Compile Include="UIExtension\MixIns\WidgetBuilders\ACOverlayWidgetBuilder.cs" />
+    <Compile Include="UIExtension\MixIns\VMItems\SelectableArmyItemPropertyVM.cs" />
+    <Compile Include="UIExtension\MixIns\WidgetBuilders\WidgetFunctions\ArmyCommanderWidgetFunctions.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
