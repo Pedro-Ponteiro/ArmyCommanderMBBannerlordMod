@@ -1,10 +1,23 @@
-﻿using TaleWorlds.CampaignSystem.Party;
+﻿using ArmyCommander.UIExtension.MixIns.VMItems;
+using TaleWorlds.CampaignSystem.Party;
 
 
 namespace ArmyCommander.UIExtension.Context
 {
     public class ACArmyLineUIContext
     {
+
+        public SelectableArmyLineVM _lineVM;
+        public void registerLineVM(SelectableArmyLineVM vm)
+        {
+            _lineVM = vm;
+        }
+
+
+        public SelectableArmyLineVM LineVM()
+        {
+            return _lineVM;
+        }
 
         public MobileParty LeaderParty { get; set; }
 

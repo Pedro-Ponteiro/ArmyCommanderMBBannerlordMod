@@ -1,5 +1,4 @@
 ﻿using ArmyCommander.UIExtension.Context;
-using ArmyCommander.UIExtension.VMContext;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +8,7 @@ using TaleWorlds.Library;
 
 namespace ArmyCommander.UIExtension.MixIns.VMItems
 {
-    public class ACArmyOverlayArmyList: ViewModel
+    public class ACArmyOverlayArmyListVM : ViewModel
     {
         private MBBindingList<SelectableArmyLineVM> _ArmiesList;
 
@@ -32,7 +31,7 @@ namespace ArmyCommander.UIExtension.MixIns.VMItems
 
 
 
-        public ACArmyOverlayArmyList(
+        public ACArmyOverlayArmyListVM(
             MBBindingList<SelectableArmyLineVM> armiesList
             )
         {
@@ -50,8 +49,18 @@ namespace ArmyCommander.UIExtension.MixIns.VMItems
             foreach (var line in _ArmiesList)
             {
                 ACArmyLineUIContext ui_context = new ACArmyLineUIContext();
-                ui_context = ACArmyOverlayUIContext.CurrentArmyOverlayVMMixIn.UpdateLineContext(ui_context, line.LeaderParty.Army);
+                ui_context = ACArmyOverlayUIContext.Instance.CurrentArmyOverlayVMMixIn.UpdateLineContext(ui_context, line.LeaderParty.Army);
                 line.UpdateValues(ui_context);
+            }
+
+            RefreshValues();
+        }
+
+        public void UpdateSelection()
+        {
+            foreach (var line in _ArmiesList)
+            {
+                line?.UpdateSelection();
             }
 
             RefreshValues();

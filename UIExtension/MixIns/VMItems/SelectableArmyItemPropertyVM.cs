@@ -7,7 +7,7 @@ using TaleWorlds.Core.ViewModelCollection.Information;
 using TaleWorlds.Library;
 
 
-namespace ArmyCommander.UIExtension
+namespace ArmyCommander.UIExtension.MixIns.VMItems
 {
     public class SelectableArmyItemPropertyVM : ViewModel
     {
@@ -34,12 +34,19 @@ namespace ArmyCommander.UIExtension
         private string _value;
         private BasicTooltipViewModel _hint;
         private string _colonText;
+        private int _changeAmount;
 
         private Func<ACArmyLineUIContext, bool> _updateIsWarning;
         private Func<ACArmyLineUIContext, string> _updateValue;
         private Func<ACArmyLineUIContext, int> _updateDailyChange;
         private Func<ACArmyLineUIContext, BasicTooltipViewModel> _updateHint;
 
+
+        public Action ActivateParentHovered { get; private set; }
+        public Action DeactivateParentHovered { get; private set; }
+
+        public Action ExecuteParentClickFunction { get; private set; }
+        
 
 
         //private string _upperText;
@@ -125,7 +132,24 @@ namespace ArmyCommander.UIExtension
             }
         }
 
-        [DataSourceProperty]
+        public void ExecuteBeginHint()
+        {
+            ActivateParentHovered?.Invoke();
+            this.Hint?.ExecuteBeginHint();
+        }
+
+        public void ExecuteEndHint()
+        { 
+            DeactivateParentHovered();
+            this.Hint?.ExecuteEndHint();
+        }
+
+        public void ExecuteClickFunction()
+        {
+            ExecuteParentClickFunction();
+        }
+
+
         public BasicTooltipViewModel Hint
         {
             get
@@ -141,6 +165,8 @@ namespace ArmyCommander.UIExtension
                 }
             }
         }
+
+
 
         [DataSourceProperty]
         public string ColonText
@@ -159,8 +185,6 @@ namespace ArmyCommander.UIExtension
             }
         }
 
-
-        private int _changeAmount;
 
         [DataSourceProperty]
         public int ChangeAmount
@@ -203,6 +227,7 @@ namespace ArmyCommander.UIExtension
 
             sprite_path = property_type_sprite;
 
+
             RefreshValues();
 
         }
@@ -221,6 +246,11 @@ namespace ArmyCommander.UIExtension
             IsWarning = _updateIsWarning(context);
             ChangeAmount = _updateDailyChange(context);
             Hint = _updateHint(context);
+
+            ActivateParentHovered = context.LineVM().ExecuteBeginHover;
+            DeactivateParentHovered = context.LineVM().ExecuteEndHover;
+            ExecuteParentClickFunction = context.LineVM().ExecuteClickFunction;
+
             RefreshValues();
         }
     }

@@ -1,8 +1,7 @@
 ﻿using ArmyCommander.Helpers;
-using ArmyCommander.Patches;
+using ArmyCommander.HarmonyPatches;
 using ArmyCommander.UIExtension.Context;
 using ArmyCommander.UIExtension.MixIns.VMItems;
-using ArmyCommander.UIExtension.VMContext;
 using ArmyCommander.UIExtension.WidgetBuilders;
 using Bannerlord.UIExtenderEx.Attributes;
 using Bannerlord.UIExtenderEx.ViewModels;
@@ -17,14 +16,14 @@ using TaleWorlds.CampaignSystem.ViewModelCollection.GameMenu.Overlay;
 using TaleWorlds.Library;
 
 
-namespace ArmyCommander.UIExtension
+namespace ArmyCommander.UIExtension.MixIns
 {
     [ViewModelMixin("RefreshValues")]
     public sealed class ArmyMenuOverlayVMMixin : BaseViewModelMixin<ArmyMenuOverlayVM>
     {
 
 
-        private ACArmyOverlayArmyList _ArmyOverlayArmiesList;
+        private ACArmyOverlayArmyListVM _ArmyOverlayArmiesList;
         private MBBindingList<SelectableArmyItemPropertyVM> _ArmyOverlayTopWidgets;
 
 
@@ -32,16 +31,24 @@ namespace ArmyCommander.UIExtension
 
         public ArmyMenuOverlayVMMixin(ArmyMenuOverlayVM vm) : base(vm)
         {
-            ACArmyOverlayUIContext.RegisterVM(vm);
-            ACArmyOverlayUIContext.RegisterMixIn(this);
+
+            new ACArmyOverlayUIContext(vm, this);
+
 
             vm.IsInitializationOver = false;
-            ArmyOverlayArmiesList = new ACArmyOverlayArmyList(new MBBindingList<SelectableArmyLineVM>());
+
+            ArmyOverlayArmiesList = new ACArmyOverlayArmyListVM(new MBBindingList<SelectableArmyLineVM>());
+
+            if (ACArmyOverlayUIContext.Instance.SelectedArmy != null)
+            {
+                // refresh
+                ACArmyOverlayUIContext.Instance.SelectedArmy = Hero.Find(ACArmyOverlayUIContext.Instance.SelectedArmy.LeaderParty.LeaderHero.StringId).PartyBelongedTo.Army;
+                CampaignEventDispatcher.Instance.OnArmyOverlaySetDirty();
+            }
+
             RenewArmyList(null, refreshOverlay: false);
+
             vm.IsInitializationOver = true;
-
-            //ArmyOverlayTopWidgets = new MBBindingList<SelectableArmyItemPropertyVM>();
-
 
             CampaignEvents.HourlyTickEvent.AddNonSerializedListener(this, UpdateAllArmyLines);
 
@@ -65,23 +72,23 @@ namespace ArmyCommander.UIExtension
             {
                 return;
             }
-            ACArmyOverlayUIContext.CurrentArmyOverlayVM.IsInitializationOver = false;
+            ACArmyOverlayUIContext.Instance.CurrentArmyOverlayVM.IsInitializationOver = false;
+
+            if (army == ACArmyOverlayUIContext.Instance.SelectedArmy)
+            {
+                ACArmyOverlayUIContext.Instance.SelectedArmy = null;
+            }
 
             RenewArmyList(new List<Army>() { army});
-
-            if (army == ACArmyOverlayUIContext.SelectedArmy)
-            {
-                ACArmyOverlayUIContext.SelectedArmy = null;
-            }
 
 
             if (ArmyOverlayArmiesList.ArmiesCount() == 0)
             {
-                OnFinalizeMixIn();
+                OnFinalize();
             }
 
 
-            ACArmyOverlayUIContext.CurrentArmyOverlayVM.IsInitializationOver = true;
+            ACArmyOverlayUIContext.Instance.CurrentArmyOverlayVM.IsInitializationOver = true;
 
         }
 
@@ -97,11 +104,11 @@ namespace ArmyCommander.UIExtension
                 return;
             }
 
-            ACArmyOverlayUIContext.CurrentArmyOverlayVM.IsInitializationOver = false;
+            ACArmyOverlayUIContext.Instance.CurrentArmyOverlayVM.IsInitializationOver = false;
 
             RenewArmyList();
 
-            ACArmyOverlayUIContext.CurrentArmyOverlayVM.IsInitializationOver = true;
+            ACArmyOverlayUIContext.Instance.CurrentArmyOverlayVM.IsInitializationOver = true;
 
         }
 
@@ -168,34 +175,40 @@ namespace ArmyCommander.UIExtension
                 ArmyOverlayArmiesList.AddLine(army_line_widget);
             }
 
+
             if (refreshOverlay)
             {
-                CampaignEventDispatcher.Instance.OnArmyOverlaySetDirty();
                 MapScreen_OnRefreshState_Patch.RefreshArmyOverlay();
+                CampaignEventDispatcher.Instance.OnArmyOverlaySetDirty();
             }
 
+            UpdateLineSelection();
         }
 
         // on day tick
         public void UpdateAllArmyLines()
         {
-            ACArmyOverlayUIContext.CurrentArmyOverlayVM.IsInitializationOver = false;
+            ACArmyOverlayUIContext.Instance.CurrentArmyOverlayVM.IsInitializationOver = false;
 
             ArmyOverlayArmiesList.UpdateValues();
 
-            ACArmyOverlayUIContext.CurrentArmyOverlayVM.IsInitializationOver = true;
+            ACArmyOverlayUIContext.Instance.CurrentArmyOverlayVM.IsInitializationOver = true;
+        }
+
+        public void UpdateLineSelection()
+        {
+            ArmyOverlayArmiesList.UpdateSelection();
         }
 
 
         public override void OnRefresh()
         {
+            UpdateLineSelection();
         }
-
-
 
         #endregion
 
-        public void OnFinalizeMixIn()
+        public override void OnFinalize()
         {
             CampaignEvents.HourlyTickEvent.ClearListeners(this);
         }
@@ -219,7 +232,7 @@ namespace ArmyCommander.UIExtension
         }
 
         [DataSourceProperty]
-        public ACArmyOverlayArmyList ArmyOverlayArmiesList
+        public ACArmyOverlayArmyListVM ArmyOverlayArmiesList
         {
             get { return _ArmyOverlayArmiesList; }
             set

@@ -1,9 +1,10 @@
 ﻿using ArmyCommander.Helpers;
 using ArmyCommander.UIExtension;
-using ArmyCommander.UIExtension.VMContext;
+using ArmyCommander.UIExtension.Context;
 using HarmonyLib;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -66,7 +67,7 @@ namespace ArmyCommander.HarmonyPatches
             ref int __result
         )
         {
-            if (x.Party == ACArmyManagementUIContext.currentMainParty)
+            if (x.Party == ACArmyManagementUIContext.Instance?.currentMainParty)
             {
                 __result = -1;
                 return false;
@@ -81,7 +82,7 @@ namespace ArmyCommander.HarmonyPatches
         private static bool PlayerHasArmySetterPrefix(ArmyManagementVM __instance, bool value)
         {
 
-            if (ACArmyManagementUIContext.currentMainParty?.IsMainParty == true && ACArmyManagementUIContext.mainPartyHasArmy)
+            if (ACArmyManagementUIContext.Instance?.currentMainParty?.IsMainParty == true && ACArmyManagementUIContext.Instance?.mainPartyHasArmy == true)
             {
                 value = true;
             }
@@ -106,8 +107,6 @@ namespace ArmyCommander.HarmonyPatches
         [HarmonyPostfix]
         private static void ConstructorPostfix(ArmyManagementVM __instance, Action onClose)
         {
-            OnCloseRef(__instance) = onClose;
-            ItemComparerField.SetValue(__instance, Activator.CreateInstance(ManagementItemComparerType, true));
             __instance.PartyList = new MBBindingList<ArmyManagementItemVM>();
             __instance.PartiesInCart = new MBBindingList<ArmyManagementItemVM>();
             PartiesToRemoveRef(__instance) = new MBBindingList<ArmyManagementItemVM>();
@@ -134,24 +133,23 @@ namespace ArmyCommander.HarmonyPatches
 
             bool is_player_kingdom_leader = Hero.MainHero.IsKingdomLeader;
 
-
+            // Atualiza o contexto ao setar esses caras abaixo
             if (!is_player_kingdom_leader)
             {
-                ACArmyManagementUIContext.currentMainParty = Hero.MainHero.PartyBelongedTo;
+                ACArmyManagementUIContext.Instance.currentMainParty = Hero.MainHero.PartyBelongedTo;
             }
-            else if (ACArmyOverlayUIContext.SelectedArmy == null)
+            else if (ACArmyOverlayUIContext.Instance.SelectedArmy == null)
             {
-                ACArmyManagementUIContext.currentMainParty = Hero.MainHero.PartyBelongedTo;
+                ACArmyManagementUIContext.Instance.currentMainParty = Hero.MainHero.PartyBelongedTo;
             }
             else
             {
-                ACArmyManagementUIContext.currentMainParty = ACArmyOverlayUIContext.SelectedArmy.LeaderParty;
+                ACArmyManagementUIContext.Instance.currentMainParty = ACArmyOverlayUIContext.Instance.SelectedArmy.LeaderParty;
             }
 
-            ACArmyManagementUIContext.mainPartyHasArmy = ACArmyManagementUIContext.currentMainParty.Army != null;
 
             // Isso habilita botões como de boost cohesion, etc.
-            __instance.PlayerHasArmy = ACArmyManagementUIContext.currentMainParty.IsMainParty && ACArmyManagementUIContext.mainPartyHasArmy;
+            __instance.PlayerHasArmy = ACArmyManagementUIContext.Instance.currentMainParty.IsMainParty && ACArmyManagementUIContext.Instance.mainPartyHasArmy;
 
 
 
@@ -162,7 +160,7 @@ namespace ArmyCommander.HarmonyPatches
             // o onreset vai funcionar em cima do currentlyselectedarmy do contexto, que vai ser setado quando o onadd for feito em uma party que é armyleader 
 
 
-            MainPartyItemRef(__instance) = new ArmyManagementItemVM(onAddToCart, onRemove, onFocus, ACArmyManagementUIContext.currentMainParty)
+            MainPartyItemRef(__instance) = new ArmyManagementItemVM(onAddToCart, onRemove, onFocus, ACArmyManagementUIContext.Instance.currentMainParty)
             {
                 IsAlreadyWithPlayer = true,
                 IsMainHero = !is_player_kingdom_leader,
@@ -170,7 +168,7 @@ namespace ArmyCommander.HarmonyPatches
                 IsTransferDisabled = PlayerSiege.PlayerSiegeEvent != null || !is_player_kingdom_leader
             };
 
-            if (ACArmyManagementUIContext.mainPartyHasArmy)
+            if (ACArmyManagementUIContext.Instance.mainPartyHasArmy)
             {
                 MainPartyItemRef(__instance).Cost = 0;
             }
@@ -185,7 +183,7 @@ namespace ArmyCommander.HarmonyPatches
 
             foreach (MobileParty item in MobileParty.All)
             {
-                if (item.LeaderHero != null && item.MapFaction == Hero.MainHero.MapFaction && item.LeaderHero != ACArmyManagementUIContext.currentMainParty.LeaderHero && !item.IsCaravan)
+                if (item.LeaderHero != null && item.MapFaction == Hero.MainHero.MapFaction && item.LeaderHero != ACArmyManagementUIContext.Instance.currentMainParty.LeaderHero && !item.IsCaravan)
                 {
                     __instance.PartyList.Add(new ArmyManagementItemVM(onAddToCart, onRemove, onFocus, item)
                     {
@@ -196,11 +194,11 @@ namespace ArmyCommander.HarmonyPatches
             }
 
 
-            if (ACArmyManagementUIContext.mainPartyHasArmy)
+            if (ACArmyManagementUIContext.Instance.mainPartyHasArmy)
             {
                 foreach (ArmyManagementItemVM party in __instance.PartyList)
                 {
-                    if (party.Party.Army == ACArmyManagementUIContext.currentMainParty.Army)
+                    if (party.Party.Army == ACArmyManagementUIContext.Instance.currentMainParty.Army)
                     {
                         party.Cost = 0;
                         party.IsAlreadyWithPlayer = true;
@@ -209,7 +207,7 @@ namespace ArmyCommander.HarmonyPatches
                     }
                     else
                     {
-                        party.Cost = Campaign.Current.Models.ArmyManagementCalculationModel.CalculatePartyInfluenceCost(ACArmyManagementUIContext.currentMainParty, party.Party);
+                        party.Cost = Campaign.Current.Models.ArmyManagementCalculationModel.CalculatePartyInfluenceCost(ACArmyManagementUIContext.Instance.currentMainParty, party.Party);
                     }
                 }
 
@@ -224,7 +222,7 @@ namespace ArmyCommander.HarmonyPatches
 
 
 
-            if (MobileParty.MainParty.Army != null && MobileParty.MainParty.Army == ACArmyManagementUIContext.currentMainParty.Army)
+            if (MobileParty.MainParty.Army != null && MobileParty.MainParty.Army == ACArmyManagementUIContext.Instance.currentMainParty.Army)
             {
                 __instance.CohesionBoostCost = Campaign.Current.Models.ArmyManagementCalculationModel.GetCohesionBoostInfluenceCost(MobileParty.MainParty.Army, 10);
             }
@@ -233,11 +231,14 @@ namespace ArmyCommander.HarmonyPatches
 
             __instance.SortControllerVM = new ArmyManagementSortControllerVM(PartyListRef(__instance));
 
-            
+            __instance.PartiesInCart = GetOrderedPartiesInCart(__instance);
+            __instance.SortControllerVM.CostState = 0;
+            __instance.SortControllerVM.ExecuteSortByCost();
+
+
             OriginalOnRefresh(__instance);
             __instance.RefreshValues();
 
-            //return false;
         }
 
 
@@ -245,7 +246,7 @@ namespace ArmyCommander.HarmonyPatches
         [HarmonyPostfix]
         private static void RefreshValuesPostfix(ArmyManagementVM __instance)
         {
-            __instance.TitleText = ACArmyManagementUIContext.mainPartyHasArmy ? __instance.TitleText : "Army Creation";
+            __instance.TitleText = ACArmyManagementUIContext.Instance?.mainPartyHasArmy == true ? __instance.TitleText : "Army Creation";
         }
 
 
@@ -256,40 +257,42 @@ namespace ArmyCommander.HarmonyPatches
             ref bool __result,
             ref TextObject disabledReason)
         {
-            if (ACArmyManagementUIContext.mainPartyHasArmy == false)
+            if (ACArmyManagementUIContext.Instance?.mainPartyHasArmy == false)
             {
                 disabledReason = new TextObject("{=iSZTOeYH}No army to disband.");
                 __result = false;
                 return false;
             }
 
-            if (ACArmyManagementUIContext.currentMainParty?.MapEvent != null)
+            if (ACHelpers.IsPartyBusy(ACArmyManagementUIContext.Instance.currentMainParty) || ACHelpers.IsPlayerBusy())
             {
                 disabledReason = new TextObject("{=uipNpzVw}Cannot disband the army right now.");
                 __result = false;
                 return false;
             }
 
-            if (ACArmyManagementUIContext.currentMainParty?.SiegeEvent != null)
-            {
-                disabledReason = GameTexts.FindText("str_action_disabled_reason_siege");
-                __result = false;
-                return false;
-            }
-
-            // Checa o estado do Player
-            if (!CampaignUIHelper.GetMapScreenActionIsEnabledWithReason(out var disabledReason2))
-            {
-                disabledReason = disabledReason2;
-                __result = false;
-                return false;
-            }
 
             disabledReason = TextObject.GetEmpty();
             __result = true;
             return false;
         }
 
+
+        private static MBBindingList<ArmyManagementItemVM> GetOrderedPartiesInCart(ArmyManagementVM __instance)
+        {
+            var sortedPartiesInCart = new MBBindingList<ArmyManagementItemVM>();
+
+            foreach (var item in __instance.PartiesInCart
+                .OrderByDescending(item =>
+                    item.Party.Army != null &&
+                    item.Party.Army.LeaderParty == item.Party)
+                .ThenByDescending(item => item.Party.Party.EstimatedStrength))
+            {
+                sortedPartiesInCart.Add(item);
+            }
+
+            return sortedPartiesInCart;
+        }
 
         private static void OnFirstPartyAdded(ArmyManagementVM __instance, ArmyManagementItemVM armyItem)
         {
@@ -298,14 +301,14 @@ namespace ArmyCommander.HarmonyPatches
             MobileParty partySelected = armyItem.Party;
             Army armySelected = partySelected.Army;
 
-            // DAR TRIGGER NA FUNÇÃO EQUIVALENTE DO MIXIN
-            ArmyManagementVMMixIn.UpdateContextOnFirstPartyAdded(partySelected);
+            // Isso atualiza o contexto
+            ACArmyManagementUIContext.Instance.currentMainParty = armyItem.Party;
 
 
-            __instance.PlayerHasArmy = ACArmyManagementUIContext.mainPartyHasArmy && ACArmyManagementUIContext.currentMainParty?.IsMainParty == true;
+            __instance.PlayerHasArmy = ACArmyManagementUIContext.Instance.mainPartyHasArmy && ACArmyManagementUIContext.Instance.currentMainParty?.IsMainParty == true;
 
 
-            if (ACArmyManagementUIContext.mainPartyHasArmy == true)
+            if (ACArmyManagementUIContext.Instance.mainPartyHasArmy == true)
             {
 
                 foreach (var item in __instance.PartyList)
@@ -330,18 +333,33 @@ namespace ArmyCommander.HarmonyPatches
             }
             else
             {
+
+                armyItem.IsAlreadyWithPlayer = true;
+                armyItem.IsInCart = true;
+                armyItem.CanJoinBackWithoutCost = false;
+                __instance.PartiesInCart.Add(armyItem);
                 __instance.TotalCost += armyItem.Cost;
+                armyItem.UpdateEligibility();
+
+                foreach (var item in __instance.PartyList)
+                {
+                    item.UpdateEligibility();
+                }
             }
 
 
+            __instance.PartiesInCart = GetOrderedPartiesInCart(__instance);
+            __instance.SortControllerVM.CostState = 0;
+            __instance.SortControllerVM.ExecuteSortByCost();
             __instance.RefreshValues();
-            __instance.PartiesInCart.Sort((IComparer<ArmyManagementItemVM>)ItemComparerField.GetValue(__instance));
+
+
         }
 
         private static void OnArmyLeaderRemoved(ArmyManagementVM __instance)
         {
-
-            ArmyManagementVMMixIn.UpdateContextOnLeaderPartyRemoved();
+            // Isso atualiza o contexto
+            ACArmyManagementUIContext.Instance.currentMainParty = null;
 
             __instance.PlayerHasArmy = false;
 
@@ -377,8 +395,10 @@ namespace ArmyCommander.HarmonyPatches
             }
 
             __instance.TotalCost = InfluenceSpentForCohesionBoostingRef(__instance);
-
+            __instance.SortControllerVM.CostState = 0;
+            __instance.SortControllerVM.ExecuteSortByCost();
             __instance.RefreshValues();
+
         }
 
 
@@ -449,7 +469,7 @@ namespace ArmyCommander.HarmonyPatches
                 // atualiza as propriedades do lado esquerdo
                 // mainPartyHasArmy = false
 
-                if (armyItem.Party == ACArmyManagementUIContext.currentMainParty)
+                if (armyItem.Party == ACArmyManagementUIContext.Instance.currentMainParty)
                 {
                     OnArmyLeaderRemoved(__instance);
                 }
@@ -493,21 +513,20 @@ namespace ArmyCommander.HarmonyPatches
                 ApplyCohesionChangeRef(__instance);
             }
 
-            Army armyToUse = ACArmyManagementUIContext.currentMainParty?.Army;
+            Army armyToUse = ACArmyManagementUIContext.Instance.currentMainParty?.Army;
             bool armyCreated = false;
 
             if (__instance.PartiesInCart.Count > 1 && MobileParty.MainParty.MapFaction.IsKingdomFaction)
             {
-                IEnumerable<MobileParty> imbs = __instance.PartiesInCart.Select((item) => { return item.Party; }).Where((mb) => mb != ACArmyManagementUIContext.currentMainParty);
+                IEnumerable<MobileParty> imbs = __instance.PartiesInCart.Select((item) => { return item.Party; }).Where((mb) => mb != ACArmyManagementUIContext.Instance.currentMainParty);
                 MBReadOnlyList<MobileParty> mbs = new MBReadOnlyList<MobileParty>(imbs);
                 if (armyToUse == null)
                 {
-                    // TODO: !!!!! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                     // MBS IS NOT USED IF ITS A PLAYER LEADING THE ARMY!
                     ((Kingdom)MobileParty.MainParty.MapFaction).CreateArmy(
-                        ACArmyManagementUIContext.currentMainParty.LeaderHero,
-                        ACArmyManagementUIContext.targetSettlement,
-                        ACArmyManagementUIContext.armyBehavior,
+                        ACArmyManagementUIContext.Instance.currentMainParty.LeaderHero,
+                        ACArmyManagementUIContext.Instance.targetSettlement,
+                        ACArmyManagementUIContext.Instance.armyBehavior,
                         mbs
                         );
 
@@ -518,19 +537,36 @@ namespace ArmyCommander.HarmonyPatches
                 {
                     foreach (var mb in mbs)
                     {
-                        mb.Army = ACArmyManagementUIContext.currentMainParty.Army;
+                        mb.Army = ACArmyManagementUIContext.Instance.currentMainParty.Army;
                     }
+
+
+
+                    if (!armyToUse.LeaderParty.IsMainParty)
+                    {
+
+                        armyToUse.ArmyType = ACArmyManagementUIContext.Instance.armyBehavior;
+
+                        armyToUse.Gather(ACArmyManagementUIContext.Instance.targetSettlement);
+
+                    }
+
+
                 }
-                else if (armyCreated && ACArmyManagementUIContext.currentMainParty.IsMainParty)
+                else if (armyCreated && ACArmyManagementUIContext.Instance.currentMainParty.IsMainParty)
                 {
                     // MANUAL ASSIGNMENT FOR PLAYER LEADED ARMY!
                     foreach (var mb in mbs)
                     {
-                        mb.Army = ACArmyManagementUIContext.currentMainParty.Army;
+                        mb.Army = ACArmyManagementUIContext.Instance.currentMainParty.Army;
                     }
                 }
 
-                armyToUse = ACArmyManagementUIContext.currentMainParty.Army;
+                armyToUse = ACArmyManagementUIContext.Instance.currentMainParty.Army;
+                if (ACArmyOverlayUIContext.Instance != null)
+                {
+                    ACArmyOverlayUIContext.Instance.SelectedArmy = armyToUse;
+                }
             }
 
             int influenceSpentForCohesionBoosting = InfluenceSpentForCohesionBoostingRef(__instance);
@@ -571,16 +607,18 @@ namespace ArmyCommander.HarmonyPatches
 
         public static void CustomDisbandArmy(ArmyManagementVM __instance)
         {
-            if (ACArmyManagementUIContext.currentMainParty.IsMainParty)
+            if (ACArmyManagementUIContext.Instance.currentMainParty.IsMainParty)
             {
-                ACArmyManagementUIContext.currentMainParty.Army = null;
+                ACArmyManagementUIContext.Instance.currentMainParty.Army = null;
             }
             else
             {
-                DisbandArmyAction.ApplyByReleasedByPlayerAfterBattle(ACArmyManagementUIContext.currentMainParty.Army);
+                DisbandArmyAction.ApplyByReleasedByPlayerAfterBattle(ACArmyManagementUIContext.Instance.currentMainParty.Army);
             }
 
             PartiesToRemoveRef(__instance).Clear();
+
+            __instance.PlayerHasArmy = false;
 
             OnCloseRef(__instance)?.Invoke();
             CampaignEventDispatcher.Instance.OnArmyOverlaySetDirty();
@@ -602,9 +640,9 @@ namespace ArmyCommander.HarmonyPatches
         private static bool ExecuteResetPrefix(ArmyManagementVM __instance)
         {
 
-            if (ACArmyManagementUIContext.currentMainParty != null)
+            if (ACArmyManagementUIContext.Instance.currentMainParty != null)
             {
-                CustomOnRemove(__instance, __instance.PartiesInCart.First((item) => item.Party == ACArmyManagementUIContext.currentMainParty));
+                CustomOnRemove(__instance, __instance.PartiesInCart.First((item) => item.Party == ACArmyManagementUIContext.Instance.currentMainParty));
             }
 
 
@@ -613,7 +651,7 @@ namespace ArmyCommander.HarmonyPatches
 
 
             __instance.NewCohesion = __instance.Cohesion;
-            ChangeClanInfluenceAction.Apply(Clan.PlayerClan, InitialInfluenceRef(__instance) - Clan.PlayerClan.Influence);
+            ChangeClanInfluenceAction.Apply(Clan.PlayerClan, InitialInfluenceRef(__instance) - (Clan.PlayerClan.Influence + ACArmyManagementUIContext.Instance.influenceSent));
             __instance.TotalCost = 0;
             BoostedCohesionRef(__instance) = 0;
             InfluenceSpentForCohesionBoostingRef(__instance) = 0;
@@ -621,6 +659,26 @@ namespace ArmyCommander.HarmonyPatches
             OriginalOnRefresh(__instance);
 
             return false;
+        }
+
+        [HarmonyPatch(typeof(ArmyManagementVM), "ExecuteCancel")]
+        [HarmonyPrefix]
+        private static bool ExecuteCancelPrefix(ArmyManagementVM __instance)
+        {
+
+            ChangeClanInfluenceAction.Apply(Clan.PlayerClan, InitialInfluenceRef(__instance) - (Clan.PlayerClan.Influence + ACArmyManagementUIContext.Instance.influenceSent));
+            OnCloseRef(__instance)?.Invoke();
+
+
+            return false;
+        }
+
+        [HarmonyPatch(typeof(ArmyManagementVM), "OnFinalize")]
+        [HarmonyPostfix]
+        private static void OnFinalizePostfix(ArmyManagementVM __instance)
+        {
+            ACArmyManagementUIContext.Instance?.CurrentArmyManagementVMMixIn.OnFinalize();
+            ACArmyManagementUIContext.Instance?.UnregisterInstance();
         }
 
 

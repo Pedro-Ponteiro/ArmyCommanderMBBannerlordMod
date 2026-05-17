@@ -3,8 +3,8 @@ using Bannerlord.UIExtenderEx.Prefabs2;
 
 namespace ArmyCommander.UIExtension.Patches
 {
-    [PrefabExtension("ArmyOverlay", @"//Window")]
-    internal sealed class ArmiesPanelPatch : PrefabExtensionInsertPatch
+    [PrefabExtension("ArmyManagement", @"//Window")]
+    internal sealed class ArmyManagementPatch : PrefabExtensionInsertPatch
     {
         public override InsertType Type
         {
@@ -12,7 +12,7 @@ namespace ArmyCommander.UIExtension.Patches
         }
 
         [PrefabExtensionFileName]
-        public string PatchFileName => "ArmyOverlayWindow";
+        public string PatchFileName => "ArmyManagementWindow";
 
     }
 }

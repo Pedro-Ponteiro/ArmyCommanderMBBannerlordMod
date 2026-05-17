@@ -5,17 +5,20 @@ using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.ViewModelCollection.Map;
 using TaleWorlds.CampaignSystem.ViewModelCollection.Map.MapBar;
 
-[HarmonyPatch(typeof(MapBarVM))]
-internal static class MapBarVM_GetIsGatherArmyVisible_Patch
-{
-    [HarmonyPostfix]
-    [HarmonyPatch("GetIsGatherArmyVisible")]
-    private static void Postfix(MapBarVM __instance, ref bool __result)
+namespace ArmyCommander.HarmonyPatches
+{ 
+    [HarmonyPatch(typeof(MapBarVM))]
+    internal static class MapBarVM_GetIsGatherArmyVisible_Patch
     {
-        // provavelmente temos que desabilitar esse botão para vermos o de tras.
-        if (__result == true && ACHelpers.ShouldShowArmyOverlayForPlayerKingdom())
+        [HarmonyPostfix]
+        [HarmonyPatch("GetIsGatherArmyVisible")]
+        private static void Postfix(MapBarVM __instance, ref bool __result)
         {
-            __result = false;
+            // Temos que tirar a visibilidade desse botão para vermos o de tras.
+            if (__result == true && ACHelpers.ShouldShowArmyOverlayForPlayer())
+            {
+                __result = false;
+            }
         }
     }
 }

@@ -1,14 +1,15 @@
-﻿using System;
+﻿using ArmyCommander.Helpers;
+using ArmyCommander.UIExtension.Context;
+using ArmyCommander.UIExtension.MixIns.VMItems;
+using System;
+using System.Collections.Generic;
+using System.Data;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.CampaignSystem.ViewModelCollection;
 using TaleWorlds.Core.ViewModelCollection.Information;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
-using ArmyCommander.UIExtension.MixIns.VMItems;
-using ArmyCommander.UIExtension.Context;
-using ArmyCommander.Helpers;
-using System.Collections.Generic;
-using System.Data;
 
 
 
@@ -106,7 +107,7 @@ namespace ArmyCommander.UIExtension.WidgetBuilders
                 (c) => false,
                 (c) => $"{c.MenCount}/{c.PotentialMenCount}",
                 (c) => c.MenJoiningToday,
-                (c) => null
+                (c) => new BasicTooltipViewModel(() => CampaignUIHelper.GetArmyManCountTooltip(c.LeaderParty.Army))
                 );
 
             return item;
@@ -119,7 +120,7 @@ namespace ArmyCommander.UIExtension.WidgetBuilders
                 (c) => c.CurrentArmyFood + c.TotalArmyFoodChange < 0,
                 (c) => $"{c.CurrentArmyFood:F0}/{c.TotalArmyFood:F0}",
                 (c) => (int)c.TotalArmyFoodChange,
-                (c) => null
+                (c) => new BasicTooltipViewModel(() => CampaignUIHelper.GetArmyFoodTooltip(c.LeaderParty.Army))
                 );
 
             return item;
@@ -132,7 +133,7 @@ namespace ArmyCommander.UIExtension.WidgetBuilders
                 (c) => c.CurrentArmyInfluence + c.DailyArmyInfluenceChange < 0,
                 (c) => $"{c.CurrentArmyInfluence:F0}",
                 (c) => (int)c.DailyArmyInfluenceChange,
-                (c) => null
+                (c) => new BasicTooltipViewModel(() => CampaignUIHelper.GetInfluenceTooltip(c.LeaderParty.ActualClan))
                 );
 
             return item;
@@ -145,7 +146,7 @@ namespace ArmyCommander.UIExtension.WidgetBuilders
                 (c) => c.CurrentCohesion + c.DailyCohesionChange < 0,
                 (c) => $"{c.CurrentCohesion:F0}",
                 (c) => (int)c.DailyCohesionChange,
-                (c) => null
+                (c) => new BasicTooltipViewModel(() => CampaignUIHelper.GetArmyCohesionTooltip(c.LeaderParty.Army))
                 );
 
             return item;

@@ -1,6 +1,5 @@
-﻿using ArmyCommander.Patches;
+﻿using ArmyCommander.HarmonyPatches;
 using ArmyCommander.UIExtension.Context;
-using ArmyCommander.UIExtension.VMContext;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -19,32 +18,19 @@ namespace ArmyCommander.UIExtension.MixIns.VMItems
         private MBBindingList<SelectableArmyPropertiesRow> _ArmyInfoRows;
         private Func<ACArmyLineUIContext, MobileParty> _updateLeaderParty;
         private CharacterImageIdentifierVM _LeaderVisual;
+        private bool _forceHovered;
+        private bool _isSelected;
 
 
         // ACESSADO PELO .XML (buttons)
-        private void ExecuteClickFunction()
+        public void ExecuteClickFunction()
         {
-            ClickFunction.Invoke();
+            ACArmyOverlayUIContext.Instance.SelectedArmy = LeaderParty.Army;
+
+            // Atualizar o Overlay de Armies Original
+            CampaignEventDispatcher.Instance.OnArmyOverlaySetDirty();
         }
 
-        private Action ClickFunction
-        {
-            get
-            {
-                Action click = () =>
-                {
-
-                    if (LeaderParty != null)
-                    {
-                        // Atualizar o Overlay de Armies Original
-                        ACArmyOverlayUIContext.SelectedArmy = LeaderParty.Army;
-                        CampaignEventDispatcher.Instance.OnArmyOverlaySetDirty();
-                    }
-                };
-
-                return click;
-            }
-        }
 
         [DataSourceProperty]
         public MobileParty LeaderParty
@@ -97,10 +83,56 @@ namespace ArmyCommander.UIExtension.MixIns.VMItems
             }
         }
 
-        
+        [DataSourceProperty]
+        public bool IsSelected
+        {
+            get
+            {
+                return _isSelected;
+            }
+            set
+            {
+                if (_isSelected != value)
+                {
+                    _isSelected = value;
+                    OnPropertyChangedWithValue(value, nameof(IsSelected));
+                }
+            }
+        }
+
+        [DataSourceProperty]
+        public bool ForceHovered
+        {
+            get
+            {
+                return _forceHovered;
+            }
+            set
+            {
+                if (_forceHovered != value)
+                {
+                    _forceHovered = value;
+                    OnPropertyChangedWithValue(value, nameof(ForceHovered));
+                }
+            }
+        }
+
+        public void ExecuteBeginHover()
+        {
+            ForceHovered = true;
+        }
+
+        public void ExecuteEndHover()
+        {
+            if (IsSelected != true)
+            {
+                ForceHovered = false;
+            }
+        }
+
 
         public SelectableArmyLineVM(
-            Func<ACArmyLineUIContext ,MobileParty> updateLeaderParty,
+            Func<ACArmyLineUIContext, MobileParty> updateLeaderParty,
             MBBindingList<SelectableArmyPropertiesRow> armyInfoRows
             )
         {
@@ -127,13 +159,29 @@ namespace ArmyCommander.UIExtension.MixIns.VMItems
                 LeaderVisual = new CharacterImageIdentifierVM(characterCode);
             }
 
+            context.registerLineVM(this);
+
             foreach (var item in ArmyInfoRows)
             {
                 item.UpdateValues(context);
             }
 
             RefreshValues();
-        } 
+        }
+
+        public void UpdateSelection()
+        {
+            if (LeaderParty == ACArmyOverlayUIContext.Instance.SelectedArmy?.LeaderParty)
+            {
+                IsSelected = true;
+                ExecuteBeginHover();
+            }
+            else
+            {
+                IsSelected = false;
+                ExecuteEndHover();
+            }
+        }
 
     }
 }

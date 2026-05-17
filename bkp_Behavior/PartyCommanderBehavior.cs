@@ -7,9 +7,9 @@ using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.Core;
 
-namespace ArmyCommander
+namespace ArmyCommander.Behavior
 {
-    public partial class ArmyCommander
+    public partial class ArmyCommanderBehavior
     {
 
 

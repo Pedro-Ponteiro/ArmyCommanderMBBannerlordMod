@@ -8,6 +8,7 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.MountAndBlade;
 
+
 namespace ArmyCommander
 {
     public class MySubModule : MBSubModuleBase
@@ -164,9 +165,9 @@ namespace ArmyCommander
                         return;
                     }
 
-                    Log("Adicionando behavior ArmyCommander");
-                    campaignGameStarter.AddBehavior(new ArmyCommander());
-                    Log("Behavior ArmyCommander adicionado");
+                    //Log("Adicionando behavior ArmyCommander");
+                    //campaignGameStarter.AddBehavior(new ArmyCommanderBehavior());
+                    //Log("Behavior ArmyCommander adicionado");
                 }
                 else
                 {

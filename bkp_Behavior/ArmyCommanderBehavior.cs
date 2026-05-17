@@ -13,9 +13,9 @@ using TaleWorlds.LinQuick;
 
 
 
-namespace ArmyCommander
+namespace ArmyCommander.Behavior
 {
-    public partial class ArmyCommander : CampaignBehaviorBase
+    public partial class ArmyCommanderBehavior : CampaignBehaviorBase
     {
 
         private IDisbandPartyCampaignBehavior _disbandPartyCampaignBehavior;

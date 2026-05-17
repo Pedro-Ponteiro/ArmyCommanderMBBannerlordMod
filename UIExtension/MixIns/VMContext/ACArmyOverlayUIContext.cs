@@ -1,66 +1,52 @@
 ﻿using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.ViewModelCollection.GameMenu.Overlay;
 using TaleWorlds.Library;
-using ArmyCommander.UIExtension.MixIns.VMItems;
+using ArmyCommander.UIExtension.MixIns;
 
-namespace ArmyCommander.UIExtension.VMContext
+namespace ArmyCommander.UIExtension.Context
 {
-    public static class ACArmyOverlayUIContext
+    public class ACArmyOverlayUIContext
     {
         
 
-        public static ArmyMenuOverlayVM CurrentArmyOverlayVM { get; private set; }
-        public static ArmyMenuOverlayVMMixin CurrentArmyOverlayVMMixIn { get; private set; }
+        public ArmyMenuOverlayVM CurrentArmyOverlayVM { get; private set; }
+        public ArmyMenuOverlayVMMixin CurrentArmyOverlayVMMixIn { get; private set; }
 
-        public static void RegisterVM(ArmyMenuOverlayVM vm)
+        public static ACArmyOverlayUIContext Instance { get; private set; }
+
+        public void UnregisterInstance()
         {
-            CurrentArmyOverlayVM = vm;
+            Instance = null;
         }
 
-        public static void UnregisterVM(ArmyMenuOverlayVM vm)
+        public ACArmyOverlayUIContext(ArmyMenuOverlayVM currentArmyOverlayVM, ArmyMenuOverlayVMMixin currentArmyOverlayVMMixIn)
         {
-            if (ReferenceEquals(CurrentArmyOverlayVM, vm))
-            {
-                CurrentArmyOverlayVM = null;
-            }
+            Instance = this;
+            CurrentArmyOverlayVM = currentArmyOverlayVM;
+            CurrentArmyOverlayVMMixIn = currentArmyOverlayVMMixIn;
         }
-
-
-        public static void RegisterMixIn(ArmyMenuOverlayVMMixin vm)
-        {
-            CurrentArmyOverlayVMMixIn = vm;
-        }
-
-        public static void UnregisterMixIn(ArmyMenuOverlayVMMixin vm)
-        {
-            if (ReferenceEquals(CurrentArmyOverlayVM, vm))
-            {
-                CurrentArmyOverlayVMMixIn = null;
-            }
-        }
-
 
         // currently selected army line context
 
-        public static Army SelectedArmy;
+        private Army _selectedArmy;
 
-
-        public static class ButtonPressStates
+        public Army SelectedArmy
         {
-            public static bool IsArmyCreation { get; set; }
-            public static bool IsArmyManagement { get; set; }
+            get
+            {
+                return _selectedArmy;
+            }
+            set
+            {
 
+                if (object.ReferenceEquals(_selectedArmy, value))
+                {
+                    return;
+                }
+                _selectedArmy = value;
+
+                CurrentArmyOverlayVMMixIn.UpdateLineSelection();
+            }
         }
-
-
-        public static class IterableWidgets
-        {
-            //public static MBBindingList<SelectableArmyItemPropertyVM> ArmyOverlayTopWidgets { get; set; }
-
-            public static MBBindingList<SelectableArmyLineVM> ArmyOverlayArmyListWidgets { get; set; }
-
-        }
-
-
     }
 }

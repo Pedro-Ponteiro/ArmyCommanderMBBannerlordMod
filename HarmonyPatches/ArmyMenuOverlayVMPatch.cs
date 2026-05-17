@@ -1,7 +1,8 @@
 ﻿using ArmyCommander.Helpers;
-using ArmyCommander.UIExtension.VMContext;
+using ArmyCommander.UIExtension.Context;
 using HarmonyLib;
 using System;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using TaleWorlds.CampaignSystem;
@@ -10,7 +11,7 @@ using TaleWorlds.CampaignSystem.ViewModelCollection;
 using TaleWorlds.CampaignSystem.ViewModelCollection.GameMenu.Overlay;
 using TaleWorlds.Localization;
 
-namespace ArmyCommander.Patches
+namespace ArmyCommander.HarmonyPatches
 {
     // ========================================================================
     // ArmyMenuOverlayVM Focused Harmony Patch
@@ -203,66 +204,38 @@ namespace ArmyCommander.Patches
 
         private static bool Prefix(ArmyMenuOverlayVM __instance, ref Army __result)
         {
-            if (Clan.PlayerClan == null || Clan.PlayerClan.Kingdom == null || Clan.PlayerClan.Kingdom.Armies.Count == 0)
+
+            // TODO: FAZER ISSO FICAR MAIS BONITO E ELEGANTE! (A INSTANCIA PODE NÃO EXISTIR QUANDO DEREM UM GET AQUI!)
+
+            // Ajustar conforme o ShouldShowArmyOverlayForPlayer
+
+            // Antes verificar se uma army já está selecionada (pode ser setada no disband ou army creation)
+            if (ACArmyOverlayUIContext.Instance?.SelectedArmy != null)
             {
-                ACArmyOverlayUIContext.SelectedArmy = null;
-                __result = null;
+                __result = ACArmyOverlayUIContext.Instance.SelectedArmy;
+            }
+            else if (MobileParty.MainParty.Army?.Kingdom != null)
+            {
+                if (ACArmyOverlayUIContext.Instance != null)
+                {
+                    ACArmyOverlayUIContext.Instance.SelectedArmy = MobileParty.MainParty.Army;
+                }
+                __result = MobileParty.MainParty.Army;
             }
             else
             {
-                // Antes verificar se uma army já está selecionada.
-                if (ACArmyOverlayUIContext.SelectedArmy != null)
+                if (ACArmyOverlayUIContext.Instance != null)
                 {
-                    __result = ACArmyOverlayUIContext.SelectedArmy;
+                    ACArmyOverlayUIContext.Instance.SelectedArmy = Clan.PlayerClan.Kingdom.Armies.FirstOrDefault();
                 }
-                else if (MobileParty.MainParty != null && MobileParty.MainParty.Army?.Kingdom != null)
-                {
-                    ACArmyOverlayUIContext.SelectedArmy = MobileParty.MainParty.Army;
-                    __result = MobileParty.MainParty.Army;
-                }
-                else
-                {
-                    ACArmyOverlayUIContext.SelectedArmy = Clan.PlayerClan.Kingdom.Armies[0];
-                    __result = Clan.PlayerClan.Kingdom.Armies[0];
-                }
+                __result = Clan.PlayerClan.Kingdom.Armies.FirstOrDefault();
             }
+            
 
             return false;
         }
     }
 
-    // ========================================================================
-    // 2. OnFrameTick
-    // ========================================================================
-
-    //[HarmonyPatch(typeof(ArmyMenuOverlayVM), "OnFrameTick")]
-    //internal static class ArmyMenuOverlayVM_OnFrameTick_Patch
-    //{
-    //    private static void Postfix(ArmyMenuOverlayVM __instance)
-    //    {
-
-    //        TextObject disabledReason = null;
-
-    //        if (!__instance.CanManageArmy &&
-    //            Clan.PlayerClan != null &&
-    //            Clan.PlayerClan.Kingdom != null &&
-    //            Clan.PlayerClan.Kingdom.Armies.Count > 0)
-    //        {
-    //            disabledReason = TextObject.GetEmpty();
-    //            __instance.CanManageArmy = true;
-    //            //if (__instance._closedHandled == true)
-    //            //{
-    //            //    __instance.ExecuteOnOverlayOpened();
-    //            //}
-    //        }
-
-    //        if (disabledReason != null && __instance.ManageArmyHint != null)
-    //        {
-    //            __instance.ManageArmyHint.HintText = disabledReason;
-    //        }
-
-    //    }
-    //}
 
     // ========================================================================
     // 3. OnFinalize
@@ -273,14 +246,8 @@ namespace ArmyCommander.Patches
     {
         private static void Postfix(ArmyMenuOverlayVM __instance)
         {
-            // Este código roda depois do OnFinalize original.
-
-            if (ACArmyOverlayUIContext.CurrentArmyOverlayVMMixIn == null)
-            {
-                return;
-            }
-
-            ACArmyOverlayUIContext.CurrentArmyOverlayVMMixIn.OnFinalizeMixIn();
+            ACArmyOverlayUIContext.Instance?.CurrentArmyOverlayVMMixIn.OnFinalize();
+            ACArmyOverlayUIContext.Instance?.UnregisterInstance();
         }
     }
 
@@ -293,15 +260,8 @@ namespace ArmyCommander.Patches
     {
         private static bool Prefix(ArmyMenuOverlayVM __instance)
         {
-            Army armyToUse = ArmyMenuOverlayVMAccess.GetArmyToUse(__instance);
 
-            if (armyToUse != null && ACHelpers.IsPlayerKingdomLeader(armyToUse))
-            {
-                if (__instance.OpenArmyManagement != null)
-                {
-                    __instance.OpenArmyManagement();
-                }
-            }
+            __instance.OpenArmyManagement();
 
             return false;
         }

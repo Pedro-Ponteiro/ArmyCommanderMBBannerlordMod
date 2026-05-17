@@ -1,4 +1,4 @@
-﻿using ArmyCommander.UIExtension.VMContext;
+﻿using ArmyCommander.UIExtension.Context;
 using HarmonyLib;
 using System;
 using TaleWorlds.CampaignSystem;
@@ -7,7 +7,7 @@ using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.Library;
 using static TaleWorlds.CampaignSystem.Army;
 
-namespace ArmyCommander.Patches
+namespace ArmyCommander.HarmonyPatches
 {
     [HarmonyPatch(typeof(Army))]
     internal static class Army_DisperseInternal_Patch
@@ -16,7 +16,7 @@ namespace ArmyCommander.Patches
         [HarmonyPatch("DisperseInternal", new Type[] { typeof(ArmyDispersionReason) })]
         private static void Postfix(Army __instance)
         {
-            ACArmyOverlayUIContext.CurrentArmyOverlayVMMixIn?.OnArmyDisband(__instance);
+            ACArmyOverlayUIContext.Instance?.CurrentArmyOverlayVMMixIn.OnArmyDisband(__instance);
         }
     }
 
@@ -27,7 +27,7 @@ namespace ArmyCommander.Patches
         [HarmonyPatch("Gather", new Type[] { typeof(Settlement), typeof(MBReadOnlyList<MobileParty>) })]
         private static void Postfix(Army __instance)
         {
-            ACArmyOverlayUIContext.CurrentArmyOverlayVMMixIn?.OnArmyGathered(__instance);
+            ACArmyOverlayUIContext.Instance?.CurrentArmyOverlayVMMixIn.OnArmyGathered(__instance);
         }
     }
 }

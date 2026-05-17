@@ -1,15 +1,61 @@
 ﻿using Helpers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
+using TaleWorlds.CampaignSystem.CampaignBehaviors;
+using TaleWorlds.CampaignSystem.Encounters;
+using TaleWorlds.CampaignSystem.MapEvents;
 using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.CampaignSystem.Siege;
+using TaleWorlds.Core;
+using TaleWorlds.Localization;
+using TaleWorlds.ObjectSystem;
 
 namespace ArmyCommander.Helpers
 {
     internal static class ACHelpers
     {
 
+
+        public static bool IsSameTWObjectSafe(
+            MBObjectBase a,
+            MBObjectBase b,
+            bool treatBothNullAsSame = true
+        )
+        {
+            bool aIsNull = a is null;
+            bool bIsNull = b is null;
+
+            if (aIsNull && bIsNull)
+            {
+                return treatBothNullAsSame;
+            }
+
+            if (aIsNull || bIsNull)
+            {
+                return false;
+            }
+
+            if (object.ReferenceEquals(a, b))
+            {
+                return true;
+            }
+
+            if (a.GetType() != b.GetType())
+            {
+                return false;
+            }
+
+            if (a.Id.Equals(b.Id))
+            {
+                return true;
+            }
+
+            return !string.IsNullOrEmpty(a.StringId)
+                && string.Equals(a.StringId, b.StringId, StringComparison.Ordinal);
+        }
 
         public static bool IsArmyAvailableForOrders(Army army)
         {
@@ -30,11 +76,83 @@ namespace ArmyCommander.Helpers
             return true;
         }
 
-        public static bool ShouldShowArmyOverlayForPlayerKingdom()
+
+        public static bool IsPlayerBusy()
         {
-            return Clan.PlayerClan?.Kingdom != null
-                && Clan.PlayerClan.Kingdom.Armies.Count > 0;
+
+            if (
+                (PlayerEncounter.Current != null && !IsSettlementOK(PlayerEncounter.EncounterSettlement)) ||
+                MapEvent.PlayerMapEvent != null ||
+                CampaignMission.Current != null ||
+                PlayerSiege.PlayerSiegeEvent != null
+                ) 
+            {
+                return true;
+            }
+
+            if (
+               IsPartyBusy(MobileParty.MainParty)
+            )
+            {
+                return true;
+            }
+
+
+
+            return false;
         }
+
+        public static bool IsPartyBusy(MobileParty mp)
+        {
+            if (
+                mp.LeaderHero.IsPrisoner ||
+                mp.MapEvent != null ||
+                mp.IsCurrentlyAtSea ||
+                mp.IsInRaftState ||
+                mp.SiegeEvent != null ||
+                !IsSettlementOK(mp.CurrentSettlement) ||
+                mp.IsDisbanding ||
+                Campaign.Current.GetCampaignBehavior<IDisbandPartyCampaignBehavior>()?.IsPartyWaitingForDisband(mp) == true
+            )
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public static bool IsSettlementOK(Settlement settlement)
+        {
+
+            if (settlement == null)
+            {
+                // settlement doesnt exist, is it possibly worse? Not OK!
+                return false;
+            }
+
+            if (settlement.IsVillage)
+            {
+                return settlement.Village.VillageState != Village.VillageStates.BeingRaided;
+            }
+
+            return settlement.IsUnderSiege != true;
+
+        }
+
+
+        public static bool ShouldShowArmyOverlayForPlayer()
+        {
+            if (Clan.PlayerClan?.Kingdom != null)
+            {
+                return Clan.PlayerClan.Kingdom.Armies.Count > 0 && MobileParty.MainParty?.IsActive == true;
+            }
+            else
+            {
+                // In vanilla, always a prisoner if Army != null.
+                return Hero.MainHero.PartyBelongedTo?.Army != null && MobileParty.MainParty?.IsActive == true;
+            }
+        }
+
 
         public static bool IsPlayerKingdomLeader(Army army)
         {
@@ -55,7 +173,7 @@ namespace ArmyCommander.Helpers
 
         public static IEnumerable<MobileParty> get_parties_joining_today(Army army, IEnumerable<MobileParty> all_parties_from_army)
         {
-            return all_parties_from_army.Where(mp =>  mp != army.LeaderParty &&  mp.AttachedTo == null && get_days_distance(mp, army.LeaderParty, mp.Speed) < 1);
+            return all_parties_from_army.Where(mp => mp != army.LeaderParty && mp.AttachedTo == null && get_days_distance(mp, army.LeaderParty, mp.Speed) < 1);
         }
 
 
