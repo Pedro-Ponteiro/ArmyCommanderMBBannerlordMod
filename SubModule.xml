@@ -3,29 +3,43 @@
 	<Name value="Army Commander" />
 	<Id value="ArmyCommander" />
 	<Version value="v2.2.0" />
-	<SingleplayerModule value="true"/>
-	<MultiplayerModule value="false"/>
+	<SingleplayerModule value="true" />
+	<MultiplayerModule value="false" />
 	<ModuleType value="Community" />
+
 	<DependedModules>
-		<DependedModule Id="Native" Optional="false"/>
-		<DependedModule Id="SandBoxCore" Optional="false"/>
-		<DependedModule Id="Sandbox" Optional="false"/>
-		<DependedModule Id="StoryMode" Optional="true"/>
-		<DependedModule Id="NavalDLC" Optional="true"/>
+		<DependedModule Id="Bannerlord.Harmony" Optional="false" />
+		<DependedModule Id="Bannerlord.ButterLib" Optional="false" />
+		<DependedModule Id="Bannerlord.UIExtenderEx" Optional="false" />
+
+		<DependedModule Id="Native" Optional="false" />
+		<DependedModule Id="SandBoxCore" Optional="false" />
+		<DependedModule Id="CustomBattle" Optional="false" />
+		<DependedModule Id="Sandbox" Optional="false" />
+		<DependedModule Id="StoryMode" Optional="true" />
+
+		<DependedModule Id="NavalDLC" Optional="true" />
 	</DependedModules>
+
 	<DependedModuleMetadatas>
 		<DependedModuleMetadata id="Bannerlord.Harmony" order="LoadBeforeThis" />
+		<DependedModuleMetadata id="Bannerlord.ButterLib" order="LoadBeforeThis" />
+		<DependedModuleMetadata id="Bannerlord.UIExtenderEx" order="LoadBeforeThis" />
+
 		<DependedModuleMetadata id="Native" order="LoadBeforeThis" />
 		<DependedModuleMetadata id="SandBoxCore" order="LoadBeforeThis" />
+		<DependedModuleMetadata id="CustomBattle" order="LoadBeforeThis" />
 		<DependedModuleMetadata id="Sandbox" order="LoadBeforeThis" />
 		<DependedModuleMetadata id="StoryMode" order="LoadBeforeThis" optional="true" />
-		<DependedModuleMetadata id="NavalDLC" order="LoadBeforeThis" />
+
+		<DependedModuleMetadata id="NavalDLC" order="LoadBeforeThis" optional="true" />
 	</DependedModuleMetadatas>
+
 	<SubModules>
 		<SubModule>
-			<Name value="Army Commander"/>
-			<DLLName value="ArmyCommander.dll"/>
-			<SubModuleClassType value="ArmyCommander.MySubModule"/>
+			<Name value="Army Commander" />
+			<DLLName value="ArmyCommander.dll" />
+			<SubModuleClassType value="ArmyCommander.MySubModule" />
 			<Tags>
 				<Tag key="DedicatedServerType" value="none" />
 				<Tag key="IsNoRenderModeElement" value="false" />
@@ -33,4 +47,3 @@
 		</SubModule>
 	</SubModules>
 </Module>
-
