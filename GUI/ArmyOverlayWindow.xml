@@ -1,0 +1,157 @@
+<Window>
+    <!-- StackLayout.LayoutMethod="VerticalBottomToTop"  -->
+    <Widget DoNotAcceptEvents="true" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent">
+        <Children>
+
+            <!-- MINHAS COISAS -->
+            <ArmyOverlayWidget DoNotAcceptEvents="true" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" PageControlWidget="ACOverlayWidget\ACGridControlWidget" ArmyListGridWidget="ACOverlayWidget\ACGridControlWidget\ArmiesList" ExtendButton="ACOverlayWidget\ACExtendButtonWidget" IsInfoBarExtended="false" Overlay="ACOverlayWidget" PopupWidget="ACPopupParent\Popup">
+                <Children>
+                    <!--  -->
+                    <!--  -->
+                    <Widget MarginLeft="-40" HorizontalFlip="true" Id="ACOverlayWidget" VisualDefinition="Overlay" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="525" SuggestedHeight="229" HorizontalAlignment="Left" VerticalAlignment="Bottom" PositionYOffset="0" Sprite="SPGeneral\MapOverlay\Army\army_overlay_base">
+                        <Children>
+                            <!-- Top Widgets -->
+                            <BrushListPanel Id="ACArmyOverlayTopControls" WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="40" MarginRight="30" MarginTop="25" Brush="ArmyCommander.TopWidgetsBackground" HorizontalAlignment="Right" StackLayout.LayoutMethod="HorizontalRightToLeft">
+                                <Children>
+                                    <ListPanel MarginRight="70" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" VerticalAlignment="Center">
+                                        <Children>
+                                            <!--Armies Icon-->
+                                            <Widget DoNotAcceptEvents="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedHeight="26" SuggestedWidth="26" VerticalAlignment="Center" Sprite="SPGeneral\MapOverlay\Encounter\WarIcon" Color="#D4AF37FF" />
+
+                                            <!--Armies Label-->
+                                            <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Right" VerticalAlignment="Center" Brush.FontSize="18" Text="@ACArmiesCount" />
+
+                                        </Children>
+                                    </ListPanel>
+
+                                    <ListPanel MarginRight="4" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" VerticalAlignment="Center">
+                                        <Children>
+                                            <!--Man Count Icon-->
+                                            <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="33" SuggestedHeight="30" HorizontalAlignment="Center" VerticalAlignment="Center" MarginLeft="5" Sprite="MapBar\mapbar_icon4" Color="#D4AF37FF" />
+
+                                            <!--Man Count Label-->
+                                            <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Right" VerticalAlignment="Center" Brush.FontSize="18" Text="@ACManCount" />
+                                        </Children>
+                                    </ListPanel>
+
+                                    <ListPanel MarginLeft="8" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" VerticalAlignment="Center">
+                                        <Children>
+                                            <!--Parties Count Icon-->
+                                            <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="28" SuggestedHeight="28" HorizontalAlignment="Center" VerticalAlignment="Center" MarginLeft="5" Sprite="MapBar\mapbar_icon2" Color="#D4AF37FF" />
+
+                                            <!--Parties Count Label-->
+                                            <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Right" VerticalAlignment="Center" Brush.FontSize="18" Text="@ACPartiesCount" />
+                                        </Children>
+                                    </ListPanel>
+                                </Children>
+                            </BrushListPanel>
+
+                            <ContainerPageControlWidget DoNotAcceptEvents="true" Id="ACGridControlWidget" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" MarginTop="70" Container="ArmiesList" ItemPerPage="2" LoopNavigation="true" NextPageButton="ACNextButton" PageText="ACPageText">
+
+                                <!--Army List Scrollable Panel-->
+                                <Children>
+
+                                    <NavigationScopeTargeter ScopeID="ACArmyOverlayGridScope" ScopeParent="..\ArmiesList" ScopeMovements="Horizontal" AlternateScopeMovements="Vertical" ExtendDiscoveryAreaTop="-5" NavigateFromScopeEdges="true" UseDiscoveryAreaAsScopeEdges="true" RightNavigationScope="None" />
+                                    <NavigatableGridWidget DoNotAcceptEvents="true" Id="ArmiesList" DataSource="{ArmyOverlayArmiesList\ArmiesList}" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" MarginLeft="5" DefaultCellWidth="500" DefaultCellHeight="73" ColumnCount="1" MinIndex="0" MaxIndex="1000">
+
+                                        <!-- Army LINHAS -->
+                                        <ItemTemplate>
+
+                                            <ButtonWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="ArmyCommander.ArmyLine.Button" IsSelected="@ForceHovered" Command.Click="ExecuteClickFunction">
+                                                <Children>
+
+                                                    <!--lIST PANEL HORIZONTAL-->
+                                                    <ListPanel DoNotAcceptEvents="true" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" StackLayout.LayoutMethod="HorizontalLeftToRight">
+                                                        <Children>
+                                                            <!-- <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Text="ASDA SDAS D A" /> -->
+                                                            <!-- iMAGEM DO LIDER -->
+                                                            <!-- TODO -->
+                                                            <!-- 73 -->
+                                                            <!-- <Widget VerticalAlignment="Center" WidthSizePolicy="Fixed" SuggestedWidth="73" HeightSizePolicy="Fixed" SuggestedHeight="73"/> -->
+
+
+
+
+                                                            <ImageIdentifierWidget DoNotAcceptEvents="true" MarginLeft="30" VerticalAlignment="Center" Id="CharacterImage" DataSource="{LeaderVisual}" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="72" SuggestedHeight="53" AdditionalArgs="@AdditionalArgs" ImageId="@Id" TextureProviderName="@TextureProviderName" />
+
+                                                            <!-- Propriedades (6, 3 por linha) (420 - 73 w (347) disponivel e 73 h disponivel) > 347/3 = 115 w -->
+                                                            <NavigatableListPanel DoNotAcceptEvents="true" DataSource="{ArmyInfoRows}" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MinIndex="0" MaxIndex="1000" StackLayout.LayoutMethod="VerticalBottomToTop">
+                                                                <ItemTemplate>
+                                                                    <!-- <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Text="ASDA SDAS D A" /> -->
+                                                                    <Widget DoNotAcceptEvents="true" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center">
+                                                                        <Children>
+                                                                            <ListPanel DoNotAcceptEvents="true" DataSource="{ArmyInfosRow}" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren">
+                                                                                <ItemTemplate>
+
+                                                                                    <!-- Elemento de info abaixo -->
+
+                                                                                    <ButtonWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" DoNotPassEventsToChildren="true" Command.Click="ExecuteClickFunction" Command.HoverBegin="ExecuteBeginHint" Command.HoverEnd="ExecuteEndHint">
+                                                                                        <Children>
+                                                                                            <ListPanel Id="InfoBlock" StackLayout.LayoutMethod="HorizontalLeftToRight" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                                                                <Children>
+                                                                                                    <!-- <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Text="ASDA SDAS D A" /> -->
+                                                                                                    <!--Icon-->
+                                                                                                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="27" SuggestedHeight="27" HorizontalAlignment="Right" VerticalAlignment="Center" Sprite="@sprite_path" Color="#D4AF37FF" />
+                                                                                                    <!--Value-->
+                                                                                                    <Widget HorizontalAlignment="Left" VerticalAlignment="Center" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren">
+                                                                                                        <Children>
+                                                                                                            <MapBarCustomValueTextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" MinWidth="20" MaxWidth="115" SuggestedHeight="36" VerticalAlignment="Center" Brush="MapTextBrushWithAnim" Brush.FontSize="20" IsWarning="@IsWarning" NormalColor="#F4E1C4FF" Text="@Value" WarningColor="#DB0808FF" ValueAsInt="1"/>
+                                                                                                        </Children>
+                                                                                                    </Widget>
+                                                                                                    <!-- Change -->
+                                                                                                    <Widget MarginLeft="2" MarginRight="10" HorizontalAlignment="Left" VerticalAlignment="Center" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren">
+                                                                                                        <Children>
+                                                                                                            <ChangeAmountTextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="20" Brush="Settlement.Property.PositiveChange.Text" Amount="@ChangeAmount" NegativeBrushName="Settlement.Property.NegativeChange.Text" PositiveBrushName="Settlement.Property.PositiveChange.Text" Brush.TextHorizontalAlignment="Left" UseParentheses="true"/>
+                                                                                                        </Children>
+                                                                                                    </Widget>
+
+                                                                                                </Children>
+                                                                                            </ListPanel>
+                                                                                        </Children>
+                                                                                    </ButtonWidget>
+
+
+                                                                                </ItemTemplate>
+                                                                            </ListPanel>
+                                                                            <!-- <Widget Id="InfoBlockHintArea" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Sprite="BlankWhiteSquare_9" Color="#FF000044">
+                                                                                                <Children>
+                                                                                                    <HintWidget DataSource="{Hint}" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Command.HoverBegin="ExecuteBeginHint" Command.HoverEnd="ExecuteEndHint" />
+                                                                                                </Children>
+                                                                                            </Widget> -->
+                                                                        </Children>
+                                                                    </Widget>
+
+                                                                </ItemTemplate>
+                                                            </NavigatableListPanel>
+                                                        </Children>
+                                                    </ListPanel>
+                                                </Children>
+                                            </ButtonWidget>
+                                        </ItemTemplate>
+                                    </NavigatableGridWidget>
+
+                                    <ButtonWidget RenderLate="true" Id="ACNextButton" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="29" SuggestedHeight="39" HorizontalAlignment="Right" VerticalAlignment="Top" Brush="ArmyCommander.NextPageButton" />
+                                    <!-- <TextWidget Id="ACPageText" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Right" VerticalAlignment="Top" MarginTop="35" MarginRight="5" Brush="EncounterTextBrush" Brush.FontSize="16" IsDisabled="true" Text="" IsVisible="false" /> -->
+
+                                </Children>
+
+                            </ContainerPageControlWidget>
+
+                            <!-- <Standard.VerticalScrollbar Id="ArmiesListScrollbar" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" HorizontalAlignment="Right" /> -->
+
+                            <NavigationScopeTargeter ScopeID="ACArmyOverlayExtendButtonScope" ScopeParent="..\ACExtendButtonWidget" ScopeMovements="Horizontal" DownNavigationScope="ArmyOverlayExtendButtonScope" LeftNavigationScope="ACArmyOverlayTopControlsScope" FollowMobileTargets="true"/>
+                            <ButtonWidget RenderLate="true" Id="ACExtendButtonWidget" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="41" SuggestedHeight="34" HorizontalAlignment="Right" MarginTop="27" Brush="MapInfoBarExtendButtonBrush" GamepadNavigationIndex="0" MarginRight="50" />
+                        </Children>
+                    </Widget>
+
+                    <!-- FORA DO OVERLAYWIDGET -->
+                    <!--Popup Widget-->
+                    <!-- <OverlayPopup IsVisible="false" Id="ACPopupParent" /> -->
+
+                </Children>
+            </ArmyOverlayWidget>
+
+            <ArmyCommanderOriginalArmyOverlayWidgetPlaceholder />
+        </Children>
+    </Widget>
+</Window>

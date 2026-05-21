@@ -1,0 +1,52 @@
+<!-- Minhas Coisas -->
+<ListPanel IsVisible="@ACIsValidArmySelected" WidthSizePolicy="Fixed" SuggestedWidth="!ArmyManagement.Panel.Left.Width" HeightSizePolicy="Fixed" SuggestedHeight="70" StackLayout.LayoutMethod="VerticalBottomToTop" HorizontalAlignment="Left" VerticalAlignment="Bottom" MarginBottom="30" MarginLeft="60">
+    <Children>
+
+        <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Brush="ArmyManagement.Army.TotalCostAndStrength.Title" Brush.FontSize="35" Text="@ArmyBehaviorDescription" ClipContents="false" HorizontalAlignment="Center" />
+
+
+        <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="35" StackLayout.LayoutMethod="HorizontalLeftToRight" HorizontalAlignment="Center">
+            <Children>
+
+                <!-- Send Influence -->
+                <ListPanel IsVisible="@SendInfluenceEnabled" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" StackLayout.LayoutMethod="VerticalBottomToTop">
+                    <Children>
+
+                        <ButtonWidget Command.Click="ExecuteSendInfluence" DoNotPassEventsToChildren="true" Brush="ArmyManagement.Army.AddCoherenceButton" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent">
+                            <Children>
+                                <TextWidget MarginLeft="18" MarginRight="18" Brush="ArmyManagement.Army.TotalCostAndStrength.Title" Brush.FontSize="15" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" Text="Send 50 Influence" ClipContents="false" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                <!-- <Widget Sprite="General\Icons\Influence@2x" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" /> -->
+                            </Children>
+                        </ButtonWidget>
+                    </Children>
+                </ListPanel>
+
+                <!-- Target Settlement -->
+                <ListPanel IsVisible="@TargetSettlementEnabled" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" StackLayout.LayoutMethod="VerticalBottomToTop">
+                    <Children>
+                        <!-- <TextWidget Brush="ArmyManagement.Army.TotalCostAndStrength.Title" Brush.FontSize="13" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Text="Target Settlement" ClipContents="false" HorizontalAlignment="Center" /> -->
+
+                        <ButtonWidget Command.Click="ExecuteSelectTargetSettlement" DoNotPassEventsToChildren="true" Brush="ArmyManagement.Army.AddCoherenceButton" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent">
+                            <Children>
+                                <TextWidget MarginLeft="18" MarginRight="18" Brush="ArmyManagement.Army.TotalCostAndStrength.Title" Brush.FontSize="15" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" Text="@TargetSettlementName" ClipContents="false" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Children>
+                        </ButtonWidget>
+                    </Children>
+                </ListPanel>
+
+                <!-- Army Behavior -->
+                <ListPanel IsVisible="@ArmyBehaviorEnabled" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" StackLayout.LayoutMethod="VerticalBottomToTop">
+                    <Children>
+                        <!-- <TextWidget Brush="ArmyManagement.Army.TotalCostAndStrength.Title" Brush.FontSize="13" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Text="Army Behavior" ClipContents="false" HorizontalAlignment="Center" /> -->
+
+                        <ButtonWidget DoNotPassEventsToChildren="true" Brush="ArmyManagement.Army.AddCoherenceButton" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" IsDisabled="true">
+                            <Children>
+                                <TextWidget MarginLeft="18" MarginRight="18" Brush="ArmyManagement.Army.TotalCostAndStrength.Title" Brush.FontSize="15" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" Text="@ArmyBehaviorText" ClipContents="false" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Children>
+                        </ButtonWidget>
+                    </Children>
+                </ListPanel>
+            </Children>
+        </ListPanel>
+    </Children>
+</ListPanel>
