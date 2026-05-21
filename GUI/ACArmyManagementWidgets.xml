@@ -1,5 +1,5 @@
 <!-- Minhas Coisas -->
-<ListPanel IsVisible="@ACIsValidArmySelected" WidthSizePolicy="Fixed" SuggestedWidth="!ArmyManagement.Panel.Left.Width" HeightSizePolicy="Fixed" SuggestedHeight="70" StackLayout.LayoutMethod="VerticalBottomToTop" HorizontalAlignment="Left" VerticalAlignment="Bottom" MarginBottom="30" MarginLeft="60">
+<ListPanel IsVisible="@ACIsValidArmySelected" WidthSizePolicy="Fixed" SuggestedWidth="!ArmyManagement.Panel.Left.Width" HeightSizePolicy="Fixed" SuggestedHeight="70" StackLayout.LayoutMethod="VerticalTopToBottom" HorizontalAlignment="Left" VerticalAlignment="Bottom" MarginBottom="30" MarginLeft="60">
     <Children>
 
         <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Brush="ArmyManagement.Army.TotalCostAndStrength.Title" Brush.FontSize="35" Text="@ArmyBehaviorDescription" ClipContents="false" HorizontalAlignment="Center" />

@@ -75,7 +75,7 @@
                                                             <ImageIdentifierWidget DoNotAcceptEvents="true" MarginLeft="30" VerticalAlignment="Center" Id="CharacterImage" DataSource="{LeaderVisual}" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="72" SuggestedHeight="53" AdditionalArgs="@AdditionalArgs" ImageId="@Id" TextureProviderName="@TextureProviderName" />
 
                                                             <!-- Propriedades (6, 3 por linha) (420 - 73 w (347) disponivel e 73 h disponivel) > 347/3 = 115 w -->
-                                                            <NavigatableListPanel DoNotAcceptEvents="true" DataSource="{ArmyInfoRows}" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MinIndex="0" MaxIndex="1000" StackLayout.LayoutMethod="VerticalBottomToTop">
+                                                            <NavigatableListPanel DoNotAcceptEvents="true" DataSource="{ArmyInfoRows}" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MinIndex="0" MaxIndex="1000" StackLayout.LayoutMethod="VerticalTopToBottom">
                                                                 <ItemTemplate>
                                                                     <!-- <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Text="ASDA SDAS D A" /> -->
                                                                     <Widget DoNotAcceptEvents="true" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center">
