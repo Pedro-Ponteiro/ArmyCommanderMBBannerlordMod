@@ -308,4 +308,9 @@
     <Compile Include="UIExtension\UIPatches\ACChatLogPatch.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+
+  <Target Name="DeployModFiles" AfterTargets="Build">
+    <Exec Command='robocopy "$(ProjectDir)GUI" "$(BannerlordDir)\Modules\ArmyCommander\GUI" /MIR /NFL /NDL /NJH /NJS /NP &amp; if %25ERRORLEVEL% LEQ 7 exit 0 else exit %25ERRORLEVEL%' />
+    <Copy SourceFiles="$(ProjectDir)SubModule.xml" DestinationFiles="$(BannerlordDir)\Modules\ArmyCommander\SubModule.xml" OverwriteReadOnlyFiles="true" />
+  </Target>
 </Project>
