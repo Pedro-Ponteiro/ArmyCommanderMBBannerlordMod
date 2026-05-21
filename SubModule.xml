@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Module>
+	<Name value="Army Commander" />
+	<Id value="ArmyCommander" />
+	<Version value="v2.2.0" />
+	<SingleplayerModule value="true"/>
+	<MultiplayerModule value="false"/>
+	<ModuleType value="Community" />
+	<DependedModules>
+		<DependedModule Id="Native" Optional="false"/>
+		<DependedModule Id="SandBoxCore" Optional="false"/>
+		<DependedModule Id="Sandbox" Optional="false"/>
+		<DependedModule Id="StoryMode" Optional="true"/>
+		<DependedModule Id="NavalDLC" Optional="true"/>
+	</DependedModules>
+	<DependedModuleMetadatas>
+		<DependedModuleMetadata id="Bannerlord.Harmony" order="LoadBeforeThis" />
+		<DependedModuleMetadata id="Native" order="LoadBeforeThis" />
+		<DependedModuleMetadata id="SandBoxCore" order="LoadBeforeThis" />
+		<DependedModuleMetadata id="Sandbox" order="LoadBeforeThis" />
+		<DependedModuleMetadata id="StoryMode" order="LoadBeforeThis" optional="true" />
+		<DependedModuleMetadata id="NavalDLC" order="LoadBeforeThis" />
+	</DependedModuleMetadatas>
+	<SubModules>
+		<SubModule>
+			<Name value="Army Commander"/>
+			<DLLName value="ArmyCommander.dll"/>
+			<SubModuleClassType value="ArmyCommander.MySubModule"/>
+			<Tags>
+				<Tag key="DedicatedServerType" value="none" />
+				<Tag key="IsNoRenderModeElement" value="false" />
+			</Tags>
+		</SubModule>
+	</SubModules>
+</Module>
+
