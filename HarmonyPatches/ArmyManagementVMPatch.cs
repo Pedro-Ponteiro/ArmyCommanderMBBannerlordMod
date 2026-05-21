@@ -138,7 +138,7 @@ namespace ArmyCommander.HarmonyPatches
             {
                 ACArmyManagementUIContext.Instance.currentMainParty = Hero.MainHero.PartyBelongedTo;
             }
-            else if (ACArmyOverlayUIContext.Instance.SelectedArmy == null)
+            else if (ACArmyOverlayUIContext.Instance?.SelectedArmy == null)
             {
                 ACArmyManagementUIContext.Instance.currentMainParty = Hero.MainHero.PartyBelongedTo;
             }
@@ -257,7 +257,7 @@ namespace ArmyCommander.HarmonyPatches
             ref bool __result,
             ref TextObject disabledReason)
         {
-            if (ACArmyManagementUIContext.Instance?.mainPartyHasArmy == false)
+            if (ACArmyManagementUIContext.Instance?.mainPartyHasArmy != true)
             {
                 disabledReason = new TextObject("{=iSZTOeYH}No army to disband.");
                 __result = false;

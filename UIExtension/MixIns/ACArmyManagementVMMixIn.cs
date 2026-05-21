@@ -288,7 +288,7 @@ namespace ArmyCommander.UIExtension.MixIns
 
                 ACArmyManagementUIContext.Instance.CurrentArmyManagementVM.RefreshValues();
 
-                ACArmyOverlayUIContext.Instance.CurrentArmyOverlayVMMixIn.UpdateAllArmyLines();
+                ACArmyOverlayUIContext.Instance?.CurrentArmyOverlayVMMixIn.UpdateLeftArmyOverlay();
 
             }
         }

@@ -75,7 +75,7 @@ namespace ArmyCommander.HarmonyPatches
             else if (party.Army != null && party.Army != currentArmy)
             {
                 if (!Hero.MainHero.IsKingdomLeader)
-                { 
+                {
                     // Comportamento normal
                     result = false;
                     explanation = new TextObject("{=aROohsat}Already in another army.");
@@ -103,9 +103,9 @@ namespace ArmyCommander.HarmonyPatches
             else if (__instance.GetPartySizeScore(party) <= Campaign.Current.Models.ArmyManagementCalculationModel.PlayerMobilePartySizeRatioToCallToArmy)
             {
                 result = false;
-                explanation = new TextObject($"{{=!}}Party has less men than {Campaign.Current.Models.ArmyManagementCalculationModel.PlayerMobilePartySizeRatioToCallToArmy:F0}% of it's party size limit.");
+                explanation = new TextObject($"{{=!}}Party has less men than 40% of it's party size limit.");
             }
-            
+
             __result = result;
 
             return false;

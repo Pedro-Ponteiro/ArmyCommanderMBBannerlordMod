@@ -7,10 +7,8 @@ using Bannerlord.UIExtenderEx.Attributes;
 using Bannerlord.UIExtenderEx.ViewModels;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
-using TaleWorlds.CampaignSystem.Map;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.ViewModelCollection.GameMenu.Overlay;
 using TaleWorlds.Library;
@@ -24,7 +22,9 @@ namespace ArmyCommander.UIExtension.MixIns
 
 
         private ACArmyOverlayArmyListVM _ArmyOverlayArmiesList;
-        private MBBindingList<SelectableArmyItemPropertyVM> _ArmyOverlayTopWidgets;
+        private string _ArmiesCount;
+        private string _MenCount;
+        private string _PartiesCount;
 
 
         #region Constructor
@@ -43,14 +43,17 @@ namespace ArmyCommander.UIExtension.MixIns
             {
                 // refresh
                 ACArmyOverlayUIContext.Instance.SelectedArmy = Hero.Find(ACArmyOverlayUIContext.Instance.SelectedArmy.LeaderParty.LeaderHero.StringId).PartyBelongedTo.Army;
-                CampaignEventDispatcher.Instance.OnArmyOverlaySetDirty();
             }
 
-            RenewArmyList(null, refreshOverlay: false);
+            RenewLeftArmyOverlay(null, refreshRightOverlay: false);
+            CampaignEventDispatcher.Instance.OnArmyOverlaySetDirty();
+
+            // TODO: !!!!!!!!!!!!
+            UpdateTopWidgets();
 
             vm.IsInitializationOver = true;
 
-            CampaignEvents.HourlyTickEvent.AddNonSerializedListener(this, UpdateAllArmyLines);
+            CampaignEvents.HourlyTickEvent.AddNonSerializedListener(this, UpdateLeftArmyOverlay);
 
         }
 
@@ -76,10 +79,11 @@ namespace ArmyCommander.UIExtension.MixIns
 
             if (army == ACArmyOverlayUIContext.Instance.SelectedArmy)
             {
-                ACArmyOverlayUIContext.Instance.SelectedArmy = null;
+                ACArmyOverlayUIContext.Instance.SelectedArmy = Clan.PlayerClan.Kingdom.Armies.FirstOrDefault();
             }
 
-            RenewArmyList(new List<Army>() { army});
+            RenewLeftArmyOverlay(new List<Army>() { army});
+            UpdateTopWidgets();
 
 
             if (ArmyOverlayArmiesList.ArmiesCount() == 0)
@@ -106,7 +110,8 @@ namespace ArmyCommander.UIExtension.MixIns
 
             ACArmyOverlayUIContext.Instance.CurrentArmyOverlayVM.IsInitializationOver = false;
 
-            RenewArmyList();
+            RenewLeftArmyOverlay();
+            UpdateTopWidgets();
 
             ACArmyOverlayUIContext.Instance.CurrentArmyOverlayVM.IsInitializationOver = true;
 
@@ -121,8 +126,8 @@ namespace ArmyCommander.UIExtension.MixIns
         {
 
 
-            IEnumerable<MobileParty> all_parties_from_army = ACHelpers.get_all_parties_from_army(army);
-            IEnumerable<MobileParty> parties_joining_today = ACHelpers.get_parties_joining_today(army, all_parties_from_army);
+            List<MobileParty> all_parties_from_army = context.all_parties_from_army;
+            List<MobileParty> parties_joining_today = context.parties_joining_today;
 
             context.LeaderParty = army.LeaderParty;
 
@@ -154,11 +159,17 @@ namespace ArmyCommander.UIExtension.MixIns
         }
 
 
-        public void RenewArmyList(List<Army> excluded_armies = null, bool refreshOverlay = true)
+        public void RenewLeftArmyOverlay(List<Army> excluded_armies = null, bool refreshRightOverlay = true)
         {
             ArmyOverlayArmiesList.ClearLines();
 
-            ACArmyLineUIContext ui_context;
+            ACArmyOverlayUIContext.Instance.ArmiesCount = 0;
+            ACArmyOverlayUIContext.Instance.MenInArmiesCount = 0;
+            ACArmyOverlayUIContext.Instance.MenInKingdomCount = 0;
+            ACArmyOverlayUIContext.Instance.PartiesInArmiesCount = 0;
+            ACArmyOverlayUIContext.Instance.PartiesInKingdomCount = 0;
+
+
 
             foreach (Army army in Clan.PlayerClan.Kingdom.Armies)
             {
@@ -167,30 +178,43 @@ namespace ArmyCommander.UIExtension.MixIns
                     continue;
                 }
 
-                ui_context = new ACArmyLineUIContext();
-                ui_context = UpdateLineContext(ui_context, army);
                 SelectableArmyLineVM army_line_widget = ACArmyLineWidgetBuilders.BuildArmyLine();
-                army_line_widget.UpdateValues(ui_context);
 
                 ArmyOverlayArmiesList.AddLine(army_line_widget);
             }
 
+            ArmyOverlayArmiesList.UpdateValues();
 
-            if (refreshOverlay)
+            if (refreshRightOverlay)
             {
                 MapScreen_OnRefreshState_Patch.RefreshArmyOverlay();
                 CampaignEventDispatcher.Instance.OnArmyOverlaySetDirty();
             }
 
             UpdateLineSelection();
+            
+        }
+
+        private void UpdateTopWidgets()
+        {
+            ACArmiesCount = $"{ACArmyOverlayUIContext.Instance.ArmiesCount}";
+            ACManCount = $"{ACArmyOverlayUIContext.Instance.MenInArmiesCount}/{ACArmyOverlayUIContext.Instance.MenInKingdomCount}";
+            ACPartiesCount = $"{ACArmyOverlayUIContext.Instance.PartiesInArmiesCount}/{ACArmyOverlayUIContext.Instance.PartiesInKingdomCount}";
         }
 
         // on day tick
-        public void UpdateAllArmyLines()
+        public void UpdateLeftArmyOverlay()
         {
             ACArmyOverlayUIContext.Instance.CurrentArmyOverlayVM.IsInitializationOver = false;
 
+            ACArmyOverlayUIContext.Instance.ArmiesCount = 0;
+            ACArmyOverlayUIContext.Instance.MenInArmiesCount = 0;
+            ACArmyOverlayUIContext.Instance.MenInKingdomCount = 0;
+            ACArmyOverlayUIContext.Instance.PartiesInArmiesCount = 0;
+            ACArmyOverlayUIContext.Instance.PartiesInKingdomCount = 0;
+
             ArmyOverlayArmiesList.UpdateValues();
+            UpdateTopWidgets();
 
             ACArmyOverlayUIContext.Instance.CurrentArmyOverlayVM.IsInitializationOver = true;
         }
@@ -218,15 +242,43 @@ namespace ArmyCommander.UIExtension.MixIns
 
 
         [DataSourceProperty]
-        public MBBindingList<SelectableArmyItemPropertyVM> ArmyOverlayTopWidgets
+        public string ACArmiesCount
         {
-            get { return _ArmyOverlayTopWidgets; }
+            get { return _ArmiesCount; }
             set
             {
-                if (!ReferenceEquals(_ArmyOverlayTopWidgets, value))
+                if (_ArmiesCount != value)
                 {
-                    _ArmyOverlayTopWidgets = value;
-                    OnPropertyChangedWithValue(value, "ArmyOverlayTopWidgets");
+                    _ArmiesCount = value;
+                    OnPropertyChangedWithValue(value, "ACArmiesCount");
+                }
+            }
+        }
+
+        [DataSourceProperty]
+        public string ACPartiesCount
+        {
+            get { return _PartiesCount; }
+            set
+            {
+                if (_PartiesCount != value)
+                {
+                    _PartiesCount = value;
+                    OnPropertyChangedWithValue(value, "ACPartiesCount");
+                }
+            }
+        }
+
+        [DataSourceProperty]
+        public string ACManCount
+        {
+            get { return _MenCount; }
+            set
+            {
+                if (_MenCount != value)
+                {
+                    _MenCount = value;
+                    OnPropertyChangedWithValue(value, "ACManCount");
                 }
             }
         }

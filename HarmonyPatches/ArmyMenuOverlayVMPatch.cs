@@ -207,7 +207,7 @@ namespace ArmyCommander.HarmonyPatches
 
             // TODO: FAZER ISSO FICAR MAIS BONITO E ELEGANTE! (A INSTANCIA PODE NÃO EXISTIR QUANDO DEREM UM GET AQUI!)
 
-            // Ajustar conforme o ShouldShowArmyOverlayForPlayer
+            // Ajustar conforme o ShouldShowArmyOverlayForPlayer?
 
             // Antes verificar se uma army já está selecionada (pode ser setada no disband ou army creation)
             if (ACArmyOverlayUIContext.Instance?.SelectedArmy != null)
@@ -284,6 +284,21 @@ namespace ArmyCommander.HarmonyPatches
             {
                 ArmyMenuOverlayVMAccess.SetIsVisualsDirty(__instance, true);
             }
+
+            return false;
+        }
+    }
+
+    // ========================================================================
+    // 6. GetIsPlayerArmyLeader
+    // ========================================================================
+
+    [HarmonyPatch(typeof(ArmyMenuOverlayVM), "GetIsPlayerArmyLeader", new Type[] { typeof(Army) })]
+    internal static class ArmyMenuOverlayVM_GetIsPlayerArmyLeader_Patch
+    {
+        private static bool Prefix(Army army, ref bool __result)
+        {
+            __result = true;
 
             return false;
         }

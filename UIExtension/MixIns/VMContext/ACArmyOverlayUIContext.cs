@@ -48,5 +48,18 @@ namespace ArmyCommander.UIExtension.Context
                 CurrentArmyOverlayVMMixIn.UpdateLineSelection();
             }
         }
+
+        public int ArmiesCount = 0;
+
+        public int PartiesInArmiesCount = 0;
+
+        public int PartiesInKingdomCount = 0;
+
+        public int MenInArmiesCount = 0;
+
+        public int MenInKingdomCount = 0;
+
+
+
     }
 }

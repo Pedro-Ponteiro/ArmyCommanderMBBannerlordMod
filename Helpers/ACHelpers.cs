@@ -106,11 +106,10 @@ namespace ArmyCommander.Helpers
         {
             if (
                 mp.LeaderHero.IsPrisoner ||
-                mp.MapEvent != null ||
                 mp.IsCurrentlyAtSea ||
                 mp.IsInRaftState ||
                 mp.SiegeEvent != null ||
-                !IsSettlementOK(mp.CurrentSettlement) ||
+                (mp.CurrentSettlement != null  && !IsSettlementOK(mp.CurrentSettlement)) ||
                 mp.IsDisbanding ||
                 Campaign.Current.GetCampaignBehavior<IDisbandPartyCampaignBehavior>()?.IsPartyWaitingForDisband(mp) == true
             )

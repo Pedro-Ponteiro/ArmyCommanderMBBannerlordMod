@@ -16,7 +16,7 @@ namespace ArmyCommander.UIExtension.MixIns.VMItems
     {
         private MobileParty _LeaderParty;
         private MBBindingList<SelectableArmyPropertiesRow> _ArmyInfoRows;
-        private Func<ACArmyLineUIContext, MobileParty> _updateLeaderParty;
+        public Func<ACArmyLineUIContext, MobileParty> _updateLeaderParty;
         private CharacterImageIdentifierVM _LeaderVisual;
         private bool _forceHovered;
         private bool _isSelected;

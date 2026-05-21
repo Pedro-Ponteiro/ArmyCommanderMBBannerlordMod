@@ -205,9 +205,8 @@
   <ItemGroup>
     <Compile Include="Actions\ArmyCommanderActions.cs" />
     <Compile Include="CalculationModels\ACCalculationModel.cs" />
-    <Compile Include="Behavior\ArmyCommanderBehavior.cs" />
-    <Compile Include="Behavior\PartyCommanderBehavior.cs" />
     <Compile Include="HarmonyPatches\ArmyMenuOverlayVMPatch.cs" />
+    <Compile Include="HarmonyPatches\ArmyOverlayWidgetPatch.cs" />
     <Compile Include="HarmonyPatches\ArmyPatch.cs" />
     <Compile Include="HarmonyPatches\CampaignUIHelperPatch.cs" />
     <Compile Include="HarmonyPatches\DefaultArmyManagementCalculationModelPatch.cs" />
