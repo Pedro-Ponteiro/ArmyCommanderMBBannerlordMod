@@ -3,7 +3,7 @@ using Bannerlord.UIExtenderEx.Prefabs2;
 
 namespace ArmyCommander.UIExtension.Patches
 {
-    [PrefabExtension("ArmyManagement", @"//Window/Widget/Children/BrushWidget")]
+    [PrefabExtension("ArmyManagement", @"//Window/Widget/Children/BrushWidget/Children")]
     internal sealed class ArmyManagementPatch : PrefabExtensionInsertPatch
     {
         public override InsertType Type
