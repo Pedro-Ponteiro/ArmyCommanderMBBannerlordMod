@@ -5,14 +5,18 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+
     <ProjectGuid>{5FD22BA2-6F50-44E2-9F57-4C8AD47B9127}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+
     <RootNamespace>ArmyCommander</RootNamespace>
     <AssemblyName>ArmyCommander</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+
     <BannerlordDir>C:\Program Files (x86)\Steam\steamapps\common\Mount &amp; Blade II Bannerlord</BannerlordDir>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -32,11 +36,11 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
     <PlatformTarget>x64</PlatformTarget>
     <OutputPath>$(BannerlordDir)\Modules\ArmyCommander\bin\Win64_Shipping_Client\</OutputPath>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
     <PlatformTarget>x64</PlatformTarget>
     <OutputPath>$(BannerlordDir)\Modules\ArmyCommander\bin\Win64_Shipping_Client\</OutputPath>
   </PropertyGroup>
@@ -258,6 +262,7 @@
   <ItemGroup>
     <Compile Include="Actions\ArmyCommanderActions.cs" />
     <Compile Include="CalculationModels\ACCalculationModel.cs" />
+    <Compile Include="HarmonyPatches\ArmyManagementVMPatch.cs" />
     <Compile Include="HarmonyPatches\ArmyMenuOverlayVMPatch.cs" />
     <Compile Include="HarmonyPatches\ArmyOverlayWidgetPatch.cs" />
     <Compile Include="HarmonyPatches\ArmyPatch.cs" />
@@ -266,24 +271,22 @@
     <Compile Include="HarmonyPatches\MapBarVMPatch.cs" />
     <Compile Include="HarmonyPatches\MapScreenPatch.cs" />
     <Compile Include="HarmonyPatches\OpenArmyManagement_All_Patch.cs" />
-    <Compile Include="UIExtension\MixIns\VMItems\ACArmyOverlayArmyListVM.cs" />
-    <Compile Include="UIExtension\MixIns\VMItems\SelectableArmyPropertiesRow.cs" />
-    <Compile Include="UIExtension\UIPatches\ACArmyOverlayArmyListPatch.cs" />
     <Compile Include="Helpers\ACHelpers.cs" />
     <Compile Include="MySubModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="HarmonyPatches\ArmyManagementVMPatch.cs" />
+    <Compile Include="UIExtension\MixIns\ACArmyManagementVMMixIn.cs" />
+    <Compile Include="UIExtension\MixIns\ACOverlayMenuVMMixIn.cs" />
     <Compile Include="UIExtension\MixIns\VMContext\ACArmyLineUIContext.cs" />
     <Compile Include="UIExtension\MixIns\VMContext\ACArmyManagementUIContext.cs" />
-    <Compile Include="UIExtension\MixIns\ACArmyManagementVMMixIn.cs" />
     <Compile Include="UIExtension\MixIns\VMContext\ACArmyOverlayUIContext.cs" />
-    <Compile Include="UIExtension\MixIns\VMItems\SelectableArmyLineVM.cs" />
-    <Compile Include="UIExtension\UIPatches\ACChatLogPatch.cs" />
-    <Compile Include="UIExtension\UIPatches\ACArmyManagementPatch.cs" />
-    <Compile Include="UIExtension\MixIns\ACOverlayMenuVMMixIn.cs" />
-    <Compile Include="UIExtension\MixIns\WidgetBuilders\ACArmyLineWidgetBuilders.cs" />
+    <Compile Include="UIExtension\MixIns\VMItems\ACArmyOverlayArmyListVM.cs" />
     <Compile Include="UIExtension\MixIns\VMItems\SelectableArmyItemPropertyVM.cs" />
+    <Compile Include="UIExtension\MixIns\VMItems\SelectableArmyLineVM.cs" />
+    <Compile Include="UIExtension\MixIns\VMItems\SelectableArmyPropertiesRow.cs" />
+    <Compile Include="UIExtension\MixIns\WidgetBuilders\ACArmyLineWidgetBuilders.cs" />
+    <Compile Include="UIExtension\UIPatches\ACArmyManagementPatch.cs" />
+    <Compile Include="UIExtension\UIPatches\ACArmyOverlayArmyListPatch.cs" />
+    <Compile Include="UIExtension\UIPatches\ACChatLogPatch.cs" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
