@@ -7,7 +7,7 @@ using System.Text;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.MountAndBlade;
-
+// using ArmyCommander.Behavior;
 
 namespace ArmyCommander
 {
@@ -166,7 +166,7 @@ namespace ArmyCommander
                     }
 
                     //Log("Adicionando behavior ArmyCommander");
-                    //campaignGameStarter.AddBehavior(new ArmyCommanderBehavior());
+                    //campaignGameStarter.AddBehavior(new ArmyCommanderBehavior(campaignGameStarter));
                     //Log("Behavior ArmyCommander adicionado");
                 }
                 else
