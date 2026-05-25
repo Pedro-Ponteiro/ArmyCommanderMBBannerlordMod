@@ -277,5 +277,9 @@ namespace ArmyCommander.Helpers
             return 50;
         }
 
+        internal static bool ShouldAllowMercenaryClanToGatherArmy(Clan clan)
+        {
+            return true;
+        }
     }
 }
