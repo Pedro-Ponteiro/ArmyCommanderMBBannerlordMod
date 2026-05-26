@@ -46,13 +46,13 @@
                                 </Children>
                             </BrushListPanel>
 
-                            <ContainerPageControlWidget DoNotAcceptEvents="true" Id="ACGridControlWidget" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" MarginTop="70" Container="ArmiesList" ItemPerPage="2" LoopNavigation="true" NextPageButton="ACNextButton" PageText="ACPageText">
+                            <ContainerPageControlWidget DoNotAcceptEvents="true" Id="ACGridControlWidget" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" MarginTop="70" Container="ArmiesList" ItemPerPage="2" LoopNavigation="true" NextPageButton="ACNextButtonWidget\ACNextButton" PageText="ACNextButtonWidget\ACPageText" MarginLeft="-5">
 
                                 <!--Army List Scrollable Panel-->
                                 <Children>
 
                                     <NavigationScopeTargeter ScopeID="ACArmyOverlayGridScope" ScopeParent="..\ArmiesList" ScopeMovements="Horizontal" AlternateScopeMovements="Vertical" ExtendDiscoveryAreaTop="-5" NavigateFromScopeEdges="true" UseDiscoveryAreaAsScopeEdges="true" RightNavigationScope="None" />
-                                    <NavigatableGridWidget DoNotAcceptEvents="true" Id="ArmiesList" DataSource="{ArmyOverlayArmiesList\ArmiesList}" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" MarginLeft="5" DefaultCellWidth="500" DefaultCellHeight="73" ColumnCount="1" MinIndex="0" MaxIndex="1000">
+                                    <NavigatableGridWidget DoNotAcceptEvents="true" Id="ArmiesList" DataSource="{ArmyOverlayArmiesList\ArmiesList}" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" MarginLeft="0" DefaultCellWidth="500" DefaultCellHeight="73" ColumnCount="1" MinIndex="0" MaxIndex="1000">
 
                                         <!-- Army LINHAS -->
                                         <ItemTemplate>
@@ -61,7 +61,7 @@
                                                 <Children>
 
                                                     <!--lIST PANEL HORIZONTAL-->
-                                                    <ListPanel DoNotAcceptEvents="true" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" StackLayout.LayoutMethod="HorizontalLeftToRight">
+                                                    <ListPanel DoNotAcceptEvents="true" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" StackLayout.LayoutMethod="HorizontalLeftToRight">
                                                         <Children>
                                                             <!-- <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Text="ASDA SDAS D A" /> -->
                                                             <!-- iMAGEM DO LIDER -->
@@ -75,7 +75,7 @@
                                                             <ImageIdentifierWidget DoNotAcceptEvents="true" MarginLeft="30" VerticalAlignment="Center" Id="CharacterImage" DataSource="{LeaderVisual}" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="72" SuggestedHeight="53" AdditionalArgs="@AdditionalArgs" ImageId="@Id" TextureProviderName="@TextureProviderName" />
 
                                                             <!-- Propriedades (6, 3 por linha) (420 - 73 w (347) disponivel e 73 h disponivel) > 347/3 = 115 w -->
-                                                            <NavigatableListPanel DoNotAcceptEvents="true" DataSource="{ArmyInfoRows}" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MinIndex="0" MaxIndex="1000" StackLayout.LayoutMethod="VerticalTopToBottom">
+                                                            <NavigatableListPanel DoNotAcceptEvents="true" DataSource="{ArmyInfoRows}" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" MinIndex="0" MaxIndex="1000" StackLayout.LayoutMethod="VerticalTopToBottom">
                                                                 <ItemTemplate>
                                                                     <!-- <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Text="ASDA SDAS D A" /> -->
                                                                     <Widget DoNotAcceptEvents="true" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center">
@@ -95,7 +95,7 @@
                                                                                                     <!--Value-->
                                                                                                     <Widget HorizontalAlignment="Left" VerticalAlignment="Center" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren">
                                                                                                         <Children>
-                                                                                                            <MapBarCustomValueTextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" MinWidth="20" MaxWidth="115" SuggestedHeight="36" VerticalAlignment="Center" Brush="MapTextBrushWithAnim" Brush.FontSize="20" IsWarning="@IsWarning" NormalColor="#F4E1C4FF" Text="@Value" WarningColor="#DB0808FF" ValueAsInt="1"/>
+                                                                                                            <MapBarCustomValueTextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" MinWidth="20" SuggestedHeight="36" VerticalAlignment="Center" Brush="MapTextBrushWithAnim" Brush.FontSize="20" IsWarning="@IsWarning" NormalColor="#F4E1C4FF" Text="@Value" WarningColor="#DB0808FF" ValueAsInt="1"/>
                                                                                                         </Children>
                                                                                                     </Widget>
                                                                                                     <!-- Change -->
