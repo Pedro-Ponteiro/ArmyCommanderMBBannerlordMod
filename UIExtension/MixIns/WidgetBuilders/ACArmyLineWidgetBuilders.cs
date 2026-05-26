@@ -21,7 +21,7 @@ namespace ArmyCommander.UIExtension.WidgetBuilders
 
         #region Line Builder
 
-        public static SelectableArmyLineVM BuildArmyLine()
+        public static SelectableArmyLineVM BuildArmyLine(bool conservativeLayout = false)
         {
 
             SelectableArmyItemPropertyVM widget_army_parties_text = BuildArmyPartiesWidget();
@@ -37,25 +37,33 @@ namespace ArmyCommander.UIExtension.WidgetBuilders
             SelectableArmyItemPropertyVM widget_army_cohesioncost_text = BuildLostCohesionCostWidget();
 
 
+            MBBindingList<SelectableArmyItemPropertyVM> first_row_items = new MBBindingList<SelectableArmyItemPropertyVM>();
+            MBBindingList<SelectableArmyItemPropertyVM> second_row_items = new MBBindingList<SelectableArmyItemPropertyVM>();
+            first_row_items.Add(widget_army_parties_text);
+            first_row_items.Add(widget_army_men_text);
+
+            if (!conservativeLayout)
+            {
+                first_row_items.Add(widget_army_food_text);
+            }
+            else
+            {
+                second_row_items.Add(widget_army_food_text);
+            }
+
+
+            second_row_items.Add(widget_army_influence_text);
+            second_row_items.Add(widget_army_cohesion_text);
+            second_row_items.Add(widget_army_cohesioncost_text);
+
             SelectableArmyPropertiesRow first_row = new SelectableArmyPropertiesRow(
-                new MBBindingList<SelectableArmyItemPropertyVM>()
-                {
-                        widget_army_parties_text,
-                        widget_army_men_text,
-                        widget_army_food_text
-                }
+                first_row_items
             );
 
 
 
             SelectableArmyPropertiesRow second_row = new SelectableArmyPropertiesRow(
-            
-                new MBBindingList<SelectableArmyItemPropertyVM>()
-                {
-                        widget_army_influence_text,
-                        widget_army_cohesion_text,
-                        widget_army_cohesioncost_text
-                }
+                second_row_items
             );
 
             MBBindingList<SelectableArmyPropertiesRow> rows = new MBBindingList<SelectableArmyPropertiesRow>()

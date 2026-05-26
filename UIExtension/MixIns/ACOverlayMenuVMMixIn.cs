@@ -179,7 +179,10 @@ namespace ArmyCommander.UIExtension.MixIns
                     continue;
                 }
 
-                SelectableArmyLineVM army_line_widget = ACArmyLineWidgetBuilders.BuildArmyLine(army.EstimatedStrength > 3000);
+                bool conservativeLayout = ACHelpers.GetPotentialMenCount(army, ACHelpers.get_all_parties_from_army(army)) > 2000;
+
+
+                SelectableArmyLineVM army_line_widget = ACArmyLineWidgetBuilders.BuildArmyLine(conservativeLayout);
 
                 ArmyOverlayArmiesList.AddLine(army_line_widget);
             }
