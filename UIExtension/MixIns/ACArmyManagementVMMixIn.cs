@@ -306,7 +306,8 @@ namespace ArmyCommander.UIExtension.MixIns
                 affirmativeText: "Select",
                 negativeText: "Cancel",
                 ConfirmTargetSettlementSelection,
-                list => { }
+                list => { },
+                isSeachAvailable: true
                 )
             );
         }
@@ -319,7 +320,7 @@ namespace ArmyCommander.UIExtension.MixIns
             {
                 if (settlement.IsCastle || settlement.IsTown)
                 {
-                    InquiryElement settlement_inq = new InquiryElement(settlement, $"{settlement.Name.ToString()} (Defend)", null);
+                    InquiryElement settlement_inq = new InquiryElement(settlement, $"{settlement.Name.ToString()} (Defend)", new BannerImageIdentifier(Hero.MainHero.Clan.Kingdom.Banner));
                     inquiryElements.Add(settlement_inq);
                 }
             }
@@ -333,7 +334,7 @@ namespace ArmyCommander.UIExtension.MixIns
                     {
                         if (settlement.IsCastle || settlement.IsTown)
                         {
-                            InquiryElement settlement_inq = new InquiryElement(settlement, $"{settlement.Name.ToString()} (Besiege)", null);
+                            InquiryElement settlement_inq = new InquiryElement(settlement, $"{settlement.Name.ToString()} (Besiege)", new BannerImageIdentifier(faction.Banner));
                             inquiryElements.Add(settlement_inq);
                         }
                     }
