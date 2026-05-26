@@ -5,18 +5,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-
     <ProjectGuid>{5FD22BA2-6F50-44E2-9F57-4C8AD47B9127}</ProjectGuid>
     <OutputType>Library</OutputType>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-
     <RootNamespace>ArmyCommander</RootNamespace>
     <AssemblyName>ArmyCommander</AssemblyName>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-
     <BannerlordDir>C:\Program Files (x86)\Steam\steamapps\common\Mount &amp; Blade II Bannerlord</BannerlordDir>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -280,7 +276,9 @@
   <ItemGroup>
     <!-- ArmyCommander source files -->
     <Compile Include="Actions\ArmyCommanderActions.cs" />
+    <Compile Include="BehaviorStore\ArmyCommandsStore.cs" />
     <Compile Include="CalculationModels\ACCalculationModel.cs" />
+    <Compile Include="HarmonyPatches\AiPartyThinkBehaviorPatch.cs" />
     <Compile Include="HarmonyPatches\ArmyManagementVMPatch.cs" />
     <Compile Include="HarmonyPatches\ArmyMenuOverlayVMPatch.cs" />
     <Compile Include="HarmonyPatches\ArmyOverlayWidgetPatch.cs" />
@@ -290,6 +288,7 @@
     <Compile Include="HarmonyPatches\MapBarVMPatch.cs" />
     <Compile Include="HarmonyPatches\MapScreenPatch.cs" />
     <Compile Include="HarmonyPatches\OpenArmyManagement_All_Patch.cs" />
+    <Compile Include="HarmonyPatches\SetPartyAiActionPatch.cs" />
     <Compile Include="Helpers\ACHelpers.cs" />
     <Compile Include="MySubModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -308,9 +307,8 @@
     <Compile Include="UIExtension\UIPatches\ACChatLogPatch.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-
   <Target Name="DeployModFiles" AfterTargets="Build">
-    <Exec Command='robocopy "$(ProjectDir)GUI" "$(BannerlordDir)\Modules\ArmyCommander\GUI" /MIR /NFL /NDL /NJH /NJS /NP &amp; if %25ERRORLEVEL% LEQ 7 exit 0 else exit %25ERRORLEVEL%' />
+    <Exec Command="robocopy &quot;$(ProjectDir)GUI&quot; &quot;$(BannerlordDir)\Modules\ArmyCommander\GUI&quot; /MIR /NFL /NDL /NJH /NJS /NP &amp; if %25ERRORLEVEL% LEQ 7 exit 0 else exit %25ERRORLEVEL%" />
     <Copy SourceFiles="$(ProjectDir)SubModule.xml" DestinationFiles="$(BannerlordDir)\Modules\ArmyCommander\SubModule.xml" OverwriteReadOnlyFiles="true" />
   </Target>
 </Project>

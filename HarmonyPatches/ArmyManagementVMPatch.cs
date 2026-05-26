@@ -12,6 +12,7 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.Extensions;
 using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.CampaignSystem.Siege;
 using TaleWorlds.CampaignSystem.ViewModelCollection;
 using TaleWorlds.CampaignSystem.ViewModelCollection.ArmyManagement;
@@ -20,6 +21,8 @@ using TaleWorlds.Core.ViewModelCollection.Information;
 using TaleWorlds.Core.ViewModelCollection.Tutorial;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
+using static TaleWorlds.MountAndBlade.FormationAI;
+using ArmyCommander.BehaviorStore;
 
 namespace ArmyCommander.HarmonyPatches
 {
@@ -530,6 +533,8 @@ namespace ArmyCommander.HarmonyPatches
                         mbs
                         );
 
+                    ArmyCommandsStore.army_commands[ACArmyManagementUIContext.Instance.currentMainParty.Army] = 
+                        (ACArmyManagementUIContext.Instance.armyBehavior, ACArmyManagementUIContext.Instance.targetSettlement);
                     armyCreated = true;
                 }
 
@@ -540,18 +545,30 @@ namespace ArmyCommander.HarmonyPatches
                         mb.Army = ACArmyManagementUIContext.Instance.currentMainParty.Army;
                     }
 
-
-
                     if (!armyToUse.LeaderParty.IsMainParty)
                     {
+                        if (ACArmyManagementUIContext.Instance.targetSettlement != (Settlement)armyToUse.AiBehaviorObject)
+                        {
 
-                        armyToUse.ArmyType = ACArmyManagementUIContext.Instance.armyBehavior;
+                            ArmyCommandsStore.army_commands[armyToUse] = (ACArmyManagementUIContext.Instance.armyBehavior, ACArmyManagementUIContext.Instance.targetSettlement);
 
-                        armyToUse.Gather(ACArmyManagementUIContext.Instance.targetSettlement);
-
+                            if (!armyToUse.IsWaitingForArmyMembers())
+                            {
+                                if (ACArmyManagementUIContext.Instance.armyBehavior == Army.ArmyTypes.Besieger)
+                                {
+                                    SetPartyAiAction.GetActionForBesiegingSettlement(armyToUse.LeaderParty, ACArmyManagementUIContext.Instance.targetSettlement, armyToUse.LeaderParty.DesiredAiNavigationType, armyToUse.LeaderParty.CurrentSettlement?.HasPort == true);
+                                }
+                                else if (ACArmyManagementUIContext.Instance.armyBehavior == Army.ArmyTypes.Defender)
+                                {
+                                    SetPartyAiAction.GetActionForDefendingSettlement(armyToUse.LeaderParty, ACArmyManagementUIContext.Instance.targetSettlement, armyToUse.LeaderParty.DesiredAiNavigationType, armyToUse.LeaderParty.CurrentSettlement?.HasPort == true, armyToUse.LeaderParty.IsCurrentlyAtSea);
+                                }
+                            }
+                            else
+                            {
+                                armyToUse.Gather(ACArmyManagementUIContext.Instance.targetSettlement);
+                            }
+                        }
                     }
-
-
                 }
                 else if (armyCreated && ACArmyManagementUIContext.Instance.currentMainParty.IsMainParty)
                 {
@@ -563,6 +580,7 @@ namespace ArmyCommander.HarmonyPatches
                 }
 
                 armyToUse = ACArmyManagementUIContext.Instance.currentMainParty.Army;
+
                 if (ACArmyOverlayUIContext.Instance != null)
                 {
                     ACArmyOverlayUIContext.Instance.SelectedArmy = armyToUse;
