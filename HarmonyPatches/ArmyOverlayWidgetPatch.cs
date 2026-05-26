@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using ArmyCommander.UIExtension.Context;
+using HarmonyLib;
 using TaleWorlds.MountAndBlade.GauntletUI.Widgets.Menu.Overlay;
 
 namespace ArmyCommander.HarmonyPatches
@@ -16,6 +17,10 @@ namespace ArmyCommander.HarmonyPatches
             {
                 __instance.Overlay.PositionXOffset = 40f;
                 __instance.ExtendButton.PositionXOffset = 0;
+
+
+                ACArmyOverlayUIContext.Instance.ShouldShowNextPageBtn = __instance.PageControlWidget.PageCount > 1;
+
                 return false;
             }
         }

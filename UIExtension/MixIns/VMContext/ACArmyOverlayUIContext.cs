@@ -59,7 +59,27 @@ namespace ArmyCommander.UIExtension.Context
 
         public int MenInKingdomCount = 0;
 
+        private bool _shouldShowNextPageBtn;
 
+        public bool ShouldShowNextPageBtn
+        {
+            get
+            {
+                return _shouldShowNextPageBtn;
+            }
+            set
+            {
+
+                if (_shouldShowNextPageBtn == value)
+                {
+                    return;
+                }
+
+                _shouldShowNextPageBtn = value;
+
+                CurrentArmyOverlayVMMixIn.UpdateNextButtonVisibility(value);
+            }
+        }
 
     }
 }

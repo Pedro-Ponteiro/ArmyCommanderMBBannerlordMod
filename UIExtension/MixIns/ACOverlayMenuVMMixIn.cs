@@ -25,6 +25,7 @@ namespace ArmyCommander.UIExtension.MixIns
         private string _ArmiesCount;
         private string _MenCount;
         private string _PartiesCount;
+        private bool _shouldShowNextPageButton;
 
 
         #region Constructor
@@ -178,7 +179,7 @@ namespace ArmyCommander.UIExtension.MixIns
                     continue;
                 }
 
-                SelectableArmyLineVM army_line_widget = ACArmyLineWidgetBuilders.BuildArmyLine();
+                SelectableArmyLineVM army_line_widget = ACArmyLineWidgetBuilders.BuildArmyLine(army.EstimatedStrength > 3000);
 
                 ArmyOverlayArmiesList.AddLine(army_line_widget);
             }
@@ -237,8 +238,27 @@ namespace ArmyCommander.UIExtension.MixIns
             CampaignEvents.HourlyTickEvent.ClearListeners(this);
         }
 
+        public void UpdateNextButtonVisibility(bool show)
+        {
+            ShouldShowNextPageButton = show;
+        }
+
 
         #region DataSource Properties
+
+        [DataSourceProperty]
+        public bool ShouldShowNextPageButton
+        {
+            get { return _shouldShowNextPageButton; }
+            set
+            {
+                if (_shouldShowNextPageButton != value)
+                {
+                    _shouldShowNextPageButton = value;
+                    OnPropertyChangedWithValue(value, "ShouldShowNextPageButton");
+                }
+            }
+        }
 
 
         [DataSourceProperty]

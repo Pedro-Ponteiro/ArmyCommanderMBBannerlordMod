@@ -130,14 +130,16 @@
                                         </ItemTemplate>
                                     </NavigatableGridWidget>
 
-                                    <ButtonWidget RenderLate="true" Id="ACNextButton" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="29" SuggestedHeight="39" HorizontalAlignment="Right" VerticalAlignment="Top" Brush="ArmyCommander.NextPageButton" />
-                                    <!-- <TextWidget Id="ACPageText" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Right" VerticalAlignment="Top" MarginTop="35" MarginRight="5" Brush="EncounterTextBrush" Brush.FontSize="16" IsDisabled="true" Text="" IsVisible="false" /> -->
+                                    <ListPanel Id="ACNextButtonWidget" StackLayout.LayoutMethod="VerticalTopToBottom" HorizontalAlignment="Right" VerticalAlignment="Top" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="55" SuggestedHeight="85" Sprite="StdAssets\Popup\progress_bar_slider_knob" Color="#FFFFFFFF" ColorFactor="0.85" IsVisible="@ShouldShowNextPageButton" MarginRight="-15" MarginTop="-18">
+                                        <Children>
+                                            <ButtonWidget RenderLate="true" Id="ACNextButton" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="29" SuggestedHeight="39" HorizontalAlignment="Center" Brush="ArmyCommander.NextPageButton" MarginTop="10" />
+                                            <TextWidget RenderLate="true" Id="ACPageText" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" Brush="EncounterTextBrush" Brush.FontSize="16" IsDisabled="true" Text="" IsVisible="false" />
+                                        </Children>
+                                    </ListPanel>
 
                                 </Children>
 
                             </ContainerPageControlWidget>
-
-                            <!-- <Standard.VerticalScrollbar Id="ArmiesListScrollbar" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" HorizontalAlignment="Right" /> -->
 
                             <NavigationScopeTargeter ScopeID="ACArmyOverlayExtendButtonScope" ScopeParent="..\ACExtendButtonWidget" ScopeMovements="Horizontal" DownNavigationScope="ArmyOverlayExtendButtonScope" LeftNavigationScope="ACArmyOverlayTopControlsScope" FollowMobileTargets="true"/>
                             <ButtonWidget RenderLate="true" Id="ACExtendButtonWidget" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="41" SuggestedHeight="34" HorizontalAlignment="Right" MarginTop="27" Brush="MapInfoBarExtendButtonBrush" GamepadNavigationIndex="0" MarginRight="50" />
