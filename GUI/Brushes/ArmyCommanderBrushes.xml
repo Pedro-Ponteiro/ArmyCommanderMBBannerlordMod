@@ -52,7 +52,7 @@
 
     <Brush Name="ArmyCommander.NextPageButtonBackground">
         <Layers>
-            <BrushLayer Name="Background" Sprite="StdAssets\Popup\progress_bar_slider_knob" IsHidden="false" IsVisible="true" Color="#FFFFFFFF" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <BrushLayer Name="Background" Sprite="StdAssets\Popup\progress_bar_slider_knob" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" IsHidden="false" IsVisible="true" Color="#FFFFFFFF" HorizontalAlignment="Center" VerticalAlignment="Center" />
             <!-- <BrushLayer Name="Arrow" Sprite="StdAssets\arrow_pointing_left" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="29" SuggestedHeight="39" IsHidden="false" IsVisible="true" Color="#FFFFFFFF" HorizontalFlip="true" HorizontalAlignment="Center" VerticalAlignment="Center" /> -->
         </Layers>
         <Styles>
