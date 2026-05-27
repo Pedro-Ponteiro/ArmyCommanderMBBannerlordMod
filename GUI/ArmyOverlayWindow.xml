@@ -13,36 +13,48 @@
                             <!-- Top Widgets -->
                             <BrushListPanel Id="ACArmyOverlayTopControls" WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="40" MarginRight="30" MarginTop="25" Brush="ArmyCommander.TopWidgetsBackground" HorizontalAlignment="Right" StackLayout.LayoutMethod="HorizontalRightToLeft">
                                 <Children>
-                                    <ListPanel MarginRight="70" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" VerticalAlignment="Center">
+                                    <Widget DataSource="{ACArmiesCountHint}" DoNotPassEventsToChildren="true" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Command.HoverBegin="ExecuteBeginHint" Command.HoverEnd="ExecuteEndHint">
                                         <Children>
-                                            <!--Armies Icon-->
-                                            <Widget DoNotAcceptEvents="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedHeight="26" SuggestedWidth="26" VerticalAlignment="Center" Sprite="SPGeneral\MapOverlay\Encounter\WarIcon" Color="#D4AF37FF" />
+                                            <ListPanel MarginRight="70" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" VerticalAlignment="Center">
+                                                <Children>
+                                                    <!--Armies Icon-->
+                                                    <Widget DoNotAcceptEvents="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedHeight="26" SuggestedWidth="26" VerticalAlignment="Center" Sprite="SPGeneral\MapOverlay\Encounter\WarIcon" Color="#D4AF37FF" />
 
-                                            <!--Armies Label-->
-                                            <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Right" VerticalAlignment="Center" Brush.FontSize="18" Text="@ACArmiesCount" />
+                                                    <!--Armies Label-->
+                                                    <TextWidget DataSource="{..}" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Right" VerticalAlignment="Center" Brush.FontSize="18" Text="@ACArmiesCount" />
 
+                                                </Children>
+                                            </ListPanel>
                                         </Children>
-                                    </ListPanel>
+                                    </Widget>
 
-                                    <ListPanel MarginRight="4" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" VerticalAlignment="Center">
+                                    <Widget DataSource="{ACManCountHint}" DoNotPassEventsToChildren="true" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Command.HoverBegin="ExecuteBeginHint" Command.HoverEnd="ExecuteEndHint">
                                         <Children>
-                                            <!--Man Count Icon-->
-                                            <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="33" SuggestedHeight="30" HorizontalAlignment="Center" VerticalAlignment="Center" MarginLeft="5" Sprite="MapBar\mapbar_icon4" Color="#D4AF37FF" />
+                                            <ListPanel MarginRight="4" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" VerticalAlignment="Center">
+                                                <Children>
+                                                    <!--Man Count Icon-->
+                                                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="33" SuggestedHeight="30" HorizontalAlignment="Center" VerticalAlignment="Center" MarginLeft="5" Sprite="MapBar\mapbar_icon4" Color="#D4AF37FF" />
 
-                                            <!--Man Count Label-->
-                                            <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Right" VerticalAlignment="Center" Brush.FontSize="18" Text="@ACManCount" />
+                                                    <!--Man Count Label-->
+                                                    <TextWidget DataSource="{..}" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Right" VerticalAlignment="Center" Brush.FontSize="18" Text="@ACManCount" />
+                                                </Children>
+                                            </ListPanel>
                                         </Children>
-                                    </ListPanel>
+                                    </Widget>
 
-                                    <ListPanel MarginLeft="8" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" VerticalAlignment="Center">
+                                    <Widget DataSource="{ACPartiesCountHint}" DoNotPassEventsToChildren="true" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Command.HoverBegin="ExecuteBeginHint" Command.HoverEnd="ExecuteEndHint">
                                         <Children>
-                                            <!--Parties Count Icon-->
-                                            <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="28" SuggestedHeight="28" HorizontalAlignment="Center" VerticalAlignment="Center" MarginLeft="5" Sprite="MapBar\mapbar_icon2" Color="#D4AF37FF" />
+                                            <ListPanel MarginLeft="8" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" VerticalAlignment="Center">
+                                                <Children>
+                                                    <!--Parties Count Icon-->
+                                                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="28" SuggestedHeight="28" HorizontalAlignment="Center" VerticalAlignment="Center" MarginLeft="5" Sprite="MapBar\mapbar_icon2" Color="#D4AF37FF" />
 
-                                            <!--Parties Count Label-->
-                                            <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Right" VerticalAlignment="Center" Brush.FontSize="18" Text="@ACPartiesCount" />
+                                                    <!--Parties Count Label-->
+                                                    <TextWidget DataSource="{..}" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Right" VerticalAlignment="Center" Brush.FontSize="18" Text="@ACPartiesCount" />
+                                                </Children>
+                                            </ListPanel>
                                         </Children>
-                                    </ListPanel>
+                                    </Widget>
                                 </Children>
                             </BrushListPanel>
 

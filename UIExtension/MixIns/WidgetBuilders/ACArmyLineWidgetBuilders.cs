@@ -102,7 +102,7 @@ namespace ArmyCommander.UIExtension.WidgetBuilders
                 (c) => false,
                 (c) => $"{c.AttachedPartiesCount}/{c.TotalAssignedPartiesCount}",
                 (c) => c.PartiesWithinADayDistanceCount,
-                (c) => null
+                (c) => ACHintHelpers.GetArmyPartiesTooltipVM(c)
                 );
 
             return item;
@@ -115,7 +115,7 @@ namespace ArmyCommander.UIExtension.WidgetBuilders
                 (c) => false,
                 (c) => $"{c.MenCount}/{c.PotentialMenCount}",
                 (c) => c.MenJoiningToday,
-                (c) => new BasicTooltipViewModel(() => CampaignUIHelper.GetArmyManCountTooltip(c.LeaderParty.Army))
+                (c) => ACHintHelpers.GetArmyManCountTooltipVM(c)
                 );
 
             return item;
@@ -128,7 +128,7 @@ namespace ArmyCommander.UIExtension.WidgetBuilders
                 (c) => c.CurrentArmyFood + c.TotalArmyFoodChange < 0,
                 (c) => $"{c.CurrentArmyFood:F0}/{c.TotalArmyFood:F0}",
                 (c) => (int)c.TotalArmyFoodChange,
-                (c) => new BasicTooltipViewModel(() => CampaignUIHelper.GetArmyFoodTooltip(c.LeaderParty.Army))
+                (c) => ACHintHelpers.GetArmyFoodTooltipVM(c)
                 );
 
             return item;
@@ -141,7 +141,7 @@ namespace ArmyCommander.UIExtension.WidgetBuilders
                 (c) => c.CurrentArmyInfluence + c.DailyArmyInfluenceChange < 0,
                 (c) => $"{c.CurrentArmyInfluence:F0}",
                 (c) => (int)c.DailyArmyInfluenceChange,
-                (c) => new BasicTooltipViewModel(() => CampaignUIHelper.GetInfluenceTooltip(c.LeaderParty.ActualClan))
+                (c) => ACHintHelpers.GetInfluenceTooltipVM(c)
                 );
 
             return item;
@@ -154,7 +154,7 @@ namespace ArmyCommander.UIExtension.WidgetBuilders
                 (c) => c.CurrentCohesion + c.DailyCohesionChange < 0,
                 (c) => $"{c.CurrentCohesion:F0}",
                 (c) => (int)c.DailyCohesionChange,
-                (c) => new BasicTooltipViewModel(() => CampaignUIHelper.GetArmyCohesionTooltip(c.LeaderParty.Army))
+                (c) => ACHintHelpers.GetCohesionTooltipVM(c)
                 );
 
             return item;
@@ -167,7 +167,7 @@ namespace ArmyCommander.UIExtension.WidgetBuilders
                 (c) => c.CurrentArmyInfluence - c.LostCohesionCostValue < 0,
                 (c) => $"{c.LostCohesionCostValue}",
                 (c) => 0,
-                (c) => null
+                (c) => ACHintHelpers.GetLostCohesionCostTooltipVM(c)
                 );
             return item;
         }

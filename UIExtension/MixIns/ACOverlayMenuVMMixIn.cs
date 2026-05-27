@@ -1,5 +1,5 @@
-﻿using ArmyCommander.Helpers;
-using ArmyCommander.HarmonyPatches;
+﻿using ArmyCommander.HarmonyPatches;
+using ArmyCommander.Helpers;
 using ArmyCommander.UIExtension.Context;
 using ArmyCommander.UIExtension.MixIns.VMItems;
 using ArmyCommander.UIExtension.WidgetBuilders;
@@ -11,6 +11,7 @@ using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.ViewModelCollection.GameMenu.Overlay;
+using TaleWorlds.Core.ViewModelCollection.Information;
 using TaleWorlds.Library;
 
 
@@ -26,6 +27,9 @@ namespace ArmyCommander.UIExtension.MixIns
         private string _MenCount;
         private string _PartiesCount;
         private bool _shouldShowNextPageButton;
+        private BasicTooltipViewModel _ArmiesCountHint;
+        private BasicTooltipViewModel _ManCountHint;
+        private BasicTooltipViewModel _PartiesCountHint;
 
 
         #region Constructor
@@ -204,6 +208,10 @@ namespace ArmyCommander.UIExtension.MixIns
             ACArmiesCount = $"{ACArmyOverlayUIContext.Instance.ArmiesCount}";
             ACManCount = $"{ACArmyOverlayUIContext.Instance.MenInArmiesCount}/{ACArmyOverlayUIContext.Instance.MenInKingdomCount}";
             ACPartiesCount = $"{ACArmyOverlayUIContext.Instance.PartiesInArmiesCount}/{ACArmyOverlayUIContext.Instance.PartiesInKingdomCount}";
+
+            ACArmiesCountHint = ACHintHelpers.GetKingdomArmiesTooltipVM(ACArmyOverlayUIContext.Instance);
+            ACManCountHint = ACHintHelpers.GetKingdomManCountTooltipVM(ACArmyOverlayUIContext.Instance);
+            ACPartiesCountHint = ACHintHelpers.GetKingdomPartiesTooltipVM(ACArmyOverlayUIContext.Instance);
         }
 
         // on day tick
@@ -259,6 +267,49 @@ namespace ArmyCommander.UIExtension.MixIns
                 {
                     _shouldShowNextPageButton = value;
                     OnPropertyChangedWithValue(value, "ShouldShowNextPageButton");
+                }
+            }
+        }
+
+
+        [DataSourceProperty]
+        public BasicTooltipViewModel ACArmiesCountHint
+        {
+            get { return _ArmiesCountHint; }
+            set
+            {
+                if (_ArmiesCountHint != value)
+                {
+                    _ArmiesCountHint = value;
+                    OnPropertyChangedWithValue(value, "ACArmiesCountHint");
+                }
+            }
+        }
+
+        [DataSourceProperty]
+        public BasicTooltipViewModel ACManCountHint
+        {
+            get { return _ManCountHint; }
+            set
+            {
+                if (_ManCountHint != value)
+                {
+                    _ManCountHint = value;
+                    OnPropertyChangedWithValue(value, "ACManCountHint");
+                }
+            }
+        }
+
+        [DataSourceProperty]
+        public BasicTooltipViewModel ACPartiesCountHint
+        {
+            get { return _PartiesCountHint; }
+            set
+            {
+                if (_PartiesCountHint != value)
+                {
+                    _PartiesCountHint = value;
+                    OnPropertyChangedWithValue(value, "ACPartiesCountHint");
                 }
             }
         }
