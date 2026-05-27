@@ -73,7 +73,7 @@ namespace ArmyCommander.Helpers
 
                 default_list.Add(new TooltipProperty("", "", 0, onlyShowWhenExtended: false, TooltipProperty.TooltipPropertyFlags.DefaultSeperator));
 
-                default_list.Add(new TooltipProperty("All Kingdom Troops", (context.MenInKingdomCount - context.MenInArmiesCount).ToString(), 0));
+                default_list.Add(new TooltipProperty("All Kingdom Troops", context.MenInKingdomCount.ToString(), 0));
                 default_list.Add(new TooltipProperty("", "", 0, onlyShowWhenExtended: false, TooltipProperty.TooltipPropertyFlags.RundownSeperator));
 
                 // list troop count for each type.
