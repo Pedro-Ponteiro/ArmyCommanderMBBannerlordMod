@@ -277,9 +277,48 @@ namespace ArmyCommander.Helpers
             return 50;
         }
 
-        internal static bool ShouldAllowMercenaryClanToGatherArmy(Clan clan)
+        public static bool ShouldAllowMercenaryClanToGatherArmy(Clan clan)
         {
             return true;
+        }
+
+        public static Dictionary<FormationClass, (int TroopsInArmies, int TroopsInKingdom)> GetTroopTypeCountDict(IFaction faction)
+        {
+
+            Dictionary<FormationClass, (int TroopsInArmies, int TroopsInKingdom)> troopTypeCountDict = new Dictionary<FormationClass, (int TroopsInArmies, int TroopsInKingdom)>();
+            FormationClass[] formationClassValues = FormationClassExtensions.FormationClassValues;
+            foreach (FormationClass formationClass in formationClassValues)
+            {
+                troopTypeCountDict[formationClass] = (TroopsInArmies: 0, TroopsInKingdom: 0);
+            }
+
+
+            var mp_list = faction.WarPartyComponents.Select((wpc) => wpc.MobileParty);
+
+            foreach (var party in mp_list)
+            {
+                if (party.IsLordParty && party.IsActive)
+                {
+                    foreach (var memberRoster in party.MemberRoster.GetTroopRoster())
+                    {
+                        FormationClass formationClass = memberRoster.Character.DefaultFormationClass;
+
+                        var dictValues = troopTypeCountDict[formationClass];
+
+                        int healthyTroopsCount = memberRoster.Number - memberRoster.WoundedNumber;
+
+                        if (party.Army != null)
+                        {
+                            dictValues.TroopsInArmies += healthyTroopsCount;
+                        }
+
+                        dictValues.TroopsInKingdom += healthyTroopsCount;
+
+                        troopTypeCountDict[formationClass] = dictValues;
+                    }
+                }
+            }
+            return troopTypeCountDict;
         }
     }
 }
