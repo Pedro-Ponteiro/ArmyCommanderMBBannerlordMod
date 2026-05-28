@@ -99,8 +99,8 @@ namespace ArmyCommander.UIExtension.MixIns.VMItems
         {
 
             _leaderParty = context.LeaderParty;
-            _visual = _updateVisual(context);
-            _banner_9 = _updateBanner(context);
+            Visual = _updateVisual(context);
+            Banner_9 = _updateBanner(context);
             
 
             RefreshValues();
