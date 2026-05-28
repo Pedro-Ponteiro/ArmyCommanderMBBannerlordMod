@@ -104,16 +104,16 @@
                                                             <NavigatableListPanel DoNotAcceptEvents="true" DataSource="{ArmyInfoRows}" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MinIndex="0" MaxIndex="1000" StackLayout.LayoutMethod="VerticalTopToBottom" HorizontalAlignment="Center">
                                                                 <ItemTemplate>
                                                                     <!-- <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Text="ASDA SDAS D A" /> -->
-                                                                    <Widget DoNotAcceptEvents="true" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center">
+                                                                    <Widget DoNotAcceptEvents="true" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center">
                                                                         <Children>
-                                                                            <ListPanel DoNotAcceptEvents="true" DataSource="{ArmyInfosRow}" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center">
+                                                                            <ListPanel DoNotAcceptEvents="true" DataSource="{ArmyInfosRow}" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" ClipContents="true" MarginRight="20" MarginLeft="1" StackLayout.LayoutMethod="HorizontalCentered">
                                                                                 <ItemTemplate>
 
                                                                                     <!-- Elemento de info abaixo -->
 
                                                                                     <ButtonWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" DoNotPassEventsToChildren="true" Command.Click="ExecuteClickFunction" Command.HoverBegin="ExecuteBeginHint" Command.HoverEnd="ExecuteEndHint" HorizontalAlignment="Center">
                                                                                         <Children>
-                                                                                            <ListPanel Id="InfoBlock" StackLayout.LayoutMethod="HorizontalLeftToRight" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                                                            <ListPanel StackLayout.LayoutMethod="HorizontalLeftToRight" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" VerticalAlignment="Center">
                                                                                                 <Children>
                                                                                                     <!-- <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Text="ASDA SDAS D A" /> -->
                                                                                                     <!--Icon-->
