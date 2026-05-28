@@ -299,6 +299,7 @@
     <Compile Include="UIExtension\MixIns\VMContext\ACArmyOverlayUIContext.cs" />
     <Compile Include="UIExtension\MixIns\VMItems\ACArmyOverlayArmyListVM.cs" />
     <Compile Include="UIExtension\MixIns\VMItems\SelectableArmyItemPropertyVM.cs" />
+    <Compile Include="UIExtension\MixIns\VMItems\SelectableArmyLeaderVisualVM.cs" />
     <Compile Include="UIExtension\MixIns\VMItems\SelectableArmyLineVM.cs" />
     <Compile Include="UIExtension\MixIns\VMItems\SelectableArmyPropertiesRow.cs" />
     <Compile Include="UIExtension\MixIns\WidgetBuilders\ACArmyLineWidgetBuilders.cs" />

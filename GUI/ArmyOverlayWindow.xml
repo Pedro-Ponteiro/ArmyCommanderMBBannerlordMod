@@ -13,7 +13,7 @@
                             <!-- Top Widgets -->
                             <BrushListPanel Id="ACArmyOverlayTopControls" WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="40" MarginRight="30" MarginTop="25" Brush="ArmyCommander.TopWidgetsBackground" HorizontalAlignment="Right" StackLayout.LayoutMethod="HorizontalRightToLeft">
                                 <Children>
-                                    <Widget DataSource="{ACArmiesCountHint}" DoNotPassEventsToChildren="true" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Command.HoverBegin="ExecuteBeginHint" Command.HoverEnd="ExecuteEndHint">
+                                    <Widget DataSource="{ACArmiesCountHint}" DoNotPassEventsToChildren="true" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Command.HoverBegin="ExecuteBeginHint" Command.HoverEnd="ExecuteEndHint" VerticalAlignment="Center">
                                         <Children>
                                             <ListPanel MarginRight="70" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" VerticalAlignment="Center">
                                                 <Children>
@@ -28,7 +28,7 @@
                                         </Children>
                                     </Widget>
 
-                                    <Widget DataSource="{ACManCountHint}" DoNotPassEventsToChildren="true" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Command.HoverBegin="ExecuteBeginHint" Command.HoverEnd="ExecuteEndHint">
+                                    <Widget DataSource="{ACManCountHint}" DoNotPassEventsToChildren="true" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Command.HoverBegin="ExecuteBeginHint" Command.HoverEnd="ExecuteEndHint" VerticalAlignment="Center">
                                         <Children>
                                             <ListPanel MarginRight="4" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" VerticalAlignment="Center">
                                                 <Children>
@@ -42,7 +42,7 @@
                                         </Children>
                                     </Widget>
 
-                                    <Widget DataSource="{ACPartiesCountHint}" DoNotPassEventsToChildren="true" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Command.HoverBegin="ExecuteBeginHint" Command.HoverEnd="ExecuteEndHint">
+                                    <Widget DataSource="{ACPartiesCountHint}" DoNotPassEventsToChildren="true" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Command.HoverBegin="ExecuteBeginHint" Command.HoverEnd="ExecuteEndHint" VerticalAlignment="Center">
                                         <Children>
                                             <ListPanel MarginLeft="8" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" VerticalAlignment="Center">
                                                 <Children>
@@ -84,7 +84,21 @@
 
 
 
-                                                            <ImageIdentifierWidget DoNotAcceptEvents="true" MarginLeft="30" VerticalAlignment="Center" Id="CharacterImage" DataSource="{LeaderVisual}" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="72" SuggestedHeight="53" AdditionalArgs="@AdditionalArgs" ImageId="@Id" TextureProviderName="@TextureProviderName" />
+                                                            <!-- <ImageIdentifierWidget DoNotAcceptEvents="true" MarginLeft="30" VerticalAlignment="Center" Id="CharacterImage" DataSource="{LeaderVisual}" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="72" SuggestedHeight="53" AdditionalArgs="@AdditionalArgs" ImageId="@Id" TextureProviderName="@TextureProviderName" /> -->
+
+                                                            <Widget DataSource="{LeaderVisualVM}" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="72" SuggestedHeight="53" VerticalAlignment="Center" MarginLeft="30">
+                                                                <Children>
+                                                                    <ButtonWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="Encyclopedia.NoAudioButton" DoNotPassEventsToChildren="true" Command.Click="ExecuteLink" Command.HoverBegin="ExecuteBeginHint" Command.HoverEnd="ExecuteEndHint">
+                                                                        <Children>
+                                                                            <MaskedTextureWidget DataSource="{Banner_9}" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="32" SuggestedHeight="42" HorizontalAlignment="Right" VerticalAlignment="Top" Brush="Flat.Tuple.Banner.Small.Hero" AdditionalArgs="@AdditionalArgs" ImageId="@Id" TextureProviderName="@TextureProviderName" IsDisabled="true" />
+                                                                            <ImageIdentifierWidget DataSource="{Visual}" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" AdditionalArgs="@AdditionalArgs" ImageId="@Id" TextureProviderName="@TextureProviderName" />
+                                                                        </Children>
+                                                                    </ButtonWidget>
+
+                                                                    <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="28" SuggestedHeight="16" HorizontalAlignment="Right" VerticalAlignment="Bottom" Brush="ShowOnMap.Button" Command.Click="ExecuteShowOnMap" IsEnabled="true" GamepadNavigationIndex="0" />
+
+                                                                </Children>
+                                                            </Widget>
 
                                                             <!-- Propriedades (6, 3 por linha) (420 - 73 w (347) disponivel e 73 h disponivel) > 347/3 = 115 w -->
                                                             <NavigatableListPanel DoNotAcceptEvents="true" DataSource="{ArmyInfoRows}" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" MinIndex="0" MaxIndex="1000" StackLayout.LayoutMethod="VerticalTopToBottom">

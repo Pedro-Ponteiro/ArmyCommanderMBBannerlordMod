@@ -17,7 +17,7 @@ namespace ArmyCommander.UIExtension.MixIns.VMItems
         private MobileParty _LeaderParty;
         private MBBindingList<SelectableArmyPropertiesRow> _ArmyInfoRows;
         public Func<ACArmyLineUIContext, MobileParty> _updateLeaderParty;
-        private CharacterImageIdentifierVM _LeaderVisual;
+        private SelectableArmyLeaderVisualVM _LeaderVisualVM;
         private bool _forceHovered;
         private bool _isSelected;
 
@@ -50,18 +50,18 @@ namespace ArmyCommander.UIExtension.MixIns.VMItems
         }
 
         [DataSourceProperty]
-        public CharacterImageIdentifierVM LeaderVisual
+        public SelectableArmyLeaderVisualVM LeaderVisualVM
         {
             get
             {
-                return _LeaderVisual;
+                return _LeaderVisualVM;
             }
             set
             {
-                if (value != _LeaderVisual)
+                if (value != _LeaderVisualVM)
                 {
-                    _LeaderVisual = value;
-                    OnPropertyChangedWithValue(this, "LeaderVisual");
+                    _LeaderVisualVM = value;
+                    OnPropertyChangedWithValue(this, "LeaderVisualVM");
                 }
             }
         }
@@ -155,8 +155,19 @@ namespace ArmyCommander.UIExtension.MixIns.VMItems
             if (new_leader != LeaderParty)
             {
                 LeaderParty = new_leader;
-                CharacterCode characterCode = CampaignUIHelper.GetCharacterCode(LeaderParty.LeaderHero.CharacterObject);
-                LeaderVisual = new CharacterImageIdentifierVM(characterCode);
+
+                LeaderVisualVM = new SelectableArmyLeaderVisualVM(
+                    new_leader,
+                    (c) =>
+                    {
+                        return new CharacterImageIdentifierVM(CampaignUIHelper.GetCharacterCode(c.LeaderParty.LeaderHero.CharacterObject));
+                    },
+                    (c) =>
+                    {
+                        return new BannerImageIdentifierVM(c.LeaderParty.ActualClan.Banner, nineGrid: true);
+                    });
+
+                LeaderVisualVM.UpdateValues(context);
             }
 
             context.registerLineVM(this);
