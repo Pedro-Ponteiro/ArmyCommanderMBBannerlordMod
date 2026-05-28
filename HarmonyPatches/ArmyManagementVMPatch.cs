@@ -1,4 +1,5 @@
-﻿using ArmyCommander.Helpers;
+﻿using ArmyCommander.BehaviorStore;
+using ArmyCommander.Helpers;
 using ArmyCommander.UIExtension;
 using ArmyCommander.UIExtension.Context;
 using HarmonyLib;
@@ -11,6 +12,7 @@ using System.Runtime.CompilerServices;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.Extensions;
+using TaleWorlds.CampaignSystem.GameState;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.CampaignSystem.Siege;
@@ -22,7 +24,6 @@ using TaleWorlds.Core.ViewModelCollection.Tutorial;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using static TaleWorlds.MountAndBlade.FormationAI;
-using ArmyCommander.BehaviorStore;
 
 namespace ArmyCommander.HarmonyPatches
 {
@@ -234,10 +235,8 @@ namespace ArmyCommander.HarmonyPatches
 
             __instance.SortControllerVM = new ArmyManagementSortControllerVM(PartyListRef(__instance));
 
-            __instance.PartiesInCart = GetOrderedPartiesInCart(__instance);
-            __instance.SortControllerVM.CostState = 0;
-            __instance.SortControllerVM.ExecuteSortByCost();
-
+            OrderPartiesInPlace(__instance.PartiesInCart);
+            OrderPartiesInPlace(__instance.PartyList);
 
             OriginalOnRefresh(__instance);
             __instance.RefreshValues();
@@ -281,20 +280,72 @@ namespace ArmyCommander.HarmonyPatches
         }
 
 
-        private static MBBindingList<ArmyManagementItemVM> GetOrderedPartiesInCart(ArmyManagementVM __instance)
+        private static void OrderPartiesInPlace(MBBindingList<ArmyManagementItemVM> party_list)
         {
-            var sortedPartiesInCart = new MBBindingList<ArmyManagementItemVM>();
+            var orderedParties = party_list
+                .OrderBy(item => GetPartySortPriority(item))
+                .ThenByDescending(item => item.Party.Party.EstimatedStrength)
+                .ToList();
 
-            foreach (var item in __instance.PartiesInCart
-                .OrderByDescending(item =>
-                    item.Party.Army != null &&
-                    item.Party.Army.LeaderParty == item.Party)
-                .ThenByDescending(item => item.Party.Party.EstimatedStrength))
+            party_list.Clear();
+
+            foreach (var item in orderedParties)
             {
-                sortedPartiesInCart.Add(item);
+                party_list.Add(item);
+            }
+        }
+
+        private static int GetPartySortPriority(ArmyManagementItemVM item)
+        {
+            var party = item.Party;
+
+            // 1º MainHero / MainParty
+
+
+            if (item.IsInCart)
+            {
+                if (party == ACArmyManagementUIContext.Instance.currentMainParty)
+                {
+                    return 0;
+                }
+                return 1;
             }
 
-            return sortedPartiesInCart;
+            if (party == MobileParty.MainParty)
+            {
+                return 2;
+            }
+
+            // 2º Army Leaders
+            if (party.Army != null && party.Army.LeaderParty == party)
+            {
+                return 3;
+            }
+
+            // 3º Parties que não têm army
+            if (item.IsEligible)
+            {
+                return 4;
+            }
+
+            // 4º Parties que têm army, mas não são army leaders
+            return 5;
+        }
+
+        private static void ResetSortController(ArmyManagementVM __instance)
+        {
+            __instance.SortControllerVM.DistanceState = 0;
+            __instance.SortControllerVM.CostState = 0;
+            __instance.SortControllerVM.StrengthState = 0;
+            __instance.SortControllerVM.NameState = 0;
+            __instance.SortControllerVM.ClanState = 0;
+            __instance.SortControllerVM.ShipCountState = 0;
+            __instance.SortControllerVM.IsDistanceSelected = false;
+            __instance.SortControllerVM.IsCostSelected = false;
+            __instance.SortControllerVM.IsNameSelected = false;
+            __instance.SortControllerVM.IsClanSelected = false;
+            __instance.SortControllerVM.IsStrengthSelected = false;
+            __instance.SortControllerVM.IsShipCountSelected = false;
         }
 
         private static void OnFirstPartyAdded(ArmyManagementVM __instance, ArmyManagementItemVM armyItem)
@@ -351,12 +402,10 @@ namespace ArmyCommander.HarmonyPatches
             }
 
 
-            __instance.PartiesInCart = GetOrderedPartiesInCart(__instance);
-            __instance.SortControllerVM.CostState = 0;
-            __instance.SortControllerVM.ExecuteSortByCost();
+            ResetSortController(__instance);
+            OrderPartiesInPlace(__instance.PartiesInCart);
+            OrderPartiesInPlace(__instance.PartyList);
             __instance.RefreshValues();
-
-
         }
 
         private static void OnArmyLeaderRemoved(ArmyManagementVM __instance)
@@ -398,13 +447,11 @@ namespace ArmyCommander.HarmonyPatches
             }
 
             __instance.TotalCost = InfluenceSpentForCohesionBoostingRef(__instance);
-            __instance.SortControllerVM.CostState = 0;
-            __instance.SortControllerVM.ExecuteSortByCost();
+            ResetSortController(__instance);
+
+            OrderPartiesInPlace(__instance.PartyList);
             __instance.RefreshValues();
-
         }
-
-
 
         private static void CustomOnAddToCart(ArmyManagementVM __instance, ArmyManagementItemVM armyItem)
         {
