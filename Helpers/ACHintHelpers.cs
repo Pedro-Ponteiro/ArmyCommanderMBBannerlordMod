@@ -67,13 +67,13 @@ namespace ArmyCommander.Helpers
                     int troopsInArmies = troopTypeCount.Value.TroopsInArmies;
                     if (troopsInArmies > 0)
                     {
-                        default_list.Add(new TooltipProperty(formationClass.GetName(), troopsInArmies.ToString(), 0));
+                        default_list.Add(new TooltipProperty(GameTexts.FindText("str_troop_type_name", formationClass.GetName()).ToString(), troopsInArmies.ToString(), 0));
                     }
                 }
 
                 default_list.Add(new TooltipProperty("", "", 0, onlyShowWhenExtended: false, TooltipProperty.TooltipPropertyFlags.DefaultSeperator));
 
-                default_list.Add(new TooltipProperty("All Kingdom Troops", context.MenInKingdomCount.ToString(), 0));
+                default_list.Add(new TooltipProperty("Troops Not in Armies", (context.MenInKingdomCount - context.MenInArmiesCount).ToString(), 0));
                 default_list.Add(new TooltipProperty("", "", 0, onlyShowWhenExtended: false, TooltipProperty.TooltipPropertyFlags.RundownSeperator));
 
                 // list troop count for each type.
@@ -81,10 +81,10 @@ namespace ArmyCommander.Helpers
                 foreach (var troopTypeCount in troopTypeCountDict)
                 {
                     FormationClass formationClass = troopTypeCount.Key;
-                    int troopsInKingdom = troopTypeCount.Value.TroopsInKingdom;
-                    if (troopsInKingdom > 0)
+                    int troopsNotInArmies = troopTypeCount.Value.TroopsInKingdom - troopTypeCount.Value.TroopsInArmies;
+                    if (troopsNotInArmies > 0)
                     {
-                        default_list.Add(new TooltipProperty(formationClass.GetName(), troopsInKingdom.ToString(), 0));
+                        default_list.Add(new TooltipProperty(GameTexts.FindText("str_troop_type_name", formationClass.GetName()).ToString(), troopsNotInArmies.ToString(), 0));
                     }
                 }
 
