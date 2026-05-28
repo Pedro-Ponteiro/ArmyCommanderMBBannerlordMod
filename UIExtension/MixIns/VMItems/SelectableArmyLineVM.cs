@@ -133,10 +133,12 @@ namespace ArmyCommander.UIExtension.MixIns.VMItems
 
         public SelectableArmyLineVM(
             Func<ACArmyLineUIContext, MobileParty> updateLeaderParty,
+            SelectableArmyLeaderVisualVM armyLeaderVisualVM,
             MBBindingList<SelectableArmyPropertiesRow> armyInfoRows
             )
         {
             _updateLeaderParty = updateLeaderParty;
+            LeaderVisualVM = armyLeaderVisualVM;
             ArmyInfoRows = armyInfoRows;
 
             RefreshValues();
@@ -155,17 +157,6 @@ namespace ArmyCommander.UIExtension.MixIns.VMItems
             if (new_leader != LeaderParty)
             {
                 LeaderParty = new_leader;
-
-                LeaderVisualVM = new SelectableArmyLeaderVisualVM(
-                    new_leader,
-                    (c) =>
-                    {
-                        return new CharacterImageIdentifierVM(CampaignUIHelper.GetCharacterCode(c.LeaderParty.LeaderHero.CharacterObject));
-                    },
-                    (c) =>
-                    {
-                        return new BannerImageIdentifierVM(c.LeaderParty.ActualClan.Banner, nineGrid: true);
-                    });
 
                 LeaderVisualVM.UpdateValues(context);
             }

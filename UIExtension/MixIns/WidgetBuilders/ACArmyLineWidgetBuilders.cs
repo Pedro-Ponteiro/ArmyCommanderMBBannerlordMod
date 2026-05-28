@@ -7,6 +7,7 @@ using System.Data;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.ViewModelCollection;
+using TaleWorlds.Core.ViewModelCollection.ImageIdentifiers;
 using TaleWorlds.Core.ViewModelCollection.Information;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
@@ -72,10 +73,17 @@ namespace ArmyCommander.UIExtension.WidgetBuilders
                     second_row
                 };
 
+            SelectableArmyLeaderVisualVM armyLeaderVisualVM = new SelectableArmyLeaderVisualVM(
+                (c) => c.LeaderParty,
+                (c) => new CharacterImageIdentifierVM(CampaignUIHelper.GetCharacterCode(c.LeaderParty.LeaderHero.CharacterObject)),
+                (c) => new BannerImageIdentifierVM(c.LeaderParty.ActualClan.Banner, nineGrid: true)
+            );
+
             SelectableArmyLineVM army_line = new SelectableArmyLineVM(
                 (c) => c.LeaderParty,
+                armyLeaderVisualVM,
                 rows
-                );
+            );
 
             return army_line;
         }

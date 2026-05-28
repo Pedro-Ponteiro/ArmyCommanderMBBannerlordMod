@@ -17,6 +17,7 @@ namespace ArmyCommander.UIExtension.MixIns.VMItems
     public class SelectableArmyLeaderVisualVM : ViewModel
     {
         private MobileParty _leaderParty;
+        private Func<ACArmyLineUIContext, MobileParty> _updateLeaderParty;
         private Func<ACArmyLineUIContext, CharacterImageIdentifierVM> _updateVisual;
         private Func<ACArmyLineUIContext, BannerImageIdentifierVM> _updateBanner;
 
@@ -79,12 +80,12 @@ namespace ArmyCommander.UIExtension.MixIns.VMItems
         }
 
         public SelectableArmyLeaderVisualVM(
-            MobileParty leaderParty,
+            Func<ACArmyLineUIContext, MobileParty> updateLeaderParty,
             Func<ACArmyLineUIContext, CharacterImageIdentifierVM> updateVisual,
             Func<ACArmyLineUIContext, BannerImageIdentifierVM> updateBanner
             )
         {
-            _leaderParty = leaderParty;
+            _updateLeaderParty = updateLeaderParty;
             _updateVisual = updateVisual;
             _updateBanner = updateBanner;
 
@@ -98,7 +99,7 @@ namespace ArmyCommander.UIExtension.MixIns.VMItems
         public void UpdateValues(ACArmyLineUIContext context)
         {
 
-            _leaderParty = context.LeaderParty;
+            _leaderParty = _updateLeaderParty(context);
             Visual = _updateVisual(context);
             Banner_9 = _updateBanner(context);
             
