@@ -73,7 +73,7 @@
                                                 <Children>
 
                                                     <!--lIST PANEL HORIZONTAL-->
-                                                    <ListPanel DoNotAcceptEvents="true" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" StackLayout.LayoutMethod="HorizontalLeftToRight">
+                                                    <ListPanel DoNotAcceptEvents="true" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" StackLayout.LayoutMethod="HorizontalLeftToRight">
                                                         <Children>
                                                             <!-- <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Text="ASDA SDAS D A" /> -->
                                                             <!-- iMAGEM DO LIDER -->
@@ -101,17 +101,17 @@
                                                             </Widget>
 
                                                             <!-- Propriedades (6, 3 por linha) (420 - 73 w (347) disponivel e 73 h disponivel) > 347/3 = 115 w -->
-                                                            <NavigatableListPanel DoNotAcceptEvents="true" DataSource="{ArmyInfoRows}" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" MinIndex="0" MaxIndex="1000" StackLayout.LayoutMethod="VerticalTopToBottom" HorizontalAlignment="Center">
+                                                            <NavigatableListPanel DoNotAcceptEvents="true" DataSource="{ArmyInfoRows}" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MinIndex="0" MaxIndex="1000" StackLayout.LayoutMethod="VerticalTopToBottom" HorizontalAlignment="Center">
                                                                 <ItemTemplate>
                                                                     <!-- <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Text="ASDA SDAS D A" /> -->
                                                                     <Widget DoNotAcceptEvents="true" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center">
                                                                         <Children>
-                                                                            <ListPanel DoNotAcceptEvents="true" DataSource="{ArmyInfosRow}" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren">
+                                                                            <ListPanel DoNotAcceptEvents="true" DataSource="{ArmyInfosRow}" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center">
                                                                                 <ItemTemplate>
 
                                                                                     <!-- Elemento de info abaixo -->
 
-                                                                                    <ButtonWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" DoNotPassEventsToChildren="true" Command.Click="ExecuteClickFunction" Command.HoverBegin="ExecuteBeginHint" Command.HoverEnd="ExecuteEndHint">
+                                                                                    <ButtonWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" DoNotPassEventsToChildren="true" Command.Click="ExecuteClickFunction" Command.HoverBegin="ExecuteBeginHint" Command.HoverEnd="ExecuteEndHint" HorizontalAlignment="Center">
                                                                                         <Children>
                                                                                             <ListPanel Id="InfoBlock" StackLayout.LayoutMethod="HorizontalLeftToRight" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" VerticalAlignment="Center">
                                                                                                 <Children>
