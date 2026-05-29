@@ -1,4 +1,4 @@
-﻿using ArmyCommander.BehaviorStore;
+﻿using ArmyCommander.Store;
 using ArmyCommander.Helpers;
 using ArmyCommander.UIExtension;
 using ArmyCommander.UIExtension.Context;
