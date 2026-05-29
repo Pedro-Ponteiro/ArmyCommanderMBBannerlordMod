@@ -55,7 +55,19 @@ O projeto usa stores/contextos estaticos como cola entre patches e ViewModels.
 - `ArmyCommandsBehaviorStore.army_commands`: dicionario estatico `Army -> (ArmyType, Settlement)` usado para reaplicar/forcar comandos de AI-led armies.
 - `ACPolicyStore.MercenaryArmyLeadersPolicy`: referencia estatica para a politica criada no patch de `DefaultPolicies`.
 
-Esses estados nao parecem persistidos em save/load; eles sao reconstituidos em runtime pela UI e pelos eventos.
+Os contextos de UI sao reconstituidos em runtime pela UI e pelos eventos. Os comandos em `ArmyCommandsBehaviorStore` sao persistidos por `ACArmyCommanderBehavior`, que salva uma representacao estavel baseada em ids.
+
+## Behaviors de campanha
+
+`ACBehaviors/ACArmyCommanderBehavior.cs` registra persistencia de dados de campanha via `CampaignBehaviorBase.SyncData`.
+
+O behavior nao salva referencias diretas para `Army`, `MobileParty` ou `Settlement`. Em vez disso, salva uma string XML pequena com:
+
+- `leaderHeroId`: `Hero.StringId` do lider do exercito.
+- `targetSettlementId`: `Settlement.StringId` do alvo.
+- `armyType`: valor inteiro de `Army.ArmyTypes`.
+
+No carregamento, ele resolve `Hero.Find(leaderHeroId)`, busca `hero.PartyBelongedTo?.Army`, confirma que a party ainda e lider daquele exercito e resolve `Settlement.Find(targetSettlementId)`. Entradas que nao podem mais ser resolvidas sao descartadas.
 
 ## Overlay de exercitos
 
@@ -215,7 +227,7 @@ Depois, `SetPartyAiActionPatch.cs` intercepta `SetPartyAiAction.ApplyInternal`. 
 
 - Muitos patches acessam campos/metodos privados por `AccessTools`. Mudancas de versao do Bannerlord podem quebrar nomes como `_partiesToRemove`, `_mainPartyItem`, `_armyOverlay`, `ApplyInternal` e `ArmyToUse`.
 - Os reverse patches lancam `NotImplementedException` por design se chamados sem Harmony substituir o corpo. Isso e esperado, mas dificulta testes unitarios comuns.
-- `ArmyCommandsBehaviorStore` e estatico e nao persistido. Comandos salvos podem se perder entre sessoes.
+- A persistencia de `ArmyCommandsBehaviorStore` depende de ids de heroi e settlement. Se o lider deixar de liderar o exercito ou o alvo deixar de existir, o comando e descartado no load.
 - Ha valores magicos importantes: envio de 50 influencia, custo de 100 para exercito mercenario, limite de 70% de parties do reino em exercitos e forca minima 1000.
 - `BannerlordDir` esta hardcoded para uma instalacao local. Outro ambiente precisa ajustar a propriedade no `.csproj`.
 - `ACPolicyStore.MercenaryArmyLeadersPolicy` depende do patch de `DefaultPolicies.InitializeAll`; codigo que consultar antes disso precisa tolerar null.

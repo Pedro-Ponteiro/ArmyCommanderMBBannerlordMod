@@ -30,6 +30,7 @@ Depois do build, o alvo `DeployModFiles` tambem sincroniza `GUI\` e copia `SubMo
 - `MySubModule.cs`: ponto de entrada do mod. Inicializa logs, aplica Harmony, registra UIExtenderEx e limpa recursos ao descarregar.
 - `SubModule.xml`: manifesto do modulo, dependencias, versao do mod e classe de submodulo.
 - `ArmyCommander.csproj`: referencias do Bannerlord, Harmony, UIExtenderEx e regra de deploy.
+- `ACBehaviors/`: behaviors de campanha registrados no `CampaignGameStarter`, incluindo persistencia de comandos.
 - `HarmonyPatches/`: patches que alteram regras de exercito, overlay, tela de gestao, AI e politicas.
 - `UIExtension/`: mixins, contextos, ViewModels e patches de prefab para as telas.
 - `GUI/`: XMLs injetados ou substituidos via UIExtenderEx.
