@@ -129,6 +129,9 @@ namespace ArmyCommander.HarmonyPatches
             ref bool __result)
         {
 
+            // TODO: Transpile this instead.
+
+
             possibleArmyMembers = new MBList<MobileParty>();
             Kingdom kingdom = mobileParty.MapFaction as Kingdom;
 
@@ -136,7 +139,7 @@ namespace ArmyCommander.HarmonyPatches
 
             if (mobileParty.IsCurrentlyAtSea // at sea
                 || mobileParty.LeaderHero.Clan.Influence <= 100f // not enough influence
-                //|| mobileParty.LeaderHero.Clan.IsUnderMercenaryService // is merc (TODO!)
+                || (mobileParty.LeaderHero.Clan.IsUnderMercenaryService && !ACHelpers.ShouldAllowMercenaryClanToGatherArmy(mobileParty.ActualClan))
                 || (float)mobileParty.GetNumDaysForFoodToLast() <= Campaign.Current.Models.MobilePartyAIModel.NeededFoodsInDaysThresholdForSiege // not enough food
                 || !kingdom.FactionsAtWarWith.AnyQ((IFaction x) => x.Fiefs.Any()) // no possible target settlement for besiege
                 || mobileParty.PartySizeRatio <= Campaign.Current.Models.ArmyManagementCalculationModel.AIMobilePartySizeRatioToCallToArmy // not enough men
