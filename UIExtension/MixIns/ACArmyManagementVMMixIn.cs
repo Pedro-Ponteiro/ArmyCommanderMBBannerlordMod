@@ -1,6 +1,7 @@
 ﻿using ArmyCommander.Actions;
 using ArmyCommander.HarmonyPatches;
 using ArmyCommander.Helpers;
+using ArmyCommander.Store;
 using ArmyCommander.UIExtension.Context;
 using Bannerlord.UIExtenderEx.Attributes;
 using Bannerlord.UIExtenderEx.ViewModels;
@@ -72,7 +73,11 @@ namespace ArmyCommander.UIExtension.MixIns
                 }
                 else
                 {
-                    ACArmyManagementUIContext.Instance.targetSettlement = (new_main_party.Army.AiBehaviorObject is Settlement) ? (Settlement)new_main_party.Army.AiBehaviorObject : null;
+                    ACArmyManagementUIContext.Instance.targetSettlement = ArmyCommandsBehaviorStore.army_commands.TryGetValue(new_main_party.Army, out var commands) ? commands.Settlement : null;
+                    if (ACArmyManagementUIContext.Instance.targetSettlement == null)
+                    {
+                        ACArmyManagementUIContext.Instance.targetSettlement = (new_main_party.Army.AiBehaviorObject is Settlement) ? (Settlement)new_main_party.Army.AiBehaviorObject : null;
+                    }
                 }
 
 
