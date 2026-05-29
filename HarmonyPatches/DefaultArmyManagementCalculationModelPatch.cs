@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -246,4 +247,65 @@ namespace ArmyCommander.HarmonyPatches
         }
     }
 
+    [HarmonyPatch]
+    internal static class DefaultArmyManagementCalculationModel_CanPlayerCreateArmy_Patch
+    {
+        private static MethodBase TargetMethod()
+        {
+            return AccessTools.Method(
+                typeof(DefaultArmyManagementCalculationModel),
+                nameof(DefaultArmyManagementCalculationModel.CanPlayerCreateArmy),
+                new Type[]
+                {
+                    typeof(TextObject).MakeByRefType()
+                });
+        }
+
+        private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+        {
+            var codes = new List<CodeInstruction>(instructions);
+
+            MethodInfo isUnderMercenaryServiceGetter = AccessTools.PropertyGetter(
+                typeof(Clan),
+                nameof(Clan.IsUnderMercenaryService));
+
+            MethodInfo helperMethod = AccessTools.Method(
+                typeof(DefaultArmyManagementCalculationModel_CanPlayerCreateArmy_Patch),
+                nameof(IsUnderMercenaryServiceAndPolicyNotEnacted));
+
+            int replacedCount = 0;
+
+            for (int i = 0; i < codes.Count; i++)
+            {
+                CodeInstruction instruction = codes[i];
+
+                if ((instruction.opcode == OpCodes.Callvirt || instruction.opcode == OpCodes.Call)
+                    && instruction.operand as MethodInfo == isUnderMercenaryServiceGetter)
+                {
+                    codes[i] = new CodeInstruction(OpCodes.Call, helperMethod)
+                    {
+                        labels = instruction.labels,
+                        blocks = instruction.blocks
+                    };
+
+                    replacedCount++;
+                }
+            }
+
+            if (replacedCount == 0)
+            {
+                throw new Exception(
+                    "ArmyCommander transpiler failed: Clan.IsUnderMercenaryService getter was not found in CanPlayerCreateArmy.");
+            }
+
+            return codes.AsEnumerable();
+        }
+
+        private static bool IsUnderMercenaryServiceAndPolicyNotEnacted(Clan clan)
+        {
+            return clan != null
+                && clan.IsUnderMercenaryService
+                && !ACHelpers.IsMercenaryArmyLeadersPolicyEnacted(clan);
+        }
+    }
 }
