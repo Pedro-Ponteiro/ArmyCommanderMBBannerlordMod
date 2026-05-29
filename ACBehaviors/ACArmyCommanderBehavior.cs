@@ -1,6 +1,7 @@
 using ArmyCommander.Store;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using TaleWorlds.CampaignSystem;
@@ -12,18 +13,39 @@ namespace ArmyCommander.ACBehaviors
     public sealed class ACArmyCommanderBehavior : CampaignBehaviorBase
     {
         private const string ArmyCommandsDataKey = "ArmyCommander.ArmyCommands.v1";
+        private const string BehaviorStringId = "ArmyCommander.ACArmyCommanderBehavior";
+
+        private static readonly string LogDirectory = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "ArmyCommander"
+        );
+
+        private static readonly string LogPath = Path.Combine(
+            LogDirectory,
+            "ArmyCommander_Behavior.log"
+        );
+
+        public ACArmyCommanderBehavior()
+            : base(BehaviorStringId)
+        {
+            Log("ACArmyCommanderBehavior constructed. StringId=" + BehaviorStringId);
+        }
 
         public override void RegisterEvents()
         {
+            Log("RegisterEvents called.");
         }
 
         public override void SyncData(IDataStore dataStore)
         {
+            Log("SyncData called. IsSaving=" + dataStore.IsSaving + ", IsLoading=" + dataStore.IsLoading);
+
             string serializedArmyCommands = null;
 
             if (dataStore.IsSaving)
             {
                 serializedArmyCommands = SerializeArmyCommands();
+                Log("Serialized army commands length=" + (serializedArmyCommands?.Length ?? 0));
             }
 
             dataStore.SyncData(ArmyCommandsDataKey, ref serializedArmyCommands);
@@ -31,6 +53,7 @@ namespace ArmyCommander.ACBehaviors
             if (dataStore.IsLoading)
             {
                 RestoreArmyCommands(serializedArmyCommands);
+                Log("Restored army commands count=" + ArmyCommandsBehaviorStore.army_commands.Count);
             }
         }
 
@@ -139,22 +162,30 @@ namespace ArmyCommander.ACBehaviors
                 return null;
             }
 
-            Hero leaderHero = Hero.Find(leaderHeroId);
-            MobileParty leaderParty = leaderHero?.PartyBelongedTo;
-            Army army = leaderParty?.Army;
+            Army army1 = Clan.PlayerClan.Kingdom.Armies.FirstOrDefault((army) => army.LeaderParty.LeaderHero.StringId == leaderHeroId);
 
-            if (army == null || army.LeaderParty != leaderParty)
-            {
-                return null;
-            }
-
-            return army;
+            return army1;
         }
 
         private static bool IsSupportedCommandType(Army.ArmyTypes armyType)
         {
             return armyType == Army.ArmyTypes.Besieger
                 || armyType == Army.ArmyTypes.Defender;
+        }
+
+        private static void Log(string message)
+        {
+            try
+            {
+                Directory.CreateDirectory(LogDirectory);
+                File.AppendAllText(
+                    LogPath,
+                    DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + " | " + message + Environment.NewLine
+                );
+            }
+            catch
+            {
+            }
         }
     }
 }
