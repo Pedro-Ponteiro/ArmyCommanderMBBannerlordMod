@@ -443,8 +443,7 @@ namespace ArmyCommander.HarmonyPatches
                 else
                 {
                     // INFLUENCE COST FOR SETTING UP AN ARMY LEADER
-                    item.Cost = Campaign.Current.Models.ArmyManagementCalculationModel.CalculatePartyInfluenceCost(Hero.MainHero.PartyBelongedTo, item.Party);
-                    item.Cost *= 3;
+                    item.Cost = Campaign.Current.Models.ArmyManagementCalculationModel.CalculatePartyInfluenceCost(Hero.MainHero.PartyBelongedTo, item.Party) * 3;
                 }
                 item.UpdateEligibility();
             }
