@@ -19,6 +19,11 @@ namespace ArmyCommander.HarmonyPatches
         [HarmonyPatch("DisperseInternal", new Type[] { typeof(ArmyDispersionReason) })]
         private static void Postfix(Army __instance)
         {
+            if (ArmyCommandsBehaviorStore.army_commands.TryGetValue(__instance, out _))
+            {
+                ArmyCommandsBehaviorStore.army_commands.Remove(__instance);
+            }
+
             ACArmyOverlayUIContext.Instance?.CurrentArmyOverlayVMMixIn.OnArmyDisband(__instance);
         }
     }
