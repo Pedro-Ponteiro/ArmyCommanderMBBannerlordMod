@@ -279,7 +279,23 @@ namespace ArmyCommander.Helpers
 
         public static bool ShouldAllowMercenaryClanToGatherArmy(Clan clan)
         {
-            return true;
+
+            // TODO:
+            bool MCMGlobalShouldAllowAllMercenaryAIToGatherArmy = false;
+            bool MCMGlobalShouldAllowPlayerKingdomMercenaryAIToGatherArmy = false;
+
+
+            if (clan.Kingdom != null && clan.Kingdom == Clan.PlayerClan?.Kingdom)
+            {
+                return MCMGlobalShouldAllowPlayerKingdomMercenaryAIToGatherArmy;
+            }
+            else if (clan.Kingdom != null)
+            {
+                return MCMGlobalShouldAllowAllMercenaryAIToGatherArmy;
+            }
+
+
+            return false;
         }
 
         public static Dictionary<FormationClass, (int TroopsInArmies, int TroopsInKingdom)> GetTroopTypeCountDict(IFaction faction)
