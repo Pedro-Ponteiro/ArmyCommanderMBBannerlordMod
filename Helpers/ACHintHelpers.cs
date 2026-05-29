@@ -144,7 +144,7 @@ namespace ArmyCommander.Helpers
                 default_list.Add(new TooltipProperty("Total", context.AttachedPartiesCount.ToString(), 0, onlyShowWhenExtended: false, TooltipProperty.TooltipPropertyFlags.RundownResult));
 
                 default_list.Add(
-                    new TooltipProperty(new TextObject("Expected Change from parties joining today").ToString(), context.PartiesWithinADayDistanceCount.ToString(), 0)
+                    new TooltipProperty(new TextObject("Expected Change from{newline} parties joining today").ToString(), context.PartiesWithinADayDistanceCount.ToString(), 0)
                     );
                 return default_list;
                 }
@@ -156,7 +156,7 @@ namespace ArmyCommander.Helpers
             return new BasicTooltipViewModel(() => {
                 List<TooltipProperty> default_list = CampaignUIHelper.GetArmyManCountTooltip(context.LeaderParty.Army);
                 default_list.Add(
-                    new TooltipProperty(new TextObject("Expected Change from parties joining today").ToString(), context.MenJoiningToday.ToString(), 0)
+                    new TooltipProperty(new TextObject("Expected Change from{newline} parties joining today").ToString(), context.MenJoiningToday.ToString(), 0)
                     );
                 return default_list;
                 }
@@ -169,7 +169,7 @@ namespace ArmyCommander.Helpers
             return new BasicTooltipViewModel(() => {
                 List<TooltipProperty> default_list = CampaignUIHelper.GetArmyFoodTooltip(context.LeaderParty.Army);
                 default_list.Add(
-                    new TooltipProperty(new TextObject("Expected Change from parties joining today").ToString(), context.TotalArmyFoodChange.ToString(), 0)
+                    new TooltipProperty(new TextObject("Expected Change from consumption{newline} and parties joining today").ToString(), context.TotalArmyFoodChange.ToString(), 0)
                     );
                 return default_list;
                 }
