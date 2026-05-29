@@ -1,4 +1,5 @@
 ﻿using ArmyCommander.Helpers;
+using ArmyCommander.Store;
 using ArmyCommander.UIExtension.Context;
 using HarmonyLib;
 using Helpers;
@@ -45,6 +46,12 @@ namespace ArmyCommander.HarmonyPatches
             {
                 result = false;
                 explanation = new TextObject("{=f6vTzVar}Does not have a mobile party.");
+            }
+
+            else if (currentMainParty == null && party.ActualClan.IsUnderMercenaryService && !ACHelpers.IsMercenaryArmyLeadersPolicyEnacted(Clan.PlayerClan))
+            {
+                result = false;
+                explanation = new TextObject("{=ac_merc_army_policy_not_enacted}Mercenary clans require the Mercenary Army Leaders policy to form armies.");
             }
 
             else if (ACHelpers.IsPartyBusy(party))
@@ -139,7 +146,7 @@ namespace ArmyCommander.HarmonyPatches
 
             if (mobileParty.IsCurrentlyAtSea // at sea
                 || mobileParty.LeaderHero.Clan.Influence <= 100f // not enough influence
-                || (mobileParty.LeaderHero.Clan.IsUnderMercenaryService && !ACHelpers.ShouldAllowMercenaryClanToGatherArmy(mobileParty.ActualClan))
+                || (mobileParty.LeaderHero.Clan.IsUnderMercenaryService && !ACHelpers.IsMercenaryArmyLeadersPolicyEnacted(mobileParty.ActualClan))
                 || (float)mobileParty.GetNumDaysForFoodToLast() <= Campaign.Current.Models.MobilePartyAIModel.NeededFoodsInDaysThresholdForSiege // not enough food
                 || !kingdom.FactionsAtWarWith.AnyQ((IFaction x) => x.Fiefs.Any()) // no possible target settlement for besiege
                 || mobileParty.PartySizeRatio <= Campaign.Current.Models.ArmyManagementCalculationModel.AIMobilePartySizeRatioToCallToArmy // not enough men

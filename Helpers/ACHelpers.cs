@@ -1,4 +1,5 @@
-﻿using Helpers;
+﻿using ArmyCommander.Store;
+using Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -277,23 +278,13 @@ namespace ArmyCommander.Helpers
             return 50;
         }
 
-        public static bool ShouldAllowMercenaryClanToGatherArmy(Clan clan)
+        public static bool IsMercenaryArmyLeadersPolicyEnacted(Clan clan)
         {
 
-            // TODO:
-            bool MCMGlobalShouldAllowAllMercenaryAIToGatherArmy = false;
-            bool MCMGlobalShouldAllowPlayerKingdomMercenaryAIToGatherArmy = false;
-
-
-            if (clan.Kingdom != null && clan.Kingdom == Clan.PlayerClan?.Kingdom)
+            if (clan.Kingdom != null)
             {
-                return MCMGlobalShouldAllowPlayerKingdomMercenaryAIToGatherArmy;
+                return clan.Kingdom.ActivePolicies.Contains(ACPolicyStore.MercenaryArmyLeadersPolicy);
             }
-            else if (clan.Kingdom != null)
-            {
-                return MCMGlobalShouldAllowAllMercenaryAIToGatherArmy;
-            }
-
 
             return false;
         }

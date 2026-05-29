@@ -1,4 +1,7 @@
-﻿using ArmyCommander.UIExtension.Context;
+﻿using ArmyCommander.Actions;
+using ArmyCommander.Helpers;
+using ArmyCommander.Store;
+using ArmyCommander.UIExtension.Context;
 using HarmonyLib;
 using System;
 using TaleWorlds.CampaignSystem;
@@ -27,6 +30,11 @@ namespace ArmyCommander.HarmonyPatches
         [HarmonyPatch("Gather", new Type[] { typeof(Settlement), typeof(MBReadOnlyList<MobileParty>) })]
         private static void Postfix(Army __instance)
         {
+            if (ACHelpers.IsMercenaryArmyLeadersPolicyEnacted(__instance.LeaderParty.ActualClan))
+            {
+                ACActions.SubtractInfluence(100, __instance.LeaderParty.ActualClan.Kingdom.Leader.Clan);
+            }
+
             ACArmyOverlayUIContext.Instance?.CurrentArmyOverlayVMMixIn.OnArmyGathered(__instance);
         }
     }

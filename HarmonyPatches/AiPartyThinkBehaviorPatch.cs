@@ -39,7 +39,7 @@ internal static class AiPartyThinkBehavior_PartyHourlyAiTick_Patch
 
     private static bool GetIsUnderMercenaryServiceForArmyGathering(Clan clan)
     {
-        if (ACHelpers.ShouldAllowMercenaryClanToGatherArmy(clan))
+        if (ACHelpers.IsMercenaryArmyLeadersPolicyEnacted(clan))
         {
             return false;
         }
