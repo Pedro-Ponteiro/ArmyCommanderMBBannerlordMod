@@ -32,7 +32,7 @@ namespace ArmyCommander.HarmonyPatches
                 {
                     __result = true;
                 }
-                else if (Clan.PlayerClan.IsUnderMercenaryService && ACHelpers.IsMercenaryArmyLeadersPolicyEnacted(Clan.PlayerClan))
+                else if (Clan.PlayerClan.IsUnderMercenaryService && !ACHelpers.IsMercenaryArmyLeadersPolicyEnacted(Clan.PlayerClan))
                 {
                     disabledReason = new TextObject("{=!}Cannot create or manage armies while at mercenary service and Mercenary Army Leaders Policy hasn't been enacted.");
                     __result = false;
