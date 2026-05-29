@@ -1,4 +1,4 @@
-﻿using ArmyCommander.BehaviorStore;
+﻿using ArmyCommander.Store;
 using ArmyCommander.UIExtension.Context;
 using HarmonyLib;
 using Messages.FromClient.ToLobbyServer;
@@ -75,7 +75,7 @@ namespace ArmyCommander.HarmonyPatches
             }
 
 
-            if (ArmyCommandsStore.army_commands.TryGetValue(owner.Army, out var command)) 
+            if (ArmyCommandsBehaviorStore.army_commands.TryGetValue(owner.Army, out var command)) 
             {
                 Army.ArmyTypes c_armyType = command.ArmyType;
                 Settlement c_settlement = command.Settlement;
@@ -99,7 +99,7 @@ namespace ArmyCommander.HarmonyPatches
 
                         if (!command.Settlement.OwnerClan.Kingdom.IsAtWarWith(Hero.MainHero.Clan.Kingdom))
                         {
-                            ArmyCommandsStore.army_commands.Remove(owner.Army);
+                            ArmyCommandsBehaviorStore.army_commands.Remove(owner.Army);
                             return true;
                         }
                         SetPartyAiActionOriginal.ApplyInternal(owner, c_settlement, null, CampaignVec2.Zero, 4, owner.DesiredAiNavigationType, owner.CurrentSettlement?.HasPort == true, isTargetingPort: false);
@@ -109,7 +109,7 @@ namespace ArmyCommander.HarmonyPatches
                     {
                         if (command.Settlement.OwnerClan.Kingdom != Hero.MainHero.Clan.Kingdom)
                         {
-                            ArmyCommandsStore.army_commands.Remove(owner.Army);
+                            ArmyCommandsBehaviorStore.army_commands.Remove(owner.Army);
                             return true;
                         }
                         SetPartyAiActionOriginal.ApplyInternal(owner, c_settlement, null, CampaignVec2.Zero, 7,  owner.DesiredAiNavigationType, owner.CurrentSettlement?.HasPort == true, owner.IsCurrentlyAtSea);

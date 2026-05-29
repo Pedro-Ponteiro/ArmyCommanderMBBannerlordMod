@@ -582,7 +582,7 @@ namespace ArmyCommander.HarmonyPatches
                         mbs
                         );
 
-                    ArmyCommandsStore.army_commands[ACArmyManagementUIContext.Instance.currentMainParty.Army] = 
+                    ArmyCommandsBehaviorStore.army_commands[ACArmyManagementUIContext.Instance.currentMainParty.Army] = 
                         (ACArmyManagementUIContext.Instance.armyBehavior, ACArmyManagementUIContext.Instance.targetSettlement);
                     armyCreated = true;
                 }
@@ -599,7 +599,7 @@ namespace ArmyCommander.HarmonyPatches
                         if (ACArmyManagementUIContext.Instance.targetSettlement != (Settlement)armyToUse.AiBehaviorObject)
                         {
 
-                            ArmyCommandsStore.army_commands[armyToUse] = (ACArmyManagementUIContext.Instance.armyBehavior, ACArmyManagementUIContext.Instance.targetSettlement);
+                            ArmyCommandsBehaviorStore.army_commands[armyToUse] = (ACArmyManagementUIContext.Instance.armyBehavior, ACArmyManagementUIContext.Instance.targetSettlement);
 
                             if (!armyToUse.IsWaitingForArmyMembers())
                             {
