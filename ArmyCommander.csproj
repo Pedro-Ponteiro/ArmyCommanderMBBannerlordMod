@@ -275,7 +275,9 @@
   <ItemGroup>
     <!-- ArmyCommander source files -->
     <Compile Include="ACBehaviors\ACArmyCommanderBehavior.cs" />
+    <Compile Include="ACBehaviors\ACMercenaryArmyLeadershipDialogueBehavior.cs" />
     <Compile Include="Actions\ArmyCommanderActions.cs" />
+    <Compile Include="Store\ACPermissionsStore.cs" />
     <Compile Include="Store\ArmyCommandsBehaviorStore.cs" />
     <Compile Include="CalculationModels\ACCalculationModel.cs" />
     <Compile Include="HarmonyPatches\AiPartyThinkBehaviorPatch.cs" />

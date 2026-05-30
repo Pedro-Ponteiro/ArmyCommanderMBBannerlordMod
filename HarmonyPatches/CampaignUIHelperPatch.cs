@@ -32,9 +32,9 @@ namespace ArmyCommander.HarmonyPatches
                 {
                     __result = true;
                 }
-                else if (Clan.PlayerClan.IsUnderMercenaryService && !ACHelpers.IsMercenaryArmyLeadersPolicyEnacted(Clan.PlayerClan))
+                else if (Clan.PlayerClan.IsUnderMercenaryService && !ACHelpers.HasPlayerPermissionForMercenaryArmyLeadership())
                 {
-                    disabledReason = new TextObject("{=!}Cannot create or manage armies while at mercenary service and Mercenary Army Leaders Policy hasn't been enacted.");
+                    disabledReason = new TextObject("{=!}Cannot create or manage armies while at mercenary service and Mercenary Army Leaders Policy hasn't been enacted or the King hasn't given you permission.");
                     __result = false;
                 }
                 else if (MobileParty.MainParty.Army != null && MobileParty.MainParty.Army.LeaderParty != MobileParty.MainParty)
@@ -48,7 +48,7 @@ namespace ArmyCommander.HarmonyPatches
                 }
 
             }
-            
+
             return false;
         }
     }

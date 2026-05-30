@@ -1,5 +1,5 @@
-﻿using Bannerlord.UIExtenderEx;
-using ArmyCommander.ACBehaviors;
+﻿using ArmyCommander.ACBehaviors;
+using Bannerlord.UIExtenderEx;
 using HarmonyLib;
 using System;
 using System.IO;
@@ -169,6 +169,10 @@ namespace ArmyCommander
                     Log("Adicionando behavior ACArmyCommanderBehavior");
                     campaignGameStarter.AddBehavior(new ACArmyCommanderBehavior());
                     Log("Behavior ACArmyCommanderBehavior adicionado");
+
+                    Log("Adicionando behavior ACMercenaryArmyLeadershipDialogueBehavior");
+                    campaignGameStarter.AddBehavior(new ACMercenaryArmyLeadershipDialogueBehavior());
+                    Log("Behavior ACMercenaryArmyLeadershipDialogueBehavior adicionado");
                 }
                 else
                 {

@@ -49,7 +49,7 @@ namespace ArmyCommander.HarmonyPatches
                 explanation = new TextObject("{=f6vTzVar}Does not have a mobile party.");
             }
 
-            else if (currentMainParty == null && party.ActualClan.IsUnderMercenaryService && !ACHelpers.IsMercenaryArmyLeadersPolicyEnacted(Clan.PlayerClan))
+            else if (currentMainParty == null && party.ActualClan.IsUnderMercenaryService && !party.IsMainParty && !ACHelpers.IsMercenaryArmyLeadersPolicyEnacted(Clan.PlayerClan))
             {
                 result = false;
                 explanation = new TextObject("{=ac_merc_army_policy_not_enacted}Mercenary clans require the Mercenary Army Leaders policy to form armies.");
@@ -198,7 +198,7 @@ namespace ArmyCommander.HarmonyPatches
                     list.Add((mobileParty2, item, num));
                 }
             }
-            
+
             list = list.OrderByQ(((MobileParty, float, int) x) => x.Item2).ToListQ();
             int KingdomWPCCount = kingdom.WarPartyComponents.Count;
             int numberOfPartiesInArmies = kingdom.Armies.SumQ((Army x) => x.Parties.Count);
@@ -271,7 +271,7 @@ namespace ArmyCommander.HarmonyPatches
 
             MethodInfo helperMethod = AccessTools.Method(
                 typeof(DefaultArmyManagementCalculationModel_CanPlayerCreateArmy_Patch),
-                nameof(IsUnderMercenaryServiceAndPolicyNotEnacted));
+                nameof(IsUnderMercenaryServiceAndNoPermission));
 
             int replacedCount = 0;
 
@@ -301,11 +301,11 @@ namespace ArmyCommander.HarmonyPatches
             return codes.AsEnumerable();
         }
 
-        private static bool IsUnderMercenaryServiceAndPolicyNotEnacted(Clan clan)
+        private static bool IsUnderMercenaryServiceAndNoPermission(Clan clan)
         {
             return clan != null
                 && clan.IsUnderMercenaryService
-                && !ACHelpers.IsMercenaryArmyLeadersPolicyEnacted(clan);
+                && !ACHelpers.HasPlayerPermissionForMercenaryArmyLeadership();
         }
     }
 }

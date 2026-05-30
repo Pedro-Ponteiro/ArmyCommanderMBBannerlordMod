@@ -1,4 +1,5 @@
-﻿using ArmyCommander.Store;
+﻿using ArmyCommander.ACBehaviors;
+using ArmyCommander.Store;
 using Helpers;
 using System;
 using System.Collections.Generic;
@@ -287,6 +288,26 @@ namespace ArmyCommander.Helpers
             }
 
             return false;
+        }
+
+        public static bool HasPlayerPermissionForMercenaryArmyLeadership()
+        {
+            Clan playerClan = Clan.PlayerClan;
+            Kingdom playerKingdom = playerClan?.Kingdom;
+
+            if (playerClan == null || playerKingdom == null)
+            {
+                return false;
+            }
+
+            if (!playerClan.IsUnderMercenaryService)
+            {
+                return false;
+            }
+
+
+            return ACPermissionsStore._acKingdomIdThatAllowedPlayerMercenaryArmyLeadership == playerKingdom.StringId
+                || IsMercenaryArmyLeadersPolicyEnacted(playerClan);
         }
 
         public static Dictionary<FormationClass, (int TroopsInArmies, int TroopsInKingdom)> GetTroopTypeCountDict(IFaction faction)
