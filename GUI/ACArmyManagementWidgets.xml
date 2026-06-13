@@ -1,49 +1,127 @@
 <!-- Minhas Coisas -->
-<ListPanel IsVisible="@ACIsValidArmySelected" WidthSizePolicy="Fixed" SuggestedWidth="!ArmyManagement.Panel.Left.Width" HeightSizePolicy="Fixed" SuggestedHeight="70" StackLayout.LayoutMethod="VerticalTopToBottom" HorizontalAlignment="Left" VerticalAlignment="Bottom" MarginBottom="30" MarginLeft="60">
+<ListPanel IsVisible="@ACIsValidArmySelected" WidthSizePolicy="Fixed" SuggestedWidth="!ArmyManagement.Panel.Left.Width" HeightSizePolicy="Fixed" SuggestedHeight="70" StackLayout.LayoutMethod="VerticalTopToBottom" HorizontalAlignment="Left" VerticalAlignment="Bottom" MarginBottom="30" MarginLeft="30">
     <Children>
 
-        <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Brush="ArmyManagement.Army.TotalCostAndStrength.Title" Brush.FontSize="35" Text="@ArmyBehaviorDescription" ClipContents="false" HorizontalAlignment="Center" />
+        <!-- <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Brush="ArmyManagement.Army.TotalCostAndStrength.Title" Brush.FontSize="35" Text="@ArmyBehaviorDescription" ClipContents="false" HorizontalAlignment="Center" /> -->
 
 
-        <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="35" StackLayout.LayoutMethod="HorizontalLeftToRight" HorizontalAlignment="Center">
+        <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" StackLayout.LayoutMethod="VerticalTopToBottom" HorizontalAlignment="Center">
             <Children>
 
-                <!-- Send Influence -->
-                <ListPanel IsVisible="@SendInfluenceEnabled" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" StackLayout.LayoutMethod="VerticalBottomToTop">
+                <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="35" StackLayout.LayoutMethod="HorizontalLeftToRight" HorizontalAlignment="Center">
                     <Children>
-
-                        <ButtonWidget Command.Click="ExecuteSendInfluence" DoNotPassEventsToChildren="true" Brush="ArmyManagement.Army.AddCoherenceButton" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent">
+                        <!-- BEHAVIOR DESCRIPTION -->
+                        <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" StackLayout.LayoutMethod="VerticalBottomToTop">
                             <Children>
-                                <TextWidget MarginLeft="18" MarginRight="18" Brush="ArmyManagement.Army.TotalCostAndStrength.Title" Brush.FontSize="15" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" Text="Send 50 Influence" ClipContents="false" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                <!-- <Widget Sprite="General\Icons\Influence@2x" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" /> -->
+
+                                <ButtonWidget IsDisabled="true" DoNotPassEventsToChildren="true" Brush="ArmyManagement.Army.AddCoherenceButton" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent">
+                                    <Children>
+                                        <TextWidget MarginLeft="18" MarginRight="18" Brush="ArmyManagement.Army.TotalCostAndStrength.Title" Brush.FontSize="15" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" Text="@ArmyBehaviorDescription" ClipContents="false" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        <!-- <Widget Sprite="General\Icons\Influence@2x" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" /> -->
+                                    </Children>
+                                </ButtonWidget>
                             </Children>
-                        </ButtonWidget>
+                        </ListPanel>
+
+                        <!-- CanEngageParties -->
+                        <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" StackLayout.LayoutMethod="VerticalBottomToTop">
+                            <Children>
+                                <!-- <TextWidget Brush="ArmyManagement.Army.TotalCostAndStrength.Title" Brush.FontSize="13" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Text="Target Settlement" ClipContents="false" HorizontalAlignment="Center" /> -->
+
+                                <ButtonWidget IsEnabled="@CanEngageEnemyPartiesButtonEnabled" Command.Click="ExecuteSelectCanEngageEnemyParties" DoNotPassEventsToChildren="true" Brush="ArmyManagement.Army.AddCoherenceButton" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent">
+                                    <Children>
+                                        <TextWidget MarginLeft="18" MarginRight="18" Brush="ArmyManagement.Army.TotalCostAndStrength.Title" Brush.FontSize="15" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" Text="@CanEngageEnemyPartiesButtonText" ClipContents="false" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Children>
+                                </ButtonWidget>
+                            </Children>
+                        </ListPanel>
+
+                        <!-- CanHelpAlliedParties -->
+                        <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" StackLayout.LayoutMethod="VerticalBottomToTop">
+                            <Children>
+                                <!-- <TextWidget Brush="ArmyManagement.Army.TotalCostAndStrength.Title" Brush.FontSize="13" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Text="Target Settlement" ClipContents="false" HorizontalAlignment="Center" /> -->
+
+                                <ButtonWidget IsEnabled="@CanHelpAlliedPartiesButtonEnabled" Command.Click="ExecuteSelectCanHelpAlliedParties" DoNotPassEventsToChildren="true" Brush="ArmyManagement.Army.AddCoherenceButton" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent">
+                                    <Children>
+                                        <TextWidget MarginLeft="18" MarginRight="18" Brush="ArmyManagement.Army.TotalCostAndStrength.Title" Brush.FontSize="15" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" Text="@CanHelpAlliedPartiesButtonText" ClipContents="false" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Children>
+                                </ButtonWidget>
+                            </Children>
+                        </ListPanel>
+
                     </Children>
                 </ListPanel>
 
-                <!-- Target Settlement -->
-                <ListPanel IsVisible="@TargetSettlementEnabled" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" StackLayout.LayoutMethod="VerticalBottomToTop">
+
+                <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="35" StackLayout.LayoutMethod="HorizontalLeftToRight" HorizontalAlignment="Center">
                     <Children>
-                        <!-- <TextWidget Brush="ArmyManagement.Army.TotalCostAndStrength.Title" Brush.FontSize="13" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Text="Target Settlement" ClipContents="false" HorizontalAlignment="Center" /> -->
-
-                        <ButtonWidget Command.Click="ExecuteSelectTargetSettlement" DoNotPassEventsToChildren="true" Brush="ArmyManagement.Army.AddCoherenceButton" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent">
+                        <!-- CanRecruitNewTroops -->
+                        <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" StackLayout.LayoutMethod="VerticalBottomToTop">
                             <Children>
-                                <TextWidget MarginLeft="18" MarginRight="18" Brush="ArmyManagement.Army.TotalCostAndStrength.Title" Brush.FontSize="15" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" Text="@TargetSettlementName" ClipContents="false" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                <!-- <TextWidget Brush="ArmyManagement.Army.TotalCostAndStrength.Title" Brush.FontSize="13" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Text="Target Settlement" ClipContents="false" HorizontalAlignment="Center" /> -->
+
+                                <ButtonWidget IsEnabled="@CanResupplyButtonEnabled" Command.Click="ExecuteSelectCanResupply" DoNotPassEventsToChildren="true" Brush="ArmyManagement.Army.AddCoherenceButton" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent">
+                                    <Children>
+                                        <TextWidget MarginLeft="18" MarginRight="18" Brush="ArmyManagement.Army.TotalCostAndStrength.Title" Brush.FontSize="15" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" Text="@CanResupplyButtonText" ClipContents="false" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Children>
+                                </ButtonWidget>
                             </Children>
-                        </ButtonWidget>
-                    </Children>
-                </ListPanel>
+                        </ListPanel>
 
-                <!-- Army Behavior -->
-                <ListPanel IsVisible="@ArmyBehaviorEnabled" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" StackLayout.LayoutMethod="VerticalBottomToTop">
-                    <Children>
-                        <!-- <TextWidget Brush="ArmyManagement.Army.TotalCostAndStrength.Title" Brush.FontSize="13" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Text="Army Behavior" ClipContents="false" HorizontalAlignment="Center" /> -->
-
-                        <ButtonWidget DoNotPassEventsToChildren="true" Brush="ArmyManagement.Army.AddCoherenceButton" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" IsDisabled="true">
+                        <!-- CanRunFromDanger -->
+                        <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" StackLayout.LayoutMethod="VerticalBottomToTop">
                             <Children>
-                                <TextWidget MarginLeft="18" MarginRight="18" Brush="ArmyManagement.Army.TotalCostAndStrength.Title" Brush.FontSize="15" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" Text="@ArmyBehaviorText" ClipContents="false" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                <!-- <TextWidget Brush="ArmyManagement.Army.TotalCostAndStrength.Title" Brush.FontSize="13" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Text="Target Settlement" ClipContents="false" HorizontalAlignment="Center" /> -->
+
+                                <ButtonWidget IsEnabled="@CanRunFromDangerButtonEnabled" Command.Click="ExecuteSelectCanRunFromDanger" DoNotPassEventsToChildren="true" Brush="ArmyManagement.Army.AddCoherenceButton" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent">
+                                    <Children>
+                                        <TextWidget MarginLeft="18" MarginRight="18" Brush="ArmyManagement.Army.TotalCostAndStrength.Title" Brush.FontSize="15" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" Text="@CanRunFromDangerButtonText" ClipContents="false" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Children>
+                                </ButtonWidget>
                             </Children>
-                        </ButtonWidget>
+                        </ListPanel>
+
+
+
+                        <!-- Gather Settlement -->
+                        <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" StackLayout.LayoutMethod="VerticalBottomToTop">
+                            <Children>
+                                <!-- <TextWidget Brush="ArmyManagement.Army.TotalCostAndStrength.Title" Brush.FontSize="13" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Text="Target Settlement" ClipContents="false" HorizontalAlignment="Center" /> -->
+
+                                <ButtonWidget IsEnabled="@GatherSettlementEnabled" Command.Click="ExecuteSelectGatherSettlement" DoNotPassEventsToChildren="true" Brush="ArmyManagement.Army.AddCoherenceButton" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent">
+                                    <Children>
+                                        <TextWidget MarginLeft="18" MarginRight="18" Brush="ArmyManagement.Army.TotalCostAndStrength.Title" Brush.FontSize="15" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" Text="@GatherSettlementName" ClipContents="false" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Children>
+                                </ButtonWidget>
+                            </Children>
+                        </ListPanel>
+
+                        <!-- Target Settlement -->
+                        <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" StackLayout.LayoutMethod="VerticalBottomToTop">
+                            <Children>
+                                <!-- <TextWidget Brush="ArmyManagement.Army.TotalCostAndStrength.Title" Brush.FontSize="13" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Text="Target Settlement" ClipContents="false" HorizontalAlignment="Center" /> -->
+
+                                <ButtonWidget IsEnabled="@TargetSettlementEnabled" Command.Click="ExecuteSelectTargetSettlement" DoNotPassEventsToChildren="true" Brush="ArmyManagement.Army.AddCoherenceButton" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent">
+                                    <Children>
+                                        <TextWidget MarginLeft="18" MarginRight="18" Brush="ArmyManagement.Army.TotalCostAndStrength.Title" Brush.FontSize="15" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" Text="@TargetSettlementName" ClipContents="false" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Children>
+                                </ButtonWidget>
+                            </Children>
+                        </ListPanel>
+
+                        <!-- Army Behavior -->
+                        <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" StackLayout.LayoutMethod="VerticalBottomToTop">
+                            <Children>
+                                <!-- <TextWidget Brush="ArmyManagement.Army.TotalCostAndStrength.Title" Brush.FontSize="13" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Text="Army Behavior" ClipContents="false" HorizontalAlignment="Center" /> -->
+
+                                <ButtonWidget DoNotPassEventsToChildren="true" Brush="ArmyManagement.Army.AddCoherenceButton" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" IsDisabled="true">
+                                    <Children>
+                                        <TextWidget MarginLeft="18" MarginRight="18" Brush="ArmyManagement.Army.TotalCostAndStrength.Title" Brush.FontSize="15" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" Text="@ArmyBehaviorText" ClipContents="false" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Children>
+                                </ButtonWidget>
+                            </Children>
+                        </ListPanel>
+
                     </Children>
                 </ListPanel>
             </Children>
