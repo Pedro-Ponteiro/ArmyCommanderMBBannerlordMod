@@ -28,7 +28,7 @@ namespace ArmyCommander.HarmonyPatches
             }
             else
             {
-                if (Hero.MainHero.IsKingdomLeader)
+                if (ACHelpers.HasPlayerPermissionForArmyCommand())
                 {
                     __result = true;
                 }
