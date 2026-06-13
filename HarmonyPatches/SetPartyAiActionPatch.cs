@@ -1,4 +1,5 @@
-﻿using ArmyCommander.Store;
+﻿using ArmyCommander.Helpers;
+using ArmyCommander.Store;
 using ArmyCommander.UIExtension.Context;
 using HarmonyLib;
 using Messages.FromClient.ToLobbyServer;
@@ -10,6 +11,8 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Settlements;
+using TaleWorlds.LinQuick;
+using static TaleWorlds.CampaignSystem.Party.MobileParty;
 
 namespace ArmyCommander.HarmonyPatches
 {
@@ -64,65 +67,14 @@ namespace ArmyCommander.HarmonyPatches
             object[] __args)
         {
 
-            if (!Hero.MainHero.IsKingdomLeader || Hero.MainHero.Clan.Kingdom != owner.ActualClan?.Kingdom)
-            {
-                return true;
-            }
-
-            if (owner.Army == null || owner.Army.IsWaitingForArmyMembers())
-            {
-                return true;
-            }
+            string detailName = __args[4]?.ToString();
+            Settlement original_target_settlement = (Settlement)__args[1];
+            MobileParty engaged_party = (MobileParty)__args[2];
 
 
-            if (ArmyCommandsBehaviorStore.army_commands.TryGetValue(owner.Army, out var command)) 
-            {
-                Army.ArmyTypes c_armyType = command.ArmyType;
-                Settlement c_settlement = command.Settlement;
+            bool recalculatedAI = ACAIBehaviorHelpers.AiBehaviorRecalculated(owner, detailName, original_target_settlement, engaged_party);
 
-                object detail = __args[4];
-                string detailName = detail?.ToString();
-                if (detailName == "GoToSettlement" 
-                    || detailName == "PatrolAroundSettlement" 
-                    || detailName == "PatrolAroundPoint" 
-                    || detailName == "RaidSettlement"
-                    || detailName == "BesiegeSettlement"
-                    //|| detailName == "EngageParty"
-                    //|| detailName == "GoAroundParty"
-                    || detailName == "DefendParty" // this is actually "defend settlement"
-                    || detailName == "EscortParty"
-                    //|| detailName == "MoveToNearestLand"
-                )
-                {
-                    if (c_armyType == Army.ArmyTypes.Besieger)
-                    {
-
-                        if (!command.Settlement.OwnerClan.Kingdom.IsAtWarWith(Hero.MainHero.Clan.Kingdom))
-                        {
-                            ArmyCommandsBehaviorStore.army_commands.Remove(owner.Army);
-                            return true;
-                        }
-                        SetPartyAiActionOriginal.ApplyInternal(owner, c_settlement, null, CampaignVec2.Zero, 4, owner.DesiredAiNavigationType, owner.CurrentSettlement?.HasPort == true, isTargetingPort: false);
-                        return false;
-                    }
-                    else if (c_armyType == Army.ArmyTypes.Defender)
-                    {
-                        if (command.Settlement.OwnerClan.Kingdom != Hero.MainHero.Clan.Kingdom)
-                        {
-                            ArmyCommandsBehaviorStore.army_commands.Remove(owner.Army);
-                            return true;
-                        }
-                        SetPartyAiActionOriginal.ApplyInternal(owner, c_settlement, null, CampaignVec2.Zero, 7,  owner.DesiredAiNavigationType, owner.CurrentSettlement?.HasPort == true, owner.IsCurrentlyAtSea);
-                        return false;
-                    }
-                    else
-                    {
-                        throw new NotImplementedException($"Army Command Type is invalid (should be defender or besieger, is {c_armyType.ToString()})");
-                    }
-                }
-            }
-
-            return true;
+            return !recalculatedAI;
         }
     }
 }
