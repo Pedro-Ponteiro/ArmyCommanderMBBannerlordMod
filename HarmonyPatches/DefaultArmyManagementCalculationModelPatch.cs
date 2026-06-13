@@ -70,11 +70,11 @@ namespace ArmyCommander.HarmonyPatches
             else if (party.LeaderHero == Hero.MainHero.MapFaction?.Leader && (currentMainParty != null || !Hero.MainHero.IsKingdomLeader))
             {
                 result = false;
-                explanation = new TextObject("{=ipLqVv1f}You cannot invite the ruler's party to your army.");
+                explanation = new TextObject("{=ipLqVv1f}You cannot invite the ruler's party to the army.");
             }
             else if (party.Army != null && party.Army != currentArmy)
             {
-                if (!Hero.MainHero.IsKingdomLeader)
+                if (!ACHelpers.HasPlayerPermissionForArmyCommand())
                 {
                     // Comportamento normal
                     result = false;
