@@ -1,5 +1,6 @@
 ﻿using ArmyCommander.UIExtension.Context;
 using HarmonyLib;
+using TaleWorlds.GauntletUI.BaseTypes;
 using TaleWorlds.MountAndBlade.GauntletUI.Widgets.Menu.Overlay;
 
 namespace ArmyCommander.HarmonyPatches
@@ -23,6 +24,26 @@ namespace ArmyCommander.HarmonyPatches
 
                 return false;
             }
+        }
+    }
+
+    [HarmonyPatch(typeof(ArmyOverlayWidget))]
+    internal static class ArmyOverlayWidget_OnExtendButtonClick_Patch
+    {
+        [HarmonyPostfix]
+        [HarmonyPatch("OnExtendButtonClick")]
+        private static void Postfix(
+            ArmyOverlayWidget __instance,
+            bool ____isOverlayExtended)
+        {
+            bool isOverlayExtended = ____isOverlayExtended;
+
+            if (__instance.Overlay.Id != "ACOverlayWidget")
+            {
+                return;
+            }
+
+            ACArmyOverlayUIContext.Instance.IsExtended = isOverlayExtended;
         }
     }
 }
