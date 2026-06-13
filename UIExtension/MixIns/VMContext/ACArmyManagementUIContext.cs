@@ -28,6 +28,12 @@ namespace ArmyCommander.UIExtension.Context
 
 
         private MobileParty _currentMainParty;
+        internal Settlement gatherSettlement;
+        internal bool CanEngageEnemyParties;
+        internal bool CanHelpAlliedParties;
+        internal bool CanResupply;
+        internal bool CanRunFromDanger;
+
         public MobileParty currentMainParty { 
             get
             {
