@@ -1,0 +1,21 @@
+<ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" StackLayout.LayoutMethod="HorizontalLeftToRight" VerticalAlignment="Bottom" HorizontalAlignment="Center" MarginLeft="15">
+
+    <Children>
+
+        <!-- My Stuff -->
+        <ButtonWidget Id="RemoveOrdersButton" DoNotPassEventsToChildren="true" UpdateChildrenStates="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="300" SuggestedHeight="50" HorizontalAlignment="Left" VerticalAlignment="Bottom" MarginBottom="12" Command.Click="ExecuteRemoveOrders" IsEnabled="@RemoveOrdersButtonEnabled" GamepadNavigationIndex="0">
+            <Children>
+                <BrushWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="337" SuggestedHeight="69" HorizontalAlignment="Center" VerticalAlignment="Bottom" Brush="Standard.DialogCloseButtons.CancelButton">
+                    <Children>
+                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" VerticalAlignment="Center" MarginTop="35" Brush="Popup.Button.Text" Brush.TextVerticalAlignment="Center" Text="@RemoveOrdersButtonText" />
+                    </Children>
+                </BrushWidget>
+            </Children>
+        </ButtonWidget>
+
+        <!-- original disbandButton -->
+        <ArmyCommanderOriginalDisbandButtonPlaceholder />
+
+    </Children>
+
+</ListPanel>
