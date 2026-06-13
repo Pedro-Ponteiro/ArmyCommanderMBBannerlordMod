@@ -1,4 +1,5 @@
-﻿using ArmyCommander.Helpers;
+﻿using ArmyCommander.HarmonyPatches;
+using ArmyCommander.Helpers;
 using ArmyCommander.UIExtension.Context;
 using HarmonyLib;
 using System;
@@ -63,6 +64,8 @@ namespace ArmyCommander.UIExtension.MixIns.VMItems
                     ACArmyOverlayUIContext.Instance.ArmiesCount += 1;
                 }
             }
+
+            ACChatLogWidgetController.UpdateDesiredMarginBottom(ACArmyOverlayUIContext.Instance.IsExtended, ACArmyOverlayUIContext.Instance.ArmiesCount);
 
 
             foreach (var party in Clan.PlayerClan.Kingdom.AllParties)
