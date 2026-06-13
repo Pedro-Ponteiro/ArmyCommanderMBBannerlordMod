@@ -1,19 +1,27 @@
 ﻿using ArmyCommander.ACBehaviors;
+using ArmyCommander.HarmonyPatches;
 using ArmyCommander.Store;
 using Helpers;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.CampaignBehaviors;
+using TaleWorlds.CampaignSystem.CharacterDevelopment;
 using TaleWorlds.CampaignSystem.Encounters;
 using TaleWorlds.CampaignSystem.MapEvents;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.CampaignSystem.Siege;
 using TaleWorlds.Core;
+using TaleWorlds.Core.ViewModelCollection.Information;
+using TaleWorlds.Library;
+using TaleWorlds.LinQuick;
 using TaleWorlds.Localization;
+using TaleWorlds.MountAndBlade.GauntletUI.Widgets;
 using TaleWorlds.ObjectSystem;
+using static TaleWorlds.CampaignSystem.Party.MobileParty;
 
 namespace ArmyCommander.Helpers
 {
@@ -87,7 +95,7 @@ namespace ArmyCommander.Helpers
                 MapEvent.PlayerMapEvent != null ||
                 CampaignMission.Current != null ||
                 PlayerSiege.PlayerSiegeEvent != null
-                ) 
+                )
             {
                 return true;
             }
@@ -111,7 +119,7 @@ namespace ArmyCommander.Helpers
                 mp.IsCurrentlyAtSea ||
                 mp.IsInRaftState ||
                 mp.SiegeEvent != null ||
-                (mp.CurrentSettlement != null  && !IsSettlementOK(mp.CurrentSettlement)) ||
+                (mp.CurrentSettlement != null && !IsSettlementOK(mp.CurrentSettlement)) ||
                 mp.IsDisbanding ||
                 Campaign.Current.GetCampaignBehavior<IDisbandPartyCampaignBehavior>()?.IsPartyWaitingForDisband(mp) == true
             )
@@ -347,6 +355,102 @@ namespace ArmyCommander.Helpers
                 }
             }
             return troopTypeCountDict;
+        }
+
+        public static float NumberOfDaysUntilFoodRunsOff(Army army)
+        {
+            float total_food = 0f;
+            float total_food_change = 0f;
+            foreach (MobileParty party in army.Parties)
+            {
+                if (army.DoesLeaderPartyAndAttachedPartiesContain(party))
+                {
+                    total_food += party.Food;
+                    total_food_change += party.FoodChange;
+                }
+            }
+
+
+            if (total_food <= 0)
+            {
+                return 0;
+            }
+
+            if (total_food_change >= 0)
+            {
+                return float.PositiveInfinity;
+            }
+
+            return total_food / - total_food_change;
+        }
+
+        internal static bool HasPlayerPermissionForArmyCommand()
+        {
+            Kingdom playerKingdom = Clan.PlayerClan?.Kingdom;
+
+            if (playerKingdom == null)
+            {
+                return false;
+            }
+
+            if (Hero.MainHero.IsKingdomLeader)
+            {
+                return true;
+            }
+
+
+            return ACPermissionsStore._acKingdomIdThatAllowedPlayerVassalArmyCommand == playerKingdom.StringId;
+        }
+
+        public static Settlement GetPossibleCapital(Kingdom kingdom)
+        {
+            // TODO: Precisa refatorar com raiva.
+
+            if (kingdom == null)
+            {
+                return null;
+            }
+
+
+            // Tenta pegar a principal cidade do clan dono.
+            // Se o resultado for uma cidade que não pertence ao kingdom usa a mesma função mas para o kingdom.
+
+            Settlement midSettlement;
+            Town possibleCapital;
+
+            if (kingdom.RulingClan.Settlements.Count == 0)
+            {
+                midSettlement = kingdom.FactionMidSettlement;
+                possibleCapital = midSettlement.Town;
+
+                if (!midSettlement.IsTown)
+                {
+                    possibleCapital = SettlementHelper.FindNearestTownToSettlement(midSettlement, NavigationType.All, (settlement) => settlement.OwnerClan?.Kingdom == kingdom);
+                }
+            }
+            else
+            {
+                midSettlement = kingdom.RulingClan.FactionMidSettlement;
+                possibleCapital = midSettlement.Town;
+
+                if (!midSettlement.IsTown)
+                {
+                    possibleCapital = SettlementHelper.FindNearestTownToSettlement(midSettlement, NavigationType.All, (settlement) => settlement.OwnerClan == kingdom.RulingClan);
+                }
+
+                if (possibleCapital == null)
+                {
+                    midSettlement = kingdom.FactionMidSettlement;
+                    possibleCapital = midSettlement.Town;
+
+                    if (!midSettlement.IsTown)
+                    {
+                        possibleCapital = SettlementHelper.FindNearestTownToSettlement(midSettlement, NavigationType.All, (settlement) => settlement.OwnerClan?.Kingdom == kingdom);
+                    }
+                }
+            }
+
+            return possibleCapital.Settlement;
         }
     }
 }
