@@ -24,6 +24,8 @@ using TaleWorlds.Core.ViewModelCollection.Tutorial;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using static TaleWorlds.MountAndBlade.FormationAI;
+using TaleWorlds.CampaignSystem.GameMenus;
+using TaleWorlds.LinQuick;
 
 namespace ArmyCommander.HarmonyPatches
 {
@@ -135,10 +137,10 @@ namespace ArmyCommander.HarmonyPatches
             // a direita fica vazia
 
 
-            bool is_player_kingdom_leader = Hero.MainHero.IsKingdomLeader;
+            bool canPlayerCommandArmies = ACHelpers.HasPlayerPermissionForArmyCommand();
 
             // Atualiza o contexto ao setar esses caras abaixo
-            if (!is_player_kingdom_leader)
+            if (!canPlayerCommandArmies)
             {
                 ACArmyManagementUIContext.Instance.currentMainParty = Hero.MainHero.PartyBelongedTo;
             }
@@ -167,9 +169,9 @@ namespace ArmyCommander.HarmonyPatches
             MainPartyItemRef(__instance) = new ArmyManagementItemVM(onAddToCart, onRemove, onFocus, ACArmyManagementUIContext.Instance.currentMainParty)
             {
                 IsAlreadyWithPlayer = true,
-                IsMainHero = !is_player_kingdom_leader,
+                IsMainHero = !canPlayerCommandArmies,
                 IsInCart = true,
-                IsTransferDisabled = PlayerSiege.PlayerSiegeEvent != null || !is_player_kingdom_leader
+                IsTransferDisabled = PlayerSiege.PlayerSiegeEvent != null || !canPlayerCommandArmies
             };
 
             if (ACArmyManagementUIContext.Instance.mainPartyHasArmy)
@@ -218,7 +220,7 @@ namespace ArmyCommander.HarmonyPatches
             }
 
 
-            if (is_player_kingdom_leader)
+            if (canPlayerCommandArmies)
             {
                 // disponibilizar do lado esquerdo.
                 __instance.PartyList.Add(MainPartyItemRef(__instance));
@@ -582,9 +584,21 @@ namespace ArmyCommander.HarmonyPatches
                         mbs
                         );
 
-                    ArmyCommandsBehaviorStore.army_commands[ACArmyManagementUIContext.Instance.currentMainParty.Army] = 
-                        (ACArmyManagementUIContext.Instance.armyBehavior, ACArmyManagementUIContext.Instance.targetSettlement);
+                    if (!ACArmyManagementUIContext.Instance.currentMainParty.IsMainParty)
+                    {
+                        ArmyCommandsBehaviorStore.army_commands[ACArmyManagementUIContext.Instance.currentMainParty.Army] = 
+                            (ACArmyManagementUIContext.Instance.armyBehavior,
+                            ACArmyManagementUIContext.Instance.targetSettlement,
+                            ACArmyManagementUIContext.Instance.gatherSettlement,
+                            ACArmyManagementUIContext.Instance.CanEngageEnemyParties,
+                            ACArmyManagementUIContext.Instance.CanHelpAlliedParties,
+                            ACArmyManagementUIContext.Instance.CanResupply,
+                            ACArmyManagementUIContext.Instance.CanRunFromDanger);
+                    }
+
                     armyCreated = true;
+                    armyToUse = ACArmyManagementUIContext.Instance.currentMainParty.Army;
+
                 }
 
                 if (!armyCreated)
@@ -594,28 +608,41 @@ namespace ArmyCommander.HarmonyPatches
                         mb.Army = ACArmyManagementUIContext.Instance.currentMainParty.Army;
                     }
 
-                    if (!armyToUse.LeaderParty.IsMainParty)
+                    (
+                        Army.ArmyTypes ArmyType,
+                        Settlement TargetSettlement,
+                        Settlement GatherSettlement,
+                        bool CanEngageEnemyParties,
+                        bool CanHelpAlliedParties,
+                        bool CanResupply,
+                        bool CanRunFromDanger
+                    ) new_commands = (
+                        ACArmyManagementUIContext.Instance.armyBehavior,
+                        ACArmyManagementUIContext.Instance.targetSettlement,
+                        ACArmyManagementUIContext.Instance.gatherSettlement,
+                        ACArmyManagementUIContext.Instance.CanEngageEnemyParties,
+                        ACArmyManagementUIContext.Instance.CanHelpAlliedParties,
+                        ACArmyManagementUIContext.Instance.CanResupply,
+                        ACArmyManagementUIContext.Instance.CanRunFromDanger
+                    );
+
+                    var old_commands_exist = ArmyCommandsBehaviorStore.army_commands.TryGetValue(armyToUse, out var old_player_commands);
+
+                    // TODO: CHECK THIS WITH AN AI CREATED ARMY!
+                    var default_ai_commands = ACAIBehaviorHelpers.GetDefaultAiCommands(armyToUse);
+
+                    if (!armyToUse.LeaderParty.IsMainParty && 
+                        (
+                            (!old_commands_exist && new_commands != default_ai_commands) || // for new player commands
+                            (old_commands_exist && new_commands != old_player_commands) // for changing the old player command
+                        )
+                    )
                     {
-                        if (ACArmyManagementUIContext.Instance.targetSettlement != (Settlement)armyToUse.AiBehaviorObject)
+                        ArmyCommandsBehaviorStore.army_commands[armyToUse] = new_commands;
+
+                        if (ACHelpers.IsArmyAvailableForOrders(armyToUse))
                         {
-
-                            ArmyCommandsBehaviorStore.army_commands[armyToUse] = (ACArmyManagementUIContext.Instance.armyBehavior, ACArmyManagementUIContext.Instance.targetSettlement);
-
-                            if (!armyToUse.IsWaitingForArmyMembers())
-                            {
-                                if (ACArmyManagementUIContext.Instance.armyBehavior == Army.ArmyTypes.Besieger)
-                                {
-                                    SetPartyAiAction.GetActionForBesiegingSettlement(armyToUse.LeaderParty, ACArmyManagementUIContext.Instance.targetSettlement, armyToUse.LeaderParty.DesiredAiNavigationType, armyToUse.LeaderParty.CurrentSettlement?.HasPort == true);
-                                }
-                                else if (ACArmyManagementUIContext.Instance.armyBehavior == Army.ArmyTypes.Defender)
-                                {
-                                    SetPartyAiAction.GetActionForDefendingSettlement(armyToUse.LeaderParty, ACArmyManagementUIContext.Instance.targetSettlement, armyToUse.LeaderParty.DesiredAiNavigationType, armyToUse.LeaderParty.CurrentSettlement?.HasPort == true, armyToUse.LeaderParty.IsCurrentlyAtSea);
-                                }
-                            }
-                            else
-                            {
-                                armyToUse.Gather(ACArmyManagementUIContext.Instance.targetSettlement);
-                            }
+                            ACAIBehaviorHelpers.OnPlayerArmyCommandChanged(armyToUse.LeaderParty);
                         }
                     }
                 }
@@ -624,11 +651,15 @@ namespace ArmyCommander.HarmonyPatches
                     // MANUAL ASSIGNMENT FOR PLAYER LEADED ARMY!
                     foreach (var mb in mbs)
                     {
-                        mb.Army = ACArmyManagementUIContext.Instance.currentMainParty.Army;
+                        mb.Army = armyToUse;
                     }
                 }
+                else if (armyCreated)
+                {
+                    // New AI army created
+                    ACAIBehaviorHelpers.OnPlayerArmyCommandChanged(armyToUse.LeaderParty);
+                }
 
-                armyToUse = ACArmyManagementUIContext.Instance.currentMainParty.Army;
 
                 if (ACArmyOverlayUIContext.Instance != null)
                 {
@@ -648,10 +679,18 @@ namespace ArmyCommander.HarmonyPatches
             if (__instance.PartiesInCart.Count == 1 && partiesToRemove.Count > 0)
             {
                 CustomDisbandArmy(__instance);
+                OnCloseRef(__instance)?.Invoke();
+
+                if (partiesToRemove.ContainsQ((item) => item.Party.IsMainParty))
+                {
+                    GameMenu.ExitToLast();
+                }
+
+                MapScreen_OnRefreshState_Patch.RefreshArmyOverlay();
                 return false;
             }
 
-
+            bool player_removed = false;
             if (!armyCreated && partiesToRemove.Count > 0)
             {
                 foreach (ArmyManagementItemVM item in partiesToRemove)
@@ -659,13 +698,23 @@ namespace ArmyCommander.HarmonyPatches
                     if (armyToUse.Parties.Contains(item.Party))
                     {
                         item.Party.Army = null;
+                        if (item.Party.IsMainParty)
+                        {
+                            player_removed = true;
+                        }
                     }
                 }
                 partiesToRemove.Clear();
             }
 
             OnCloseRef(__instance)?.Invoke();
-            CampaignEventDispatcher.Instance.OnArmyOverlaySetDirty();
+
+            if (player_removed)
+            {
+                GameMenu.ExitToLast();
+            }
+
+            MapScreen_OnRefreshState_Patch.RefreshArmyOverlay();
 
             return false;
         }
