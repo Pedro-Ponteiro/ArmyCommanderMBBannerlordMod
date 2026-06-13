@@ -1,4 +1,5 @@
 ﻿using ArmyCommander.ACBehaviors;
+using ArmyCommander.ACBehaviors.Context;
 using ArmyCommander.Store;
 using Bannerlord.UIExtenderEx;
 using HarmonyLib;
@@ -157,13 +158,12 @@ namespace ArmyCommander
                         return;
                     }
 
+                    ArmyCommandsContext.Reset();
                     ArmyCommandsBehaviorStore.Reset();
                     ACPermissionsStore.Reset();
 
                     campaignGameStarter.AddBehavior(new ACArmyCommanderBehavior());
-
                     campaignGameStarter.AddBehavior(new ACMercenaryArmyLeadershipDialogueBehavior());
-
                     campaignGameStarter.AddBehavior(new ACVassalArmyCommanderDialogueBehavior());
 
                 }
