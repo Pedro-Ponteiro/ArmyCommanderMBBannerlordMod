@@ -1,4 +1,5 @@
 ﻿using ArmyCommander.ACBehaviors;
+using ArmyCommander.Store;
 using Bannerlord.UIExtenderEx;
 using HarmonyLib;
 using System;
@@ -8,7 +9,7 @@ using System.Text;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.MountAndBlade;
-// using ArmyCommander.Behavior;
+
 
 namespace ArmyCommander
 {
@@ -33,57 +34,49 @@ namespace ArmyCommander
         {
             try
             {
-                Directory.CreateDirectory(LogDirectory);
 
-                Log("");
-                Log("==================================================");
-                Log("OnSubModuleLoad começou");
-                Log("Assembly: " + Assembly.GetExecutingAssembly().FullName);
-                Log("Assembly location: " + Assembly.GetExecutingAssembly().Location);
-
-                Log("Chamando base.OnSubModuleLoad()");
                 base.OnSubModuleLoad();
-                Log("base.OnSubModuleLoad() concluído");
 
-                Log("Criando Harmony");
+
+
                 _harmony = new Harmony(HarmonyId);
-                Log("Harmony criado");
 
-                Log("Chamando Harmony.PatchAll()");
+
+
                 _harmony.PatchAll(Assembly.GetExecutingAssembly());
-                Log("Harmony.PatchAll() concluído");
 
-                Log("Criando UIExtender");
+
+
                 _uiExtender = UIExtender.Create("ArmyCommander");
-                Log("UIExtender criado");
 
-                Log("Registrando assembly no UIExtender");
+
+
                 _uiExtender.Register(Assembly.GetExecutingAssembly());
-                Log("UIExtender.Register() concluído");
 
-                Log("Habilitando UIExtender");
+
+
                 _uiExtender.Enable();
-                Log("UIExtender.Enable() concluído");
 
-                Log("OnSubModuleLoad terminou com sucesso");
+
+
             }
             catch (TargetInvocationException ex)
             {
-                Log("ERRO: TargetInvocationException em OnSubModuleLoad");
+
                 LogException(ex);
-                Log("InnerException principal:");
+
                 LogException(ex.InnerException);
 
                 throw;
             }
             catch (ReflectionTypeLoadException ex)
             {
-                Log("ERRO: ReflectionTypeLoadException em OnSubModuleLoad");
+
                 LogException(ex);
 
                 if (ex.LoaderExceptions != null)
                 {
-                    Log("LoaderExceptions:");
+
 
                     foreach (Exception loaderException in ex.LoaderExceptions)
                     {
@@ -95,7 +88,7 @@ namespace ArmyCommander
             }
             catch (Exception ex)
             {
-                Log("ERRO: Exception em OnSubModuleLoad");
+
                 LogException(ex);
 
                 throw;
@@ -106,28 +99,28 @@ namespace ArmyCommander
         {
             try
             {
-                Log("OnSubModuleUnloaded começou");
+
 
                 base.OnSubModuleUnloaded();
 
-                Log("Desabilitando UIExtender");
+
                 _uiExtender?.Disable();
 
-                Log("Deregistrando UIExtender");
+
                 _uiExtender?.Deregister();
 
                 _uiExtender = null;
 
-                Log("Removendo patches Harmony");
+
                 _harmony?.UnpatchAll(HarmonyId);
 
                 _harmony = null;
 
-                Log("OnSubModuleUnloaded terminou com sucesso");
+
             }
             catch (Exception ex)
             {
-                Log("ERRO: Exception em OnSubModuleUnloaded");
+
                 LogException(ex);
 
                 throw;
@@ -138,61 +131,55 @@ namespace ArmyCommander
         {
             try
             {
-                Log("OnGameStart começou");
+
 
                 if (game == null)
                 {
-                    Log("game está null");
+
                     return;
                 }
 
                 if (gameStarterObject == null)
                 {
-                    Log("gameStarterObject está null");
+
                     return;
                 }
 
-                Log("GameType: " + game.GameType?.GetType().FullName);
-
                 if (game.GameType is Campaign)
                 {
-                    Log("GameType é Campaign");
+
 
                     CampaignGameStarter campaignGameStarter = gameStarterObject as CampaignGameStarter;
 
                     if (campaignGameStarter == null)
                     {
-                        Log("gameStarterObject NÃO é CampaignGameStarter. Tipo real: " + gameStarterObject.GetType().FullName);
+
                         return;
                     }
 
-                    Log("Adicionando behavior ACArmyCommanderBehavior");
+                    ArmyCommandsBehaviorStore.Reset();
+                    ACPermissionsStore.Reset();
+
                     campaignGameStarter.AddBehavior(new ACArmyCommanderBehavior());
-                    Log("Behavior ACArmyCommanderBehavior adicionado");
 
-                    Log("Adicionando behavior ACMercenaryArmyLeadershipDialogueBehavior");
                     campaignGameStarter.AddBehavior(new ACMercenaryArmyLeadershipDialogueBehavior());
-                    Log("Behavior ACMercenaryArmyLeadershipDialogueBehavior adicionado");
-                }
-                else
-                {
-                    Log("GameType não é Campaign. Ignorando AddBehavior.");
-                }
 
-                Log("OnGameStart terminou com sucesso");
+                    campaignGameStarter.AddBehavior(new ACVassalArmyCommanderDialogueBehavior());
+
+                }
             }
             catch (TargetInvocationException ex)
             {
-                Log("ERRO: TargetInvocationException em OnGameStart");
+
                 LogException(ex);
-                Log("InnerException principal:");
+
                 LogException(ex.InnerException);
 
                 throw;
             }
             catch (Exception ex)
             {
-                Log("ERRO: Exception em OnGameStart");
+
                 LogException(ex);
 
                 throw;
@@ -220,7 +207,7 @@ namespace ArmyCommander
         {
             if (ex == null)
             {
-                Log("Exception está null");
+
                 return;
             }
 
