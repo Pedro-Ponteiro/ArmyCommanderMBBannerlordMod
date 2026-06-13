@@ -1,7 +1,8 @@
-﻿using TaleWorlds.CampaignSystem;
+﻿using ArmyCommander.HarmonyPatches;
+using ArmyCommander.UIExtension.MixIns;
+using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.ViewModelCollection.GameMenu.Overlay;
 using TaleWorlds.Library;
-using ArmyCommander.UIExtension.MixIns;
 
 namespace ArmyCommander.UIExtension.Context
 {
@@ -49,7 +50,7 @@ namespace ArmyCommander.UIExtension.Context
             }
         }
 
-        public int ArmiesCount = 0;
+        
 
         public int PartiesInArmiesCount = 0;
 
@@ -81,5 +82,46 @@ namespace ArmyCommander.UIExtension.Context
             }
         }
 
+        private bool _isExtended = true;
+
+        public bool IsExtended
+        {
+            get
+            {
+                return _isExtended;
+            }
+            set
+            {
+
+                if (_isExtended == value)
+                {
+                    return;
+                }
+
+                _isExtended = value;
+
+                ACChatLogWidgetController.UpdateDesiredMarginBottom(_isExtended, _armiesCount);
+            }
+        }
+
+        private int _armiesCount = 0;
+
+        public int ArmiesCount
+        {
+            get
+            {
+                return _armiesCount;
+            }
+            set
+            {
+
+                if (_armiesCount == value)
+                {
+                    return;
+                }
+
+                _armiesCount = value;
+            }
+        }
     }
 }
