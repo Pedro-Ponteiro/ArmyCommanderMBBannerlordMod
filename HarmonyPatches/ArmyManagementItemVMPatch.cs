@@ -1,12 +1,61 @@
-﻿using HarmonyLib;
+﻿using ArmyCommander.Helpers;
+using ArmyCommander.UIExtension.Context;
+using HarmonyLib;
+using Helpers;
 using System;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using TaleWorlds.CampaignSystem.ViewModelCollection.ArmyManagement;
 using TaleWorlds.CampaignSystem.ViewModelCollection.KingdomManagement.Armies;
 
 namespace ArmyCommander.HarmonyPatches
 {
+
+    [HarmonyPatch]
+    internal static class ArmyManagementItemVM_Distance_Getter_Patch
+    {
+        private static MethodBase TargetMethod()
+        {
+            return AccessTools.PropertyGetter(
+                typeof(ArmyManagementItemVM),
+                "_distance"
+            );
+        }
+
+        private static void Postfix(ArmyManagementItemVM __instance, ref float __result)
+        {
+            var context = ACArmyManagementUIContext.Instance;
+
+            if (context?.currentMainParty != null &&
+                context.currentMainParty.IsMainParty == false)
+            {
+                __result = DistanceHelper.FindClosestDistanceFromMobilePartyToMobileParty(
+                    __instance.Party,
+                    context.currentMainParty,
+                    __instance.Party.NavigationCapability
+                );
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(ArmyManagementItemVM))]
+    internal static class ArmyManagementItemVM_DistInTime_Getter_Patch
+    {
+        [HarmonyPostfix]
+        [HarmonyPatch(nameof(ArmyManagementItemVM.DistInTime), MethodType.Getter)]
+        private static void Postfix(ArmyManagementItemVM __instance, ref float __result)
+        {
+            if (__instance?.Party == null || __instance.Party.Speed <= 0f)
+            {
+                return;
+            }
+
+            __result = TaleWorlds.Library.MathF.Ceiling(
+                __instance._distance / __instance.Party.Speed
+            );
+        }
+    }
 
     [HarmonyPatch]
     internal static class ArmyManagementItemVMOriginal
