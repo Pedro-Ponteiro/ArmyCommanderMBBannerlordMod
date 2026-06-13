@@ -276,7 +276,14 @@
     <!-- ArmyCommander source files -->
     <Compile Include="ACBehaviors\ACArmyCommanderBehavior.cs" />
     <Compile Include="ACBehaviors\ACMercenaryArmyLeadershipDialogueBehavior.cs" />
+    <Compile Include="ACBehaviors\ACVassalArmyCommanderDialogueBehavior.cs" />
+    <Compile Include="ACBehaviors\Context\ArmyCommandsContext.cs" />
     <Compile Include="Actions\ArmyCommanderActions.cs" />
+    <Compile Include="HarmonyPatches\ChatLogWidgetPatch.cs" />
+    <Compile Include="HarmonyPatches\DefaultMobilePartyAIModelPatch.cs" />
+    <Compile Include="HarmonyPatches\DisbandArmyActionPatch.cs" />
+    <Compile Include="HarmonyPatches\MobilePartyPatch.cs" />
+    <Compile Include="Helpers\ACAIBehaviorHelpers.cs" />
     <Compile Include="Store\ACPermissionsStore.cs" />
     <Compile Include="Store\ArmyCommandsBehaviorStore.cs" />
     <Compile Include="CalculationModels\ACCalculationModel.cs" />
@@ -310,8 +317,8 @@
     <Compile Include="UIExtension\MixIns\VMItems\SelectableArmyPropertiesRow.cs" />
     <Compile Include="UIExtension\MixIns\WidgetBuilders\ACArmyLineWidgetBuilders.cs" />
     <Compile Include="UIExtension\UIPatches\ACArmyManagementPatch.cs" />
+    <Compile Include="UIExtension\UIPatches\ACArmyManagementRightPanelDisbandButtonPatch.cs" />
     <Compile Include="UIExtension\UIPatches\ACArmyOverlayArmyListPatch.cs" />
-    <Compile Include="UIExtension\UIPatches\ACChatLogPatch.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="DeployModFiles" AfterTargets="Build">
