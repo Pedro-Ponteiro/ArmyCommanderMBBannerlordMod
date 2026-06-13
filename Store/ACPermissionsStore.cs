@@ -9,5 +9,12 @@ namespace ArmyCommander.Store
     public static class ACPermissionsStore
     {
         public static string _acKingdomIdThatAllowedPlayerMercenaryArmyLeadership;
+        public static string _acKingdomIdThatAllowedPlayerVassalArmyCommand;
+
+        public static void Reset()
+        {
+            _acKingdomIdThatAllowedPlayerMercenaryArmyLeadership = null;
+            _acKingdomIdThatAllowedPlayerVassalArmyCommand = null;
+        }
     }
 }
