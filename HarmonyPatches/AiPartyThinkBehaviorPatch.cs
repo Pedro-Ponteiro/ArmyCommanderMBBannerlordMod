@@ -1,49 +1,86 @@
 ﻿using ArmyCommander.Helpers;
 using HarmonyLib;
 using System.Collections.Generic;
+using System.Reflection.Emit;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.CampaignBehaviors.AiBehaviors;
-using System.Reflection.Emit;
+using TaleWorlds.CampaignSystem.Siege;
 
-[HarmonyPatch(typeof(AiPartyThinkBehavior), "PartyHourlyAiTick")]
-internal static class AiPartyThinkBehavior_PartyHourlyAiTick_Patch
+
+namespace ArmyCommander.HarmonyPatches
 {
-    private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+    [HarmonyPatch(typeof(AiPartyThinkBehavior), "PartyHourlyAiTick")]
+    internal static class AiPartyThinkBehavior_PartyHourlyAiTick_Patch
     {
-        var originalGetter = AccessTools.PropertyGetter(
-            typeof(Clan),
-            nameof(Clan.IsUnderMercenaryService)
-        );
-
-        var replacementMethod = AccessTools.Method(
-            typeof(AiPartyThinkBehavior_PartyHourlyAiTick_Patch),
-            nameof(GetIsUnderMercenaryServiceForArmyGathering)
-        );
-
-        foreach (var instruction in instructions)
+        private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
-            if (instruction.Calls(originalGetter))
-            {
-                yield return new CodeInstruction(OpCodes.Call, replacementMethod)
-                {
-                    labels = instruction.labels,
-                    blocks = instruction.blocks
-                };
+            var originalMercenaryGetter = AccessTools.PropertyGetter(
+                typeof(Clan),
+                nameof(Clan.IsUnderMercenaryService)
+            );
 
-                continue;
+            var replacementMercenaryMethod = AccessTools.Method(
+                typeof(AiPartyThinkBehavior_PartyHourlyAiTick_Patch),
+                nameof(GetIsUnderMercenaryServiceForArmyGathering)
+            );
+
+            var originalFinalizeSiegeEvent = AccessTools.Method(
+                typeof(SiegeEvent),
+                nameof(SiegeEvent.FinalizeSiegeEvent)
+            );
+
+            var replacementFinalizeSiegeEvent = AccessTools.Method(
+                typeof(AiPartyThinkBehavior_PartyHourlyAiTick_Patch),
+                nameof(FinalizeSiegeEventIfAllowed)
+            );
+
+            foreach (var instruction in instructions)
+            {
+                if (instruction.Calls(originalMercenaryGetter))
+                {
+                    yield return new CodeInstruction(OpCodes.Call, replacementMercenaryMethod)
+                    {
+                        labels = instruction.labels,
+                        blocks = instruction.blocks
+                    };
+
+                    continue;
+                }
+
+                if (instruction.Calls(originalFinalizeSiegeEvent))
+                {
+                    yield return new CodeInstruction(OpCodes.Call, replacementFinalizeSiegeEvent)
+                    {
+                        labels = instruction.labels,
+                        blocks = instruction.blocks
+                    };
+
+                    continue;
+                }
+
+                yield return instruction;
+            }
+        }
+
+        private static bool GetIsUnderMercenaryServiceForArmyGathering(Clan clan)
+        {
+            if (ACHelpers.IsMercenaryArmyLeadersPolicyEnacted(clan))
+            {
+                return false;
             }
 
-            yield return instruction;
+            return clan.IsUnderMercenaryService;
         }
-    }
 
-    private static bool GetIsUnderMercenaryServiceForArmyGathering(Clan clan)
-    {
-        if (ACHelpers.IsMercenaryArmyLeadersPolicyEnacted(clan))
+        private static void FinalizeSiegeEventIfAllowed(SiegeEvent siegeEvent)
         {
-            return false;
-        }
 
-        return clan.IsUnderMercenaryService;
+            if (!ACAIBehaviorHelpers.ACShouldAttackerEndSiege(siegeEvent))
+            {
+                return;
+            }
+
+            siegeEvent.FinalizeSiegeEvent();
+        }
     }
 }
