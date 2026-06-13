@@ -224,11 +224,14 @@ namespace ArmyCommander.HarmonyPatches
             }
             else
             {
+
+                Army army = Clan.PlayerClan.Kingdom.Armies.FirstOrDefault();
+
                 if (ACArmyOverlayUIContext.Instance != null)
                 {
-                    ACArmyOverlayUIContext.Instance.SelectedArmy = Clan.PlayerClan.Kingdom.Armies.FirstOrDefault();
+                    ACArmyOverlayUIContext.Instance.SelectedArmy = army;
                 }
-                __result = Clan.PlayerClan.Kingdom.Armies.FirstOrDefault();
+                __result = army;
             }
             
 
