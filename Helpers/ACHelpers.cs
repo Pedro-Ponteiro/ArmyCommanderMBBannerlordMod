@@ -135,7 +135,7 @@ namespace ArmyCommander.Helpers
 
             if (settlement == null)
             {
-                // settlement doesnt exist, is it possibly worse? Not OK!
+                // The settlement does not exist. Could it be worse? Not OK!
                 return false;
             }
 
@@ -404,7 +404,7 @@ namespace ArmyCommander.Helpers
 
         public static Settlement GetPossibleCapital(Kingdom kingdom)
         {
-            // TODO: Precisa refatorar com raiva.
+            // TODO: Refactor this with rage.
 
             if (kingdom == null)
             {
@@ -412,8 +412,8 @@ namespace ArmyCommander.Helpers
             }
 
 
-            // Tenta pegar a principal cidade do clan dono.
-            // Se o resultado for uma cidade que não pertence ao kingdom usa a mesma função mas para o kingdom.
+            // Try to get the owner clan's main city.
+            // If the result is a city that does not belong to the kingdom, use the same function, but for the kingdom.
 
             Settlement midSettlement;
             Town possibleCapital;
