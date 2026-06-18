@@ -28,8 +28,8 @@ namespace ArmyCommander.Actions
             bool prioritize_cheapest = true
         )
         {
-            // Gets items from sender and sends it to receiver.
-            // please check if the quantity is <= sender_items_to_send.amount
+            // Gets items from the sender and sends them to the receiver.
+            // Please check whether quantity <= sender_items_to_send.amount.
             // TODO: YOU MUST DEFINE THE TYPE OF THE ITEM THAT WILL BE SENT. DEFINE PARAMETER
 
             int selected_items_count = 0;
@@ -66,7 +66,7 @@ namespace ArmyCommander.Actions
         //    Func<MobileParty, int> poorness_calculator = null
         //)
         //{
-        //    // please check if the quantity is <= sender_items_to_send.amount
+        //    // Please check whether quantity <= sender_items_to_send.amount.
         //    // TODO: YOU MUST DEFINE THE TYPE OF THE ITEM THAT WILL BE SENT. DEFINE PARAMETER (MOUNT? ARMOR? FOOD?)...
 
         //    if (prioritize_cheapest_item) 
@@ -79,7 +79,7 @@ namespace ArmyCommander.Actions
 
         //    if (prioritize_poorest)
         //    {
-        //        // oh my god, how do you define who is the poorest? Quantity of items 
+        //        // Oh my god, how do you define who is the poorest? Quantity of items
         //        ACCalculationModel.DistributeToSmallestKeepOriginalOrder()
         //    }
 
