@@ -59,7 +59,7 @@ namespace ArmyCommander.Helpers
                 default_list.Add(new TooltipProperty("Troops in Armies", context.MenInArmiesCount.ToString(), 0));
                 default_list.Add(new TooltipProperty("", "", 0, onlyShowWhenExtended: false, TooltipProperty.TooltipPropertyFlags.RundownSeperator));
 
-                // list troop count for each type.
+                // List troop counts for each type.
 
                 foreach (var troopTypeCount in troopTypeCountDict)
                 {
@@ -76,7 +76,7 @@ namespace ArmyCommander.Helpers
                 default_list.Add(new TooltipProperty("Troops Not in Armies", (context.MenInKingdomCount - context.MenInArmiesCount).ToString(), 0));
                 default_list.Add(new TooltipProperty("", "", 0, onlyShowWhenExtended: false, TooltipProperty.TooltipPropertyFlags.RundownSeperator));
 
-                // list troop count for each type.
+                // List troop counts for each type.
 
                 foreach (var troopTypeCount in troopTypeCountDict)
                 {
