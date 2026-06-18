@@ -40,7 +40,7 @@ namespace ArmyCommander.HarmonyPatches
 
             MobileParty currentMainParty = ACArmyManagementUIContext.Instance?.currentMainParty;
 
-            // TODO: VERIFICAR ONDE COLOCAR UM "?" AQUI EMBAIXO!
+            // TODO: CHECK WHERE TO PUT A "?" DOWN HERE!
             Army currentArmy = ACArmyManagementUIContext.Instance?.currentMainParty?.Army;
 
             if (party == null) // OK
@@ -76,7 +76,7 @@ namespace ArmyCommander.HarmonyPatches
             {
                 if (!ACHelpers.HasPlayerPermissionForArmyCommand())
                 {
-                    // Comportamento normal
+                    // Vanilla behavior
                     result = false;
                     explanation = new TextObject("{=aROohsat}Already in another army.");
                 }
@@ -84,7 +84,7 @@ namespace ArmyCommander.HarmonyPatches
                 {
                     if (party.Army.LeaderParty != party)
                     {
-                        // Só pode selecionar um lider para popular a direita
+                        // Only a leader can be selected to populate the right side
                         result = false;
                         explanation = new TextObject("{=aROohsat}Already in another army as a member.");
                     }
@@ -228,7 +228,7 @@ namespace ArmyCommander.HarmonyPatches
                         num5 += possibleArmyMember.Party.GetCustomStrength(BattleSideEnum.Attacker, MapEvent.PowerCalculationContext.Siege);
                     }
 
-                    // TODO: MCM: adjust the strengh required
+                    // TODO: MCM: adjust the strength required
                     if (num5 < 1000f)
                     {
                         possibleArmyMembers.Clear();
