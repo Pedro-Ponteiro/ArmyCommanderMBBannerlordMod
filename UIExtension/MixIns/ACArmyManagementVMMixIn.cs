@@ -179,13 +179,13 @@ namespace ArmyCommander.UIExtension.MixIns
 
             if (ACArmyManagementUIContext.Instance.currentMainParty == null)
             {
-                // empty armybehaviorDescription
+                // Clear armyBehaviorDescription.
 
                 IsArmySelectedForCommandWidgets = false;
 
                 ArmyBehaviorDescription = " ";
 
-                // disable choose targetsettlement and armybehavior
+                // Disable target settlement and army behavior selection.
                 TargetSettlementEnabled = false;
                 TargetSettlementName = "";
 
@@ -216,12 +216,12 @@ namespace ArmyCommander.UIExtension.MixIns
             }
             else if (ACArmyManagementUIContext.Instance.mainPartyHasArmy == false)
             {
-                // empty armybehaviortext
+                // Clear armyBehaviorText.
 
                 IsArmySelectedForCommandWidgets = ACArmyManagementUIContext.Instance.currentMainParty != MobileParty.MainParty;
 
                 ArmyBehaviorDescription = "Army Commands";
-                // enable choose targetsettlement and armybehavior
+                // Enable target settlement and army behavior selection.
 
                 TargetSettlementEnabled = true;
                 TargetSettlementName = ACArmyManagementUIContext.Instance.targetSettlement?.Name?.ToString() ?? "";
@@ -256,9 +256,9 @@ namespace ArmyCommander.UIExtension.MixIns
 
                 IsArmySelectedForCommandWidgets = ACArmyManagementUIContext.Instance.currentMainParty != MobileParty.MainParty;
 
-                // update armybehaviortext
+                // Update armyBehaviorText.
                 ArmyBehaviorDescription = ACArmyManagementUIContext.Instance.currentMainParty.Army.GetLongTermBehaviorText().ToString();
-                // enable and update choose targetsettlement and armybehavior (if the army is not busy already)
+                // Enable and update target settlement and army behavior selection (if the army is not already busy).
                 TargetSettlementName = ACArmyManagementUIContext.Instance.targetSettlement?.Name?.ToString() ?? "";
                 ArmyBehaviorText = ACArmyManagementUIContext.Instance.armyBehavior.ToString();
 
