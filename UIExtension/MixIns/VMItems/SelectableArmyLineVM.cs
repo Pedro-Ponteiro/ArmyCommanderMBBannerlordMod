@@ -22,12 +22,12 @@ namespace ArmyCommander.UIExtension.MixIns.VMItems
         private bool _isSelected;
 
 
-        // ACESSADO PELO .XML (buttons)
+        // Called from .xml (buttons)
         public void ExecuteClickFunction()
         {
             ACArmyOverlayUIContext.Instance.SelectedArmy = LeaderParty.Army;
 
-            // Atualizar o Overlay de Armies Original
+            // Refresh the original army overlay
             CampaignEventDispatcher.Instance.OnArmyOverlaySetDirty();
         }
 
