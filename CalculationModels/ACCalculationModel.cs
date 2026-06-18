@@ -40,12 +40,12 @@ namespace ArmyCommander.CalculationModel
             long amount = amountToAdd;
             long level = entries[0].Value;
 
-            // Quantidade de elementos no grupo dos menores.
+            // Number of elements in the smallest group.
             int i = 1;
 
             while (i < n && amount > 0)
             {
-                // Inclui valores empatados no menor grupo.
+                // Include tied values in the smallest group.
                 if (entries[i].Value == level)
                 {
                     i++;
