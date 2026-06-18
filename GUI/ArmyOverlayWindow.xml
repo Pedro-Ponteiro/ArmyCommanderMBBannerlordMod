@@ -3,7 +3,7 @@
     <Widget DoNotAcceptEvents="true" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent">
         <Children>
 
-            <!-- MINHAS COISAS -->
+            <!-- MY STUFF -->
             <ArmyOverlayWidget DoNotAcceptEvents="true" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" PageControlWidget="ACOverlayWidget\ACGridControlWidget" ArmyListGridWidget="ACOverlayWidget\ACGridControlWidget\ArmiesList" ExtendButton="ACOverlayWidget\ACExtendButtonWidget" IsInfoBarExtended="false" Overlay="ACOverlayWidget" PopupWidget="ACPopupParent\Popup">
                 <Children>
                     <!--  -->
@@ -66,17 +66,17 @@
                                     <NavigationScopeTargeter ScopeID="ACArmyOverlayGridScope" ScopeParent="..\ArmiesList" ScopeMovements="Horizontal" AlternateScopeMovements="Vertical" ExtendDiscoveryAreaTop="-5" NavigateFromScopeEdges="true" UseDiscoveryAreaAsScopeEdges="true" RightNavigationScope="None" />
                                     <NavigatableGridWidget DoNotAcceptEvents="true" Id="ArmiesList" DataSource="{ArmyOverlayArmiesList\ArmiesList}" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" MarginLeft="0" DefaultCellWidth="500" DefaultCellHeight="73" ColumnCount="1" MinIndex="0" MaxIndex="1000">
 
-                                        <!-- Army LINHAS -->
+                                        <!-- Army Rows -->
                                         <ItemTemplate>
 
                                             <ButtonWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="ArmyCommander.ArmyLine.Button" IsSelected="@ForceHovered" Command.Click="ExecuteClickFunction">
                                                 <Children>
 
-                                                    <!--lIST PANEL HORIZONTAL-->
+                                                    <!-- Horizontal List Panel -->
                                                     <ListPanel DoNotAcceptEvents="true" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" StackLayout.LayoutMethod="HorizontalLeftToRight">
                                                         <Children>
                                                             <!-- <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Text="ASDA SDAS D A" /> -->
-                                                            <!-- iMAGEM DO LIDER -->
+                                                            <!-- Leader Image -->
                                                             <!-- TODO -->
                                                             <!-- 73 -->
                                                             <!-- <Widget VerticalAlignment="Center" WidthSizePolicy="Fixed" SuggestedWidth="73" HeightSizePolicy="Fixed" SuggestedHeight="73"/> -->
@@ -100,7 +100,7 @@
                                                                 </Children>
                                                             </Widget>
 
-                                                            <!-- Propriedades (6, 3 por linha) (420 - 73 w (347) disponivel e 73 h disponivel) > 347/3 = 115 w -->
+                                                            <!-- Properties (6, 3 per row) (420 - 73 w (347) available and 73 h available) > 347/3 = 115 w -->
                                                             <NavigatableListPanel DoNotAcceptEvents="true" DataSource="{ArmyInfoRows}" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MinIndex="0" MaxIndex="1000" StackLayout.LayoutMethod="VerticalTopToBottom" HorizontalAlignment="Center">
                                                                 <ItemTemplate>
                                                                     <!-- <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Text="ASDA SDAS D A" /> -->
@@ -109,7 +109,7 @@
                                                                             <ListPanel DoNotAcceptEvents="true" DataSource="{ArmyInfosRow}" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" ClipContents="true" MarginRight="20" MarginLeft="1" StackLayout.LayoutMethod="HorizontalCentered">
                                                                                 <ItemTemplate>
 
-                                                                                    <!-- Elemento de info abaixo -->
+                                                                                    <!-- Info element below -->
 
                                                                                     <ButtonWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" DoNotPassEventsToChildren="true" Command.Click="ExecuteClickFunction" Command.HoverBegin="ExecuteBeginHint" Command.HoverEnd="ExecuteEndHint" HorizontalAlignment="Center">
                                                                                         <Children>
@@ -172,7 +172,7 @@
                         </Children>
                     </Widget>
 
-                    <!-- FORA DO OVERLAYWIDGET -->
+                    <!-- OUTSIDE THE OVERLAYWIDGET -->
                     <!--Popup Widget-->
                     <!-- <OverlayPopup IsVisible="false" Id="ACPopupParent" /> -->
 
