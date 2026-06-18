@@ -1,4 +1,4 @@
-<!-- Minhas Coisas -->
+<!-- My Stuff -->
 <ListPanel IsVisible="@ACIsValidArmySelected" WidthSizePolicy="Fixed" SuggestedWidth="!ArmyManagement.Panel.Left.Width" HeightSizePolicy="Fixed" SuggestedHeight="70" StackLayout.LayoutMethod="VerticalTopToBottom" HorizontalAlignment="Left" VerticalAlignment="Bottom" MarginBottom="30" MarginLeft="30">
     <Children>
 
