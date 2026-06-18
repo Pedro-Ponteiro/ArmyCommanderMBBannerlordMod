@@ -14,7 +14,7 @@ namespace ArmyCommander.HarmonyPatches
         [HarmonyPatch("GetIsGatherArmyVisible")]
         private static void Postfix(MapBarVM __instance, ref bool __result)
         {
-            // Temos que tirar a visibilidade desse botão para vermos o de tras.
+            // We need to hide this button so we can see the one behind it.
             if (__result == true && ACHelpers.ShouldShowArmyOverlayForPlayer())
             {
                 __result = false;
