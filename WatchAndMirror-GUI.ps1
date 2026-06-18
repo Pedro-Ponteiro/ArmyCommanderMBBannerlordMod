@@ -17,7 +17,7 @@ function Sync-GUI {
     }
 }
 
-# Faz uma cópia inicial ao abrir o watcher
+# Make an initial copy when the watcher starts
 Sync-GUI
 
 $global:pendingSync = $false
@@ -51,7 +51,7 @@ Write-Host "Pressione Ctrl+C para parar."
 while ($true) {
     Start-Sleep -Milliseconds 300
 
-    # Debounce: espera o editor terminar de salvar antes de rodar o robocopy
+    # Debounce: wait for the editor to finish saving before running robocopy
     if ($global:pendingSync -and ((Get-Date) - $global:lastChange).TotalMilliseconds -ge 700) {
         $global:pendingSync = $false
         Sync-GUI
