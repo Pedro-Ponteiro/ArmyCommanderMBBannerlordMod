@@ -94,7 +94,7 @@ namespace ArmyCommander.ACBehaviors
             {
                 if (newOwner.Clan?.Kingdom != Clan.PlayerClan.Kingdom)
                 {
-                    // Allied Settlement was captured or clan defected to another kingdom.
+                    // Allied settlement was captured, or the clan defected to another kingdom.
                     // TODO: Add penalties to Army Commander Points if capture.
 
                     RefreshArmyCommandsStore();
@@ -104,17 +104,17 @@ namespace ArmyCommander.ACBehaviors
             {
                 if (oldOwner.Clan?.Kingdom != Clan.PlayerClan.Kingdom)
                 {
-                    // Enemy Settlement was captured by the player kingdom
-                    // or the owner clan joined player's kingdom
-                    // TODO: Add bonuses to Army Commander Points if captured by the player commanded army.
+                    // Enemy settlement was captured by the player's kingdom,
+                    // or the owner clan joined the player's kingdom.
+                    // TODO: Add bonuses to Army Commander Points if captured by the player-commanded army.
                     RefreshArmyCommandsStore();
                 }
             }
             else if (Clan.PlayerClan.Kingdom.IsAtWarWith(oldOwner.Clan.Kingdom))
             {
-                // old settlement owner is at war with kingdom player.
-                // new owner can be a friend, or not.
-                // if the new owner is also at war with the player, the command remains intact.
+                // The old settlement owner is at war with the player's kingdom.
+                // The new owner may or may not be a friend.
+                // If the new owner is also at war with the player, the command remains intact.
                 RefreshArmyCommandsStore();
             }
         }
