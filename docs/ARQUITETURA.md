@@ -1,413 +1,413 @@
-# Arquitetura do Army Commander
+# Army Commander Architecture
 
-Este arquivo documenta o estado atual do projeto depois das mudancas feitas apos `fe9f54f6d9011db1971fdf7d207ff2d6705e10d0`. O foco e ajudar manutencao futura: onde cada comportamento nasce, quais classes conversam entre si e quais pontos sao mais frageis por dependerem de internals do Bannerlord.
+This file documents the current project state after the changes made after `fe9f54f6d9011db1971fdf7d207ff2d6705e10d0`. Its purpose is to help future maintenance: where each behavior starts, which classes talk to each other, and which points are most fragile because they depend on Bannerlord internals.
 
-## Visao geral
+## Overview
 
-O Army Commander e construido ao redor de quatro eixos:
+Army Commander is built around four axes:
 
-1. Alterar regras vanilla de exercitos com Harmony.
-2. Substituir e ampliar partes do overlay e da tela `ArmyManagementVM` com UIExtenderEx.
-3. Usar contextos/stores estaticos para conectar overlay, tela de gestao, behaviors de campanha e patches de AI.
-4. Persistir ordens de exercitos AI-led e permissoes politicas/dialogadas em saves.
+1. Change vanilla army rules with Harmony.
+2. Replace and extend parts of the overlay and the `ArmyManagementVM` screen with UIExtenderEx.
+3. Use static contexts/stores to connect the overlay, management screen, campaign behaviors, and AI patches.
+4. Persist AI-led army orders and policy/dialogue permissions in saves.
 
-Na pratica, o mod transforma a gestao de exercito de uma experiencia centrada na party do jogador para uma experiencia centrada no exercito selecionado no overlay, com capacidade de comandar exercitos de terceiros quando o jogador tem permissao.
+In practice, the mod turns army management from a player-party-centered experience into an experience centered on the army selected in the overlay, with the ability to command third-party armies when the player has permission.
 
-## Inicializacao
+## Initialization
 
-`MySubModule` e o ponto de entrada.
+`MySubModule` is the entry point.
 
-- `OnSubModuleLoad` aplica `Harmony.PatchAll(Assembly.GetExecutingAssembly())`, cria `UIExtender.Create("ArmyCommander")`, registra o assembly e habilita o UIExtender.
-- `OnSubModuleUnloaded` desabilita e deregistra UIExtenderEx, remove patches Harmony pelo id `ArmyCommander` e limpa referencias.
-- `OnGameStart` valida que o jogo e `Campaign`, reseta `ArmyCommandsContext`, `ArmyCommandsBehaviorStore` e `ACPermissionsStore`, e registra:
+- `OnSubModuleLoad` applies `Harmony.PatchAll(Assembly.GetExecutingAssembly())`, creates `UIExtender.Create("ArmyCommander")`, registers the assembly, and enables UIExtender.
+- `OnSubModuleUnloaded` disables and deregisters UIExtenderEx, removes Harmony patches by the `ArmyCommander` id, and clears references.
+- `OnGameStart` validates that the game is `Campaign`, resets `ArmyCommandsContext`, `ArmyCommandsBehaviorStore`, and `ACPermissionsStore`, and registers:
   - `ACArmyCommanderBehavior`;
   - `ACMercenaryArmyLeadershipDialogueBehavior`;
   - `ACVassalArmyCommanderDialogueBehavior`.
 
-O arquivo tambem centraliza logging defensivo. Erro de log nao derruba o jogo.
+The file also centralizes defensive logging. Logging failures do not crash the game.
 
-## Build e deploy
+## Build And Deploy
 
-`ArmyCommander.csproj` define:
+`ArmyCommander.csproj` defines:
 
 - `TargetFrameworkVersion`: `v4.7.2`.
 - `OutputType`: `Library`.
 - `AssemblyName`: `ArmyCommander`.
-- `BannerlordDir`: caminho absoluto local para a instalacao Steam de Bannerlord.
-- `OutputPath`: pasta `Modules\ArmyCommander\bin\Win64_Shipping_Client`.
+- `BannerlordDir`: local absolute path to the Steam Bannerlord installation.
+- `OutputPath`: `Modules\ArmyCommander\bin\Win64_Shipping_Client`.
 
-O target `DeployModFiles`, executado apos o build, usa `robocopy` para espelhar `GUI\` no modulo instalado e copia `SubModule.xml`.
+The `DeployModFiles` target, executed after the build, uses `robocopy` to mirror `GUI\` into the installed module and copies `SubModule.xml`.
 
-`WatchAndMirror-GUI.ps1` e um utilitario separado para espelhar alteracoes da pasta `GUI` durante iteracao.
+`WatchAndMirror-GUI.ps1` is a separate utility for mirroring changes from the `GUI` folder during iteration.
 
-## Manifesto
+## Manifest
 
-`SubModule.xml` declara o modulo como singleplayer community module, versao `v2.2.0`, com dependencias obrigatorias:
+`SubModule.xml` declares the module as a singleplayer community module, version `v2.2.0`, with required dependencies:
 
 - `Bannerlord.Harmony`
 - `Bannerlord.ButterLib`
 - `Bannerlord.UIExtenderEx`
 - `Native`, `SandBoxCore`, `CustomBattle`, `Sandbox`
 
-`StoryMode` e `NavalDLC` aparecem como opcionais. A classe carregada e `ArmyCommander.MySubModule`.
+`StoryMode` and `NavalDLC` appear as optional dependencies. The loaded class is `ArmyCommander.MySubModule`.
 
-## Estado compartilhado
+## Shared State
 
-O projeto usa stores/contextos estaticos como cola entre patches e ViewModels.
+The project uses static stores/contexts as glue between patches and ViewModels.
 
-- `ACArmyOverlayUIContext`: instancia ativa do overlay de exercito. Guarda `SelectedArmy`, contadores agregados, controle do botao de pagina e estado expandido do overlay.
-- `ACArmyManagementUIContext`: instancia ativa da tela de gestao. Guarda `currentMainParty`, `mainPartyHasArmy`, alvo, ponto de reuniao, comportamento do exercito, flags de comando, influencia enviada e `movieIsLoaded`.
-- `ACArmyLineUIContext`: contexto por linha do overlay. Carrega leader party, contadores, comida, influencia, coesao, custos e listas auxiliares.
-- `ArmyCommandsBehaviorStore.army_commands`: dicionario `Army -> command tuple` usado para salvar e reaplicar ordens do jogador.
-- `ArmyCommandsContext`: caches transientes para AI, incluindo `ArmyLastVisitedSettlementCache` e `ArmyIsResupplyingDic`.
-- `ACPermissionsStore`: guarda ids de reino que concederam permissao de lideranca mercenaria ou comando de vassalo.
-- `ACPolicyStore.MercenaryArmyLeadersPolicy`: referencia estatica para a politica criada no patch de `DefaultPolicies`.
+- `ACArmyOverlayUIContext`: active army overlay instance. Stores `SelectedArmy`, aggregate counters, page button control, and overlay expanded state.
+- `ACArmyManagementUIContext`: active army management screen instance. Stores `currentMainParty`, `mainPartyHasArmy`, target, gathering point, army behavior, command flags, sent influence, and `movieIsLoaded`.
+- `ACArmyLineUIContext`: per-overlay-row context. Loads leader party, counters, food, influence, cohesion, costs, and helper lists.
+- `ArmyCommandsBehaviorStore.army_commands`: `Army -> command tuple` dictionary used to save and reapply player orders.
+- `ArmyCommandsContext`: transient AI caches, including `ArmyLastVisitedSettlementCache` and `ArmyIsResupplyingDic`.
+- `ACPermissionsStore`: stores kingdom ids that granted mercenary leadership permission or vassal command permission.
+- `ACPolicyStore.MercenaryArmyLeadersPolicy`: static reference to the policy created in the `DefaultPolicies` patch.
 
-Os contextos de UI sao reconstituidos em runtime pela UI e pelos eventos. As ordens e permissoes relevantes para save/load sao persistidas pelos behaviors de campanha.
+UI contexts are rebuilt at runtime by the UI and events. Orders and permissions relevant to save/load are persisted by campaign behaviors.
 
-## Behaviors de campanha
+## Campaign Behaviors
 
 ### ACArmyCommanderBehavior
 
-`ACArmyCommanderBehavior` registra persistencia e manutencao das ordens de exercito.
+`ACArmyCommanderBehavior` handles army order persistence and maintenance.
 
-Eventos:
+Events:
 
-- `OnSettlementOwnerChangedEvent`: revisa ordens quando posse de assentamentos muda.
-- `OnPeaceOfferResolvedEvent`: revisa ordens quando paz muda a validade de alvo inimigo.
-- `PartyAttachedAnotherParty`: reativa AI quando membro entra em exercito comandado.
-- `HourlyTickEvent`: workaround para reativar AI de exercitos comandados que ficaram em comportamento `0`.
+- `OnSettlementOwnerChangedEvent`: reviews orders when settlement ownership changes.
+- `OnPeaceOfferResolvedEvent`: reviews orders when peace changes the validity of an enemy target.
+- `PartyAttachedAnotherParty`: re-enables AI when a member joins a commanded army.
+- `HourlyTickEvent`: workaround to re-enable AI for commanded armies that ended up in behavior `0`.
 
-Persistencia:
+Persistence:
 
-- Usa a chave `ArmyCommander.ArmyCommands.v1`.
-- Serializa XML com `leaderHeroId`, `armyType`, `targetSettlementId`, `gatherSettlementId` e flags booleanas.
-- No load, procura o exercito pelo lider dentro de `Clan.PlayerClan.Kingdom.Armies`.
-- Descarta comandos sem lider, alvo ou tipo suportado.
-- Tipos suportados: `Besieger` e `Defender`.
+- Uses the `ArmyCommander.ArmyCommands.v1` key.
+- Serializes XML with `leaderHeroId`, `armyType`, `targetSettlementId`, `gatherSettlementId`, and boolean flags.
+- On load, finds the army by leader within `Clan.PlayerClan.Kingdom.Armies`.
+- Discards commands without leader, target, or supported type.
+- Supported types: `Besieger` and `Defender`.
 
-Validacao:
+Validation:
 
-- `RefreshArmyCommandsStore` chama `ACAIBehaviorHelpers.ValidatePlayerCommandAndAskIfNeeded`.
-- Se um alvo de cerco deixa de ser inimigo, ou um alvo de defesa deixa de pertencer ao reino do jogador, o mod pergunta se o exercito deve esperar em um assentamento seguro ou voltar a AI vanilla.
+- `RefreshArmyCommandsStore` calls `ACAIBehaviorHelpers.ValidatePlayerCommandAndAskIfNeeded`.
+- If a siege target stops being enemy-owned, or a defense target stops belonging to the player's kingdom, the mod asks whether the army should wait at a safe settlement or return to vanilla AI.
 
 ### ACMercenaryArmyLeadershipDialogueBehavior
 
-Adiciona dialogo para o jogador mercenario pedir permissao ao governante do reino contratado.
+Adds dialogue for the mercenary player to request permission from the ruler of the contracted kingdom.
 
-- Requer servico mercenario ativo.
-- O interlocutor deve ser o lider do reino do jogador.
-- Nao aparece se a permissao ja existe.
-- Clique exige relacao minima 25 e clan tier minimo 3.
-- Salva a permissao em `ACPermissionsStore._acKingdomIdThatAllowedPlayerMercenaryArmyLeadership`.
-- Limpa a permissao quando o servico mercenario termina.
+- Requires active mercenary service.
+- The conversation hero must be the leader of the player's kingdom.
+- Does not appear if the permission already exists.
+- Clicking requires minimum relation 25 and minimum clan tier 3.
+- Saves permission in `ACPermissionsStore._acKingdomIdThatAllowedPlayerMercenaryArmyLeadership`.
+- Clears permission when mercenary service ends.
 
 ### ACVassalArmyCommanderDialogueBehavior
 
-Adiciona dialogo para o jogador vassalo pedir permissao ao governante para comandar exercitos do reino.
+Adds dialogue for the vassal player to request permission from the ruler to command kingdom armies.
 
-- O interlocutor deve ser o lider do reino do jogador.
-- Nao aparece para mercenarios.
-- Nao aparece se `ACHelpers.HasPlayerPermissionForArmyCommand()` ja for verdadeiro.
-- Clique exige relacao minima 40 e clan tier minimo 4.
-- Salva a permissao em `ACPermissionsStore._acKingdomIdThatAllowedPlayerVassalArmyCommand`.
-- Limpa a permissao quando o clan do jogador sai do reino que a concedeu.
+- The conversation hero must be the leader of the player's kingdom.
+- Does not appear for mercenaries.
+- Does not appear if `ACHelpers.HasPlayerPermissionForArmyCommand()` is already true.
+- Clicking requires minimum relation 40 and minimum clan tier 4.
+- Saves permission in `ACPermissionsStore._acKingdomIdThatAllowedPlayerVassalArmyCommand`.
+- Clears permission when the player's clan leaves the kingdom that granted it.
 
-## Overlay de exercitos
+## Army Overlay
 
-O overlay customizado e montado por UIExtenderEx.
+The custom overlay is assembled by UIExtenderEx.
 
-- `UIExtension/UIPatches/ACArmyOverlayArmyListPatch.cs` substitui o `Window` do prefab `ArmyOverlay`.
-- O patch carrega o XML original de `SandBox/GUI/Prefabs/Map/ArmyOverlay.xml`, extrai `ArmyOverlayWidget` e o injeta no placeholder `ArmyCommanderOriginalArmyOverlayWidgetPlaceholder`.
-- `GUI/ArmyOverlayWindow.xml` adiciona o widget customizado `ACOverlayWidget` e conserva o overlay original logo depois.
-- `HarmonyPatches/ArmyOverlayWidgetPatch.cs` ajusta posicao/paginacao do overlay customizado e propaga o estado expandido para `ACArmyOverlayUIContext.IsExtended`.
-- `HarmonyPatches/ChatLogWidgetPatch.cs` registra o `ChatLogWidget` e ajusta `MarginBottom` dinamicamente para abrir espaco ao overlay.
+- `UIExtension/UIPatches/ACArmyOverlayArmyListPatch.cs` replaces the `Window` of the `ArmyOverlay` prefab.
+- The patch loads the original XML from `SandBox/GUI/Prefabs/Map/ArmyOverlay.xml`, extracts `ArmyOverlayWidget`, and injects it into the `ArmyCommanderOriginalArmyOverlayWidgetPlaceholder`.
+- `GUI/ArmyOverlayWindow.xml` adds the custom `ACOverlayWidget` and keeps the original overlay right after it.
+- `HarmonyPatches/ArmyOverlayWidgetPatch.cs` adjusts positioning/pagination for the custom overlay and propagates the expanded state to `ACArmyOverlayUIContext.IsExtended`.
+- `HarmonyPatches/ChatLogWidgetPatch.cs` registers the `ChatLogWidget` and adjusts `MarginBottom` dynamically to make room for the overlay.
 
-`ArmyMenuOverlayVMMixin` e o mixin principal dessa UI:
+`ArmyMenuOverlayVMMixin` is the main mixin for this UI:
 
-- Cria `ACArmyOverlayUIContext`.
-- Mantem `ArmyOverlayArmiesList`.
-- Reconstroi linhas com `RenewLeftArmyOverlay`.
-- Atualiza totais do topo em `UpdateTopWidgets`.
-- Escuta `CampaignEvents.HourlyTickEvent` para atualizar o overlay.
-- Reage a exercitos criados/desfeitos por callbacks chamados de patches em `ArmyPatch.cs`.
+- Creates `ACArmyOverlayUIContext`.
+- Maintains `ArmyOverlayArmiesList`.
+- Rebuilds rows with `RenewLeftArmyOverlay`.
+- Updates top totals in `UpdateTopWidgets`.
+- Listens to `CampaignEvents.HourlyTickEvent` to update the overlay.
+- Reacts to armies being created/disbanded through callbacks called by patches in `ArmyPatch.cs`.
 
-Cada linha e composta por:
+Each row is made of:
 
-- `SelectableArmyLineVM`: item clicavel, selecao/hover e execucao de `OnArmyOverlaySetDirty`.
-- `SelectableArmyLeaderVisualVM`: retrato, banner, tooltip, link de enciclopedia e camera no mapa.
-- `SelectableArmyPropertiesRow`: agrupa metricas em linhas.
-- `SelectableArmyItemPropertyVM`: metrica individual com sprite, valor, delta, warning e tooltip.
-- `ACArmyLineWidgetBuilders`: builder dos widgets de parties, tropas, comida, influencia, coesao e custo de coesao.
+- `SelectableArmyLineVM`: clickable item, selection/hover, and `OnArmyOverlaySetDirty` execution.
+- `SelectableArmyLeaderVisualVM`: portrait, banner, tooltip, encyclopedia link, and map camera behavior.
+- `SelectableArmyPropertiesRow`: groups metrics into rows.
+- `SelectableArmyItemPropertyVM`: individual metric with sprite, value, delta, warning, and tooltip.
+- `ACArmyLineWidgetBuilders`: builder for parties, troops, food, influence, cohesion, and cohesion-cost widgets.
 
-## Selecao de exercito
+## Army Selection
 
-O exercito ativo da UI fica em `ACArmyOverlayUIContext.SelectedArmy`.
+The active UI army is stored in `ACArmyOverlayUIContext.SelectedArmy`.
 
-Quando o usuario clica numa linha:
+When the user clicks a row:
 
-1. `SelectableArmyLineVM.ExecuteClickFunction` grava `SelectedArmy = LeaderParty.Army`.
-2. O overlay vanilla e marcado dirty por `CampaignEventDispatcher.Instance.OnArmyOverlaySetDirty()`.
-3. O patch `ArmyMenuOverlayVM_get_ArmyToUse_Patch` faz o getter `ArmyToUse` retornar o exercito selecionado, ou faz fallback para o exercito da main party, ou para o primeiro exercito do reino.
-4. `ArmyMenuOverlayVM_GetIsPlayerArmyLeader_Patch` sempre retorna `true`, liberando caminhos de UI que normalmente dependem do jogador ser lider.
-5. `ArmyMenuOverlayVM_ExecuteOpenArmyManagement_Patch` chama `OpenArmyManagement` diretamente.
+1. `SelectableArmyLineVM.ExecuteClickFunction` sets `SelectedArmy = LeaderParty.Army`.
+2. The vanilla overlay is marked dirty through `CampaignEventDispatcher.Instance.OnArmyOverlaySetDirty()`.
+3. `ArmyMenuOverlayVM_get_ArmyToUse_Patch` makes the `ArmyToUse` getter return the selected army, or fall back to the main party army, or to the kingdom's first army.
+4. `ArmyMenuOverlayVM_GetIsPlayerArmyLeader_Patch` always returns `true`, unlocking UI paths that normally depend on the player being the leader.
+5. `ArmyMenuOverlayVM_ExecuteOpenArmyManagement_Patch` calls `OpenArmyManagement` directly.
 
-`MapScreen_OnRefreshState_Patch` recria ou remove o overlay de exercito conforme `ACHelpers.ShouldShowArmyOverlayForPlayer()`. `MapBarVM_GetIsGatherArmyVisible_Patch` esconde o botao vanilla de gather quando o overlay customizado deve ficar visivel.
+`MapScreen_OnRefreshState_Patch` recreates or removes the army overlay according to `ACHelpers.ShouldShowArmyOverlayForPlayer()`. `MapBarVM_GetIsGatherArmyVisible_Patch` hides the vanilla gather button when the custom overlay should be visible.
 
-## Tela de gestao de exercito
+## Army Management Screen
 
-`HarmonyPatches/ArmyManagementVMPatch.cs` e a peca mais central do projeto.
+`HarmonyPatches/ArmyManagementVMPatch.cs` is the most central piece of the project.
 
-Ele cria reverse patches para chamar metodos originais de `ArmyManagementVM` quando necessario:
+It creates reverse patches to call original `ArmyManagementVM` methods when needed:
 
 - `OnRefresh`
 - `OnAddToCart`
 - `OnRemove`
 - `OnFocus`
 
-No constructor postfix, o patch reconstrui a VM:
+In the constructor postfix, the patch rebuilds the VM:
 
-- Zera/recria `PartyList`, `PartiesInCart`, `_partiesToRemove` e outros campos internos.
-- Decide `currentMainParty`:
-  - se o jogador nao pode comandar exercitos, usa a party do jogador;
-  - se nao ha exercito selecionado, usa a party do jogador;
-  - caso contrario, usa a leader party do exercito selecionado.
-- Cria o item principal (`_mainPartyItem`) e adiciona ao carrinho.
-- Popula a lista esquerda com parties do mesmo mapa/faccao.
-- Se a party principal ja lidera um exercito, move membros existentes para o carrinho com custo zero.
-- Adiciona a main party tambem na esquerda quando o jogador pode comandar exercitos.
-- Reordena listas e chama refresh original.
+- Clears/recreates `PartyList`, `PartiesInCart`, `_partiesToRemove`, and other internal fields.
+- Chooses `currentMainParty`:
+  - if the player cannot command armies, uses the player's party;
+  - if no army is selected, uses the player's party;
+  - otherwise, uses the leader party of the selected army.
+- Creates the main item (`_mainPartyItem`) and adds it to the cart.
+- Populates the left list with parties from the same map/faction.
+- If the main party already leads an army, moves existing members into the cart with zero cost.
+- Also adds the main party to the left side when the player can command armies.
+- Reorders lists and calls the original refresh.
 
-Fluxos importantes:
+Important flows:
 
-- `PlayerHasArmySetterPrefix`: so deixa `PlayerHasArmy` verdadeiro para army liderada pela main party.
-- `ManagementItemComparerComparePrefix` e `OrderPartiesInPlace`: mantem lider atual no topo, depois itens no carrinho, main party, leaders, elegiveis e membros bloqueados.
-- `OnFirstPartyAdded`: quando o primeiro item e adicionado, ele vira a party principal/contexto do exercito a criar ou editar.
-- `OnArmyLeaderRemoved`: retirar o lider limpa a selecao e volta a tela para estado de criacao.
-- `CustomOnAddToCart` e `CustomOnRemove`: substituem os fluxos vanilla para suportar editar exercitos alheios.
-- `ExecuteDonePrefix`: aplica coesao, cria exercito novo, adiciona membros, grava/atualiza ordens, recalcula AI, desconta influencia, remove parties e fecha a tela.
-- `CustomDisbandArmy`: desfaz exercito liderado pelo jogador setando `Army = null`; para outro lider, usa `DisbandArmyAction.ApplyByReleasedByPlayerAfterBattle`.
-- `ExecuteResetPrefix` e `ExecuteCancelPrefix`: restauram influencia inicial e limpam alteracoes temporarias.
-- `OnFinalizePostfix`: finaliza o mixin e remove `ACArmyManagementUIContext.Instance`.
+- `PlayerHasArmySetterPrefix`: only lets `PlayerHasArmy` be true for an army led by the main party.
+- `ManagementItemComparerComparePrefix` and `OrderPartiesInPlace`: keep the current leader at the top, followed by cart items, main party, leaders, eligible parties, and blocked members.
+- `OnFirstPartyAdded`: when the first item is added, it becomes the main party/context for the army being created or edited.
+- `OnArmyLeaderRemoved`: removing the leader clears selection and returns the screen to creation state.
+- `CustomOnAddToCart` and `CustomOnRemove`: replace vanilla flows to support editing other leaders' armies.
+- `ExecuteDonePrefix`: applies cohesion, creates a new army, adds members, saves/updates orders, recalculates AI, deducts influence, removes parties, and closes the screen.
+- `CustomDisbandArmy`: disbands a player-led army by setting `Army = null`; for another leader, uses `DisbandArmyAction.ApplyByReleasedByPlayerAfterBattle`.
+- `ExecuteResetPrefix` and `ExecuteCancelPrefix`: restore initial influence and clear temporary changes.
+- `OnFinalizePostfix`: finalizes the mixin and removes `ACArmyManagementUIContext.Instance`.
 
-## Controles customizados da gestao
+## Custom Management Controls
 
-`ArmyManagementVMMixIn` injeta/expõe controles extras usados por `GUI/ACArmyManagementWidgets.xml` e pelo wrapper do painel direito.
+`ArmyManagementVMMixIn` injects/exposes extra controls used by `GUI/ACArmyManagementWidgets.xml` and the right-panel wrapper.
 
-Estado controlado:
+Controlled state:
 
-- comportamento do exercito (`Defender` ou `Besieger`);
-- assentamento alvo;
-- assentamento de reuniao;
+- army behavior (`Defender` or `Besieger`);
+- target settlement;
+- gathering settlement;
 - `CanEngageEnemyParties`;
 - `CanHelpAlliedParties`;
 - `CanResupply`;
 - `CanRunFromDanger`;
-- envio de influencia;
-- remocao de ordens.
+- influence sending;
+- order removal.
 
-Regras principais:
+Main rules:
 
-- Para exercito novo, usa capital possivel do reino como alvo/reuniao inicial e defaults permissivos.
-- Para exercito existente com ordem salva, carrega a ordem do `ArmyCommandsBehaviorStore`.
-- Para exercito existente sem ordem salva, usa `ACAIBehaviorHelpers.GetDefaultAiCommands`.
-- O alvo escolhido em assentamento aliado seta comportamento `Defender`.
-- O alvo escolhido em assentamento inimigo seta comportamento `Besieger`.
-- O ponto de reuniao fica habilitado quando o exercito esta esperando membros.
-- `CanHelpAlliedParties` so fica habilitado quando `CanEngageEnemyParties` esta desativado.
-- `ExecuteRemoveOrders` remove a entrada de `ArmyCommandsBehaviorStore` e volta o contexto para os comandos default da AI.
-- `ExecuteSendInfluence` transfere 50 influencia do jogador para o clan do lider do exercito selecionado.
+- For a new army, uses the kingdom's possible capital as the initial target/gathering point and permissive defaults.
+- For an existing army with saved orders, loads the order from `ArmyCommandsBehaviorStore`.
+- For an existing army without saved orders, uses `ACAIBehaviorHelpers.GetDefaultAiCommands`.
+- Choosing an allied settlement as target sets behavior to `Defender`.
+- Choosing an enemy settlement as target sets behavior to `Besieger`.
+- The gathering point is enabled when the army is waiting for members.
+- `CanHelpAlliedParties` is only enabled when `CanEngageEnemyParties` is disabled.
+- `ExecuteRemoveOrders` removes the `ArmyCommandsBehaviorStore` entry and returns the context to the AI default commands.
+- `ExecuteSendInfluence` transfers 50 influence from the player to the selected army leader's clan.
 
-`UIExtension/UIPatches/ACArmyManagementRightPanelDisbandButtonPatch.cs` substitui o `DisbandButton` do painel direito por um wrapper que inclui `Remove Orders` ao lado do botao original.
+`UIExtension/UIPatches/ACArmyManagementRightPanelDisbandButtonPatch.cs` replaces the right panel's `DisbandButton` with a wrapper that includes `Remove Orders` next to the original button.
 
-`OpenArmyManagement_All_Patch` roda apos aberturas vindas do map bar, map overlay ou kingdom screen, marca `movieIsLoaded = true` e chama `UpdateWidgets`.
+`OpenArmyManagement_All_Patch` runs after openings from the map bar, map overlay, or kingdom screen, marks `movieIsLoaded = true`, and calls `UpdateWidgets`.
 
-## Ordens de AI-led armies
+## AI-Led Army Orders
 
-O fluxo de comando usa `ArmyCommandsBehaviorStore`.
+The command flow uses `ArmyCommandsBehaviorStore`.
 
-Cada ordem salva contem:
+Each saved order contains:
 
-- `ArmyType`: `Besieger` ou `Defender`;
-- `TargetSettlement`: alvo principal;
-- `GatherSettlement`: local usado enquanto o exercito espera membros;
+- `ArmyType`: `Besieger` or `Defender`;
+- `TargetSettlement`: main target;
+- `GatherSettlement`: place used while the army waits for members;
 - `CanEngageEnemyParties`;
 - `CanHelpAlliedParties`;
 - `CanResupply`;
 - `CanRunFromDanger`.
 
-Quando `ExecuteDonePrefix` cria ou atualiza um exercito nao liderado pela main party, ele compara os novos comandos com os comandos default da AI e com comandos antigos. Se houver diferenca, salva a ordem e chama `ACAIBehaviorHelpers.OnPlayerArmyCommandChanged` quando o exercito esta disponivel.
+When `ExecuteDonePrefix` creates or updates an army not led by the main party, it compares the new commands with the AI default commands and previous commands. If there is a difference, it saves the order and calls `ACAIBehaviorHelpers.OnPlayerArmyCommandChanged` when the army is available.
 
-`SetPartyAiActionPatch.cs` intercepta `SetPartyAiAction.ApplyInternal` e delega a decisao para `ACAIBehaviorHelpers.AiBehaviorRecalculated`.
+`SetPartyAiActionPatch.cs` intercepts `SetPartyAiAction.ApplyInternal` and delegates the decision to `ACAIBehaviorHelpers.AiBehaviorRecalculated`.
 
-`DefaultMobilePartyAIModelPatch.cs` corta iniciativa de AI no nivel de `GetBestInitiativeBehavior`:
+`DefaultMobilePartyAIModelPatch.cs` cuts off AI initiative at the `GetBestInitiativeBehavior` level:
 
-- bloqueia `EngageParty` quando `CanEngageEnemyParties` e falso;
-- preserva ajuda a aliados quando `CanHelpAlliedParties` e verdadeiro e a party alvo esta lutando com aliado;
-- bloqueia comportamentos de fuga quando `CanRunFromDanger` e falso.
+- blocks `EngageParty` when `CanEngageEnemyParties` is false;
+- preserves allied support when `CanHelpAlliedParties` is true and the target party is fighting an ally;
+- blocks fleeing behaviors when `CanRunFromDanger` is false.
 
-`AiPartyThinkBehaviorPatch.cs` faz dois transpilers:
+`AiPartyThinkBehaviorPatch.cs` has two transpilers:
 
-- trata mercenarios com politica ativa como nao mercenarios para logica de gathering;
-- troca `SiegeEvent.FinalizeSiegeEvent` por `FinalizeSiegeEventIfAllowed`, impedindo fim de cerco quando a ordem do jogador manda continuar e a situacao permite.
+- treats mercenaries with the active policy as non-mercenaries for gathering logic;
+- replaces `SiegeEvent.FinalizeSiegeEvent` with `FinalizeSiegeEventIfAllowed`, preventing a siege from ending when the player order says to continue and the situation allows it.
 
-## Recalculo e ressuprimento de AI
+## AI Recalculation And Resupply
 
-`ACAIBehaviorHelpers` concentra a logica de execucao das ordens.
+`ACAIBehaviorHelpers` centralizes order execution logic.
 
-Funcoes principais:
+Main functions:
 
-- `GetDefaultAiCommands`: captura estado vanilla atual do exercito.
-- `ValidatePlayerCommandAndAskIfNeeded`: valida alvo depois de paz/mudanca de dono e pergunta se o exercito deve esperar ou voltar a AI vanilla.
-- `ApplyDefaultFallBackBehavior`: transforma a ordem em defesa passiva de um assentamento seguro, com combate/ajuda/ressuprimento/fuga desativados.
-- `ReEnableAI`: libera decisoes e agenda rethink.
-- `NewArmyCommandApplied`: aplica ordem nova para waiting, besieger ou defender.
-- `FindBestSettlementForResupplying`: escolhe assentamento proximo para comida/tropas sem repetir o ultimo ou penultimo assentamento visitado.
-- `FindBestSettlementForWaiting`: escolhe cidade/castelo seguro para espera.
-- `AiBehaviorRecalculated`: decide se um comando vanilla deve ser substituido pela ordem salva.
-- `ACShouldAttackerEndSiege`: impede fim de cerco quando a ordem manda continuar e a necessidade de comida nao exige encerrar.
-- `ACShouldArmyContinueOrStartResupply`: usa histerese para decidir ressuprimento.
+- `GetDefaultAiCommands`: captures the army's current vanilla state.
+- `ValidatePlayerCommandAndAskIfNeeded`: validates target after peace/ownership changes and asks whether the army should wait or return to vanilla AI.
+- `ApplyDefaultFallBackBehavior`: turns the order into passive defense of a safe settlement, with combat/support/resupply/fleeing disabled.
+- `ReEnableAI`: unlocks decisions and schedules rethink.
+- `NewArmyCommandApplied`: applies a new order for waiting, besieger, or defender states.
+- `FindBestSettlementForResupplying`: chooses a nearby settlement for food/troops without repeating the last or penultimate visited settlement.
+- `FindBestSettlementForWaiting`: chooses a safe town/castle for waiting.
+- `AiBehaviorRecalculated`: decides whether a vanilla command should be replaced by the saved order.
+- `ACShouldAttackerEndSiege`: prevents ending a siege when the order says to continue and food needs do not require ending it.
+- `ACShouldArmyContinueOrStartResupply`: uses hysteresis to decide resupply.
 
-`ArmyCommandsContext.ArmyLastVisitedSettlementCache` e atualizado por `MobileParty_LastVisitedSettlement_Setter_Patch` para evitar loops de ressuprimento. `ArmyCommandsContext.ArmyIsResupplyingDic` registra se o exercito ja esta em ciclo de ressuprimento e ajusta thresholds de comida/tropas.
+`ArmyCommandsContext.ArmyLastVisitedSettlementCache` is updated by `MobileParty_LastVisitedSettlement_Setter_Patch` to avoid resupply loops. `ArmyCommandsContext.ArmyIsResupplyingDic` records whether the army is already in a resupply cycle and adjusts food/troop thresholds.
 
-Thresholds atuais:
+Current thresholds:
 
-- Besieger fora de cerco: comida abaixo de 15 dias para iniciar, 20 para continuar.
-- Defender/nao besieger fora de cerco: comida abaixo de 10 dias para iniciar, 15 para continuar.
-- Troops ratio abaixo de 0.65 para iniciar, 0.75 para continuar.
-- Besieger em cerco: comida abaixo de 5 dias; nao busca tropas nesse caso.
+- Besieger outside a siege: food below 15 days to start, 20 to continue.
+- Defender/non-besieger outside a siege: food below 10 days to start, 15 to continue.
+- Troops ratio below 0.65 to start, 0.75 to continue.
+- Besieger in a siege: food below 5 days; does not look for troops in this case.
 
-## Regras de elegibilidade e criacao
+## Eligibility And Creation Rules
 
-`DefaultArmyManagementCalculationModelPatch.cs` altera a elegibilidade das parties e regras de criacao de exercito.
+`DefaultArmyManagementCalculationModelPatch.cs` changes party eligibility and army creation rules.
 
-`CheckPartyEligibility` e substituido por prefix completo:
+`CheckPartyEligibility` is fully replaced by a prefix:
 
-- bloqueia party nula;
-- bloqueia mercenarios sem politica quando a selecao ainda nao tem `currentMainParty`;
-- bloqueia parties ocupadas, jogador ocupado, ruler quando inadequado, membros de outro exercito e parties pequenas;
-- permite selecionar lideres de exercitos existentes quando o jogador tem permissao de comando.
+- blocks null parties;
+- blocks mercenaries without the policy when the selection does not yet have a `currentMainParty`;
+- blocks busy parties, busy player, ruler when inappropriate, members of another army, and small parties;
+- allows selecting existing army leaders when the player has command permission.
 
-`CanLordCreateArmy` tambem e substituido:
+`CanLordCreateArmy` is also replaced:
 
-- permite mercenarios apenas quando a politica `Mercenary Army Leaders` esta ativa;
-- filtra parties disponiveis;
-- limita o quanto do reino pode estar comprometido com exercitos por uma heuristica de 70%;
-- exige forca total minima de 1000 para criar exercito AI.
+- allows mercenaries only when the `Mercenary Army Leaders` policy is active;
+- filters available parties;
+- limits how much of the kingdom can be committed to armies with a 70% heuristic;
+- requires minimum total strength 1000 to create an AI army.
 
-`CanPlayerCreateArmy` recebe transpiler para substituir a checagem simples de `Clan.IsUnderMercenaryService` por `IsUnderMercenaryServiceAndNoPermission`, que considera permissao de dialogo e politica.
+`CanPlayerCreateArmy` receives a transpiler to replace the simple `Clan.IsUnderMercenaryService` check with `IsUnderMercenaryServiceAndNoPermission`, which considers dialogue permission and policy.
 
-`CampaignUIHelper_GetCanManageCurrentArmyWithReason_Patch` libera ou bloqueia o acesso a gestao de exercito com base em:
+`CampaignUIHelper_GetCanManageCurrentArmyWithReason_Patch` allows or blocks access to army management based on:
 
-- jogador ocupado;
-- permissao de comando de exercito;
-- servico mercenario sem permissao/politica;
-- jogador ja sendo membro de outro exercito.
+- busy player;
+- army command permission;
+- mercenary service without permission/policy;
+- player already being a member of another army.
 
-## Politica de mercenarios
+## Mercenary Policy
 
-`DefaultPoliciesPatch.cs` cria a politica `army_commander_mercenary_army_leaders` durante `DefaultPolicies.InitializeAll`.
+`DefaultPoliciesPatch.cs` creates the `army_commander_mercenary_army_leaders` policy during `DefaultPolicies.InitializeAll`.
 
-Impacto declarado:
+Declared impact:
 
-- mercenarios podem formar e liderar exercitos em servico do reino;
-- o cla governante paga 100 de influencia quando um exercito mercenario e formado.
+- mercenaries can form and lead armies while serving the kingdom;
+- the ruling clan pays 100 influence when a mercenary army is formed.
 
-O custo de 100 e aplicado no postfix de `Army.Gather` quando a policy esta ativa para o clan lider do exercito.
+The 100 influence cost is applied in the `Army.Gather` postfix when the policy is active for the army leader clan.
 
-`ACHelpers.HasPlayerPermissionForMercenaryArmyLeadership` retorna verdadeiro quando:
+`ACHelpers.HasPlayerPermissionForMercenaryArmyLeadership` returns true when:
 
-- o jogador esta sob servico mercenario no reino atual; e
-- o reino salvo em `ACPermissionsStore` e o reino atual; ou
-- a politica `Mercenary Army Leaders` esta ativa para o clan.
+- the player is under mercenary service in the current kingdom; and
+- the kingdom saved in `ACPermissionsStore` is the current kingdom; or
+- the `Mercenary Army Leaders` policy is active for the clan.
 
-## Dispersao, coesao e eventos de exercito
+## Dispersion, Cohesion, And Army Events
 
-`ArmyPatch.cs` cobre eventos de gather/disperse:
+`ArmyPatch.cs` covers gather/disperse events:
 
-- `Army_DisperseInternal_Patch` remove ordens salvas do exercito dispersado e atualiza o overlay.
-- `Army_Gather_Patch` cobra influencia do governante para exercito mercenario com politica ativa e atualiza o overlay.
-- `Army_SendLeaderPartyToReachablePointAroundPosition_ReversePatch` permite reusar o envio vanilla para ponto de reuniao.
+- `Army_DisperseInternal_Patch` removes saved orders from the dispersed army and updates the overlay.
+- `Army_Gather_Patch` charges influence from the ruler for a mercenary army with the active policy and updates the overlay.
+- `Army_SendLeaderPartyToReachablePointAroundPosition_ReversePatch` allows reusing the vanilla send-to-gathering-point behavior.
 
-`DisbandArmyActionPatch.cs` protege exercitos com ordens:
+`DisbandArmyActionPatch.cs` protects armies with orders:
 
-- impede dispersao por `Inactivity` e `ObjectiveFinished`;
-- em `CohesionDepleted`, tenta gastar influencia do clan lider para recuperar coesao antes de dispersar.
+- prevents dispersion due to `Inactivity` and `ObjectiveFinished`;
+- on `CohesionDepleted`, tries to spend the leader clan's influence to recover cohesion before dispersing.
 
-## Outros patches relevantes
+## Other Relevant Patches
 
-- `ArmyManagementItemVMPatch.cs`: ajusta distancia para a party lider selecionada, recalcula tempo por velocidade e troca nome/forca de leaders de exercito na lista.
-- `CampaignUIHelperPatch.cs`: substitui `GetCanManageCurrentArmyWithReason`.
-- `MapBarVMPatch.cs`: esconde o botao vanilla de gather army quando o overlay customizado deve aparecer.
-- `MapScreenPatch.cs`: substitui `IMapStateHandler.OnRefreshState` para criar/remover overlay de exercito.
-- `MobilePartyPatch.cs`: registra o penultimo assentamento visitado por leaders comandados, usado pelo ressuprimento.
-- `ChatLogWidgetPatch.cs`: ajusta a margem inferior do chat log conforme overlay expandido/contraido e quantidade de linhas.
-- `ACArmyManagementPatch.cs`: injeta `GUI/ACArmyManagementWidgets.xml` na tela de gestao.
-- `ACArmyManagementRightPanelDisbandButtonPatch.cs`: injeta o wrapper de `Remove Orders` + botao original de disband.
-- `OpenArmyManagement_All_Patch.cs`: garante atualizacao dos widgets customizados apos a abertura da tela.
+- `ArmyManagementItemVMPatch.cs`: adjusts distance to the selected leader party, recalculates time by speed, and replaces the name/strength of army leaders in the list.
+- `CampaignUIHelperPatch.cs`: replaces `GetCanManageCurrentArmyWithReason`.
+- `MapBarVMPatch.cs`: hides the vanilla gather army button when the custom overlay should appear.
+- `MapScreenPatch.cs`: replaces `IMapStateHandler.OnRefreshState` to create/remove the army overlay.
+- `MobilePartyPatch.cs`: records the penultimate settlement visited by commanded leaders, used by resupply.
+- `ChatLogWidgetPatch.cs`: adjusts the chat log bottom margin according to overlay expanded/collapsed state and row count.
+- `ACArmyManagementPatch.cs`: injects `GUI/ACArmyManagementWidgets.xml` into the management screen.
+- `ACArmyManagementRightPanelDisbandButtonPatch.cs`: injects the `Remove Orders` + original disband button wrapper.
+- `OpenArmyManagement_All_Patch.cs`: ensures custom widgets update after the screen opens.
 
-## Helpers e calculos
+## Helpers And Calculations
 
-`ACHelpers` concentra regras de disponibilidade e metricas:
+`ACHelpers` centralizes availability rules and metrics:
 
-- comparacao segura de `MBObjectBase`;
-- disponibilidade do exercito para receber ordens;
-- se jogador/party/exercito esta ocupado;
-- se settlement esta em condicao aceitavel;
-- se o overlay deve aparecer;
-- permissao de comando e lideranca mercenaria;
-- contagens de parties/tropas;
-- distancia em dias;
-- comida, influencia, coesao e custos;
-- dias ate comida acabar;
-- capital possivel do reino;
-- agrupamento de tropas por `FormationClass`.
+- safe `MBObjectBase` comparison;
+- army availability for receiving orders;
+- whether the player/party/army is busy;
+- whether a settlement is in an acceptable condition;
+- whether the overlay should appear;
+- command permission and mercenary leadership permission;
+- party/troop counts;
+- distance in days;
+- food, influence, cohesion, and costs;
+- days until food runs out;
+- possible kingdom capital;
+- troop grouping by `FormationClass`.
 
-`ACHintHelpers` constroi tooltips para:
+`ACHintHelpers` builds tooltips for:
 
-- totais do reino no topo do overlay;
-- parties/tropas/comida/coesao/influencia de cada exercito.
+- kingdom totals at the top of the overlay;
+- parties/troops/food/cohesion/influence for each army.
 
-`ACCalculationModel.DistributeToSmallestKeepOriginalOrder` distribui um incremento inteiro elevando primeiro os menores valores e retornando a ordem original.
+`ACCalculationModel.DistributeToSmallestKeepOriginalOrder` distributes an integer increment by raising the smallest values first and returning the original order.
 
-`ACActions` contem helpers para enviar itens, transferir influencia, subtrair/adicionar influencia e mover recursos entre parties/clans.
+`ACActions` contains helpers for sending items, transferring influence, subtracting/adding influence, and moving resources between parties/clans.
 
-## Testes manuais
+## Manual Tests
 
-`docs/ArmyCommander_InGame_Test_Procedures.md` cobre regressao manual para:
+`docs/ArmyCommander_InGame_Test_Procedures.md` covers manual regression for:
 
-- persistencia de ordens apos save/load;
-- politica `Mercenary Army Leaders`;
-- criacao de exercitos por ruler, vassalo e mercenario;
-- dialogo de permissao mercenaria;
-- fim/reentrada de contrato mercenario;
-- casos negativos e riscos conhecidos.
+- order persistence after save/load;
+- `Mercenary Army Leaders` policy;
+- army creation by ruler, vassal, and mercenary;
+- mercenary permission dialogue;
+- ending/rejoining a mercenary contract;
+- negative cases and known risks.
 
-Esse documento ainda deve ser estendido para cobrir especificamente o dialogo de vassalo e as flags novas de comando (`CanEngageEnemyParties`, `CanHelpAlliedParties`, `CanResupply`, `CanRunFromDanger`).
+This document should still be extended to specifically cover vassal dialogue and the new command flags (`CanEngageEnemyParties`, `CanHelpAlliedParties`, `CanResupply`, `CanRunFromDanger`).
 
-## Pontos frageis observados
+## Observed Fragile Points
 
-- Muitos patches acessam campos/metodos privados por `AccessTools`. Mudancas de versao do Bannerlord podem quebrar nomes como `_partiesToRemove`, `_mainPartyItem`, `_armyOverlay`, `ApplyInternal`, `ArmyToUse`, `SendLeaderPartyToReachablePointAroundPosition` e `GetInfluenceBudgetWhileCreatingArmy`.
-- Os reverse patches lancam `NotImplementedException` por design se chamados sem Harmony substituir o corpo. Isso e esperado, mas dificulta testes unitarios comuns.
-- A persistencia de ordens depende de ids de heroi e settlement. Se o lider deixar de liderar o exercito, se o reino do jogador for nulo ou se o alvo sumir, o comando e descartado no load.
-- `FindArmyByLeaderHeroId` assume `Clan.PlayerClan.Kingdom` disponivel durante restore.
-- `OnSettlementOwnerChanged` acessa `oldOwner.Clan.Kingdom` em alguns caminhos; eventos com `oldOwner`/`Clan` nulos seriam perigosos.
-- `OpenArmyManagement_All_Patch.Postfix` assume que `ACArmyManagementUIContext.Instance` existe apos a abertura.
-- `FindBestSettlementForResupplying` pode retornar null; chamadas de ressuprimento devem tolerar isso para evitar aplicar ordem sem settlement.
-- Ha valores magicos importantes: envio de 50 influencia, custo de 100 para exercito mercenario, limite de 70% de parties do reino em exercitos, forca minima 1000, thresholds de comida/tropas e relacoes/tier dos dialogos.
-- `BannerlordDir` esta hardcoded para uma instalacao local. Outro ambiente precisa ajustar a propriedade no `.csproj`.
-- `ACPolicyStore.MercenaryArmyLeadersPolicy` depende do patch de `DefaultPolicies.InitializeAll`; codigo que consultar antes disso precisa tolerar null.
-- `ACActions.SendItemQuantityOneToOne` calcula `amount_to_give`, mas chama `SendItem(..., quantity)` dentro do loop. Isso parece suspeito se a intencao era enviar somente a quantidade daquele item.
-- O XML e o mixin possuem varios textos hardcoded em ingles e parte das strings ainda usa ids/localizacao parcial.
+- Many patches access private fields/methods through `AccessTools`. Bannerlord version changes may break names such as `_partiesToRemove`, `_mainPartyItem`, `_armyOverlay`, `ApplyInternal`, `ArmyToUse`, `SendLeaderPartyToReachablePointAroundPosition`, and `GetInfluenceBudgetWhileCreatingArmy`.
+- Reverse patches intentionally throw `NotImplementedException` if called without Harmony replacing the body. This is expected, but makes ordinary unit tests harder.
+- Order persistence depends on hero and settlement ids. If the leader stops leading the army, if the player's kingdom is null, or if the target disappears, the command is discarded on load.
+- `FindArmyByLeaderHeroId` assumes `Clan.PlayerClan.Kingdom` is available during restore.
+- `OnSettlementOwnerChanged` accesses `oldOwner.Clan.Kingdom` in some paths; events with null `oldOwner`/`Clan` would be dangerous.
+- `OpenArmyManagement_All_Patch.Postfix` assumes `ACArmyManagementUIContext.Instance` exists after opening.
+- `FindBestSettlementForResupplying` can return null; resupply calls should tolerate this to avoid applying an order without a settlement.
+- Important magic values: 50 influence sent, 100 cost for a mercenary army, 70% kingdom-party army limit, 1000 minimum strength, food/troop thresholds, and dialogue relation/tier requirements.
+- `BannerlordDir` is hardcoded to a local installation. Other environments need to adjust the `.csproj` property.
+- `ACPolicyStore.MercenaryArmyLeadersPolicy` depends on the `DefaultPolicies.InitializeAll` patch; code that queries it before then must tolerate null.
+- `ACActions.SendItemQuantityOneToOne` calculates `amount_to_give`, but calls `SendItem(..., quantity)` inside the loop. This looks suspicious if the intent was to send only that item's quantity.
+- The XML and mixin have several hardcoded English strings, and some strings still use partial ids/localization.
 
-## Onde mexer para tarefas comuns
+## Where To Change Common Things
 
-- Mudar visual do overlay: `GUI/ArmyOverlayWindow.xml` e `GUI/Brushes/ArmyCommanderBrushes.xml`.
-- Mudar metricas das linhas: `ACArmyLineWidgetBuilders`, `ACArmyLineUIContext`, `ACHelpers` e `ACHintHelpers`.
-- Mudar comportamento da tela de gestao: `HarmonyPatches/ArmyManagementVMPatch.cs`.
-- Mudar controles da tela de gestao: `UIExtension/MixIns/ACArmyManagementVMMixIn.cs`, `GUI/ACArmyManagementWidgets.xml` e `GUI/ArmyManagementRightPanelDisbandButtonWrapper.xml`.
-- Mudar regras de permissao/elegibilidade: `DefaultArmyManagementCalculationModelPatch.cs`, `CampaignUIHelperPatch.cs`, `ACHelpers.cs` e behaviors de dialogo.
-- Mudar comandos de exercitos AI-led: `ACAIBehaviorHelpers.cs`, `SetPartyAiActionPatch.cs`, `DefaultMobilePartyAIModelPatch.cs`, `AiPartyThinkBehaviorPatch.cs` e o trecho `ExecuteDonePrefix` em `ArmyManagementVMPatch.cs`.
-- Mudar persistencia de ordens: `ACArmyCommanderBehavior.cs` e `ArmyCommandsBehaviorStore.cs`.
-- Mudar permissao de mercenario/vassalo: `ACMercenaryArmyLeadershipDialogueBehavior.cs`, `ACVassalArmyCommanderDialogueBehavior.cs`, `ACPermissionsStore.cs` e `ACHelpers.cs`.
-- Mudar politica customizada: `DefaultPoliciesPatch.cs`, `AiPartyThinkBehaviorPatch.cs`, `DefaultArmyManagementCalculationModelPatch.cs` e `ArmyPatch.cs`.
+- Change overlay visuals: `GUI/ArmyOverlayWindow.xml` and `GUI/Brushes/ArmyCommanderBrushes.xml`.
+- Change row metrics: `ACArmyLineWidgetBuilders`, `ACArmyLineUIContext`, `ACHelpers`, and `ACHintHelpers`.
+- Change management screen behavior: `HarmonyPatches/ArmyManagementVMPatch.cs`.
+- Change management screen controls: `UIExtension/MixIns/ACArmyManagementVMMixIn.cs`, `GUI/ACArmyManagementWidgets.xml`, and `GUI/ArmyManagementRightPanelDisbandButtonWrapper.xml`.
+- Change permission/eligibility rules: `DefaultArmyManagementCalculationModelPatch.cs`, `CampaignUIHelperPatch.cs`, `ACHelpers.cs`, and dialogue behaviors.
+- Change AI-led army commands: `ACAIBehaviorHelpers.cs`, `SetPartyAiActionPatch.cs`, `DefaultMobilePartyAIModelPatch.cs`, `AiPartyThinkBehaviorPatch.cs`, and the `ExecuteDonePrefix` section in `ArmyManagementVMPatch.cs`.
+- Change order persistence: `ACArmyCommanderBehavior.cs` and `ArmyCommandsBehaviorStore.cs`.
+- Change mercenary/vassal permission: `ACMercenaryArmyLeadershipDialogueBehavior.cs`, `ACVassalArmyCommanderDialogueBehavior.cs`, `ACPermissionsStore.cs`, and `ACHelpers.cs`.
+- Change custom policy: `DefaultPoliciesPatch.cs`, `AiPartyThinkBehaviorPatch.cs`, `DefaultArmyManagementCalculationModelPatch.cs`, and `ArmyPatch.cs`.

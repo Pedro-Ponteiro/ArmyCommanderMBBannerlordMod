@@ -1,99 +1,99 @@
 # Army Commander
 
-Army Commander e um mod singleplayer para Mount & Blade II: Bannerlord. Ele amplia a gestao de exercitos do reino, adiciona novo overlay de exercito, permite escolher qual exercito sera gerenciado e adiciona ordens persistentes para exercitos liderados por AI.
+Army Commander is a singleplayer mod for Mount & Blade II: Bannerlord. It expands kingdom army management, adds a new army overlay, lets the player choose which army will be managed, and adds persistent orders for AI-led armies.
 
-## O que o mod faz
+## What The Mod Does
 
-- Mostra um overlay customizado com todos os exercitos do reino do jogador.
-- Exibe indicadores por exercito: parties, tropas, comida, influencia, coesao e custo de recuperar coesao.
-- Permite selecionar um exercito no overlay e abrir a tela de gestao usando esse exercito como alvo.
-- Permite que o lider do reino, ou um vassalo autorizado, comande exercitos liderados por outros lordes.
-- Permite que mercenarios formem/liderem exercitos quando a politica `Mercenary Army Leaders` esta ativa ou quando o governante concedeu permissao por dialogo.
-- Adiciona dialogos para pedir permissao de lideranca mercenaria e comando de exercitos como vassalo.
-- Redireciona exercitos AI-led para defender ou sitiar assentamentos escolhidos pelo jogador.
-- Persiste ordens de exercito em saves, incluindo alvo, ponto de reuniao e flags de autonomia da AI.
-- Controla desvios de AI para combate, ajuda a aliados, ressuprimento e fuga conforme as ordens salvas.
-- Protege exercitos com ordens contra dispersao automatica por inatividade/objetivo concluido e tenta recuperar coesao quando possivel.
+- Shows a custom overlay with all armies in the player's kingdom.
+- Displays per-army indicators: parties, troops, food, influence, cohesion, and the cost to recover cohesion.
+- Lets the player select an army in the overlay and open the army management screen with that army as the target.
+- Lets the kingdom ruler, or an authorized vassal, command armies led by other lords.
+- Lets mercenaries form/lead armies when the `Mercenary Army Leaders` policy is active or when the ruler grants permission through dialogue.
+- Adds dialogues to request mercenary leadership permission and vassal army command permission.
+- Redirects AI-led armies to defend or besiege settlements chosen by the player.
+- Persists army orders in saves, including target, gathering point, and AI autonomy flags.
+- Controls AI deviations for combat, allied support, resupply, and fleeing according to the saved orders.
+- Protects armies with orders from automatic dispersion due to inactivity/objective completion and tries to recover cohesion when possible.
 
-## Tecnologia e dependencias
+## Technology And Dependencies
 
-- Projeto C# class library em .NET Framework 4.7.2.
-- Mod de Bannerlord registrado por `SubModule.xml`.
-- Patching em runtime com Harmony.
-- Injecao de ViewModels e prefabs com Bannerlord.UIExtenderEx.
-- Dependencias de mod declaradas no manifesto: `Bannerlord.Harmony`, `Bannerlord.ButterLib` e `Bannerlord.UIExtenderEx`.
+- C# class library project targeting .NET Framework 4.7.2.
+- Bannerlord mod registered through `SubModule.xml`.
+- Runtime patching with Harmony.
+- ViewModel and prefab injection with Bannerlord.UIExtenderEx.
+- Mod dependencies declared in the manifest: `Bannerlord.Harmony`, `Bannerlord.ButterLib`, and `Bannerlord.UIExtenderEx`.
 
-O caminho do jogo esta configurado em `ArmyCommander.csproj` pela propriedade `BannerlordDir`. O build copia a DLL para:
+The game path is configured in `ArmyCommander.csproj` through the `BannerlordDir` property. The build copies the DLL to:
 
 `$(BannerlordDir)\Modules\ArmyCommander\bin\Win64_Shipping_Client\`
 
-Depois do build, o alvo `DeployModFiles` espelha `GUI\` com `robocopy /MIR` e copia `SubModule.xml` para a pasta do modulo no Bannerlord.
+After the build, the `DeployModFiles` target mirrors `GUI\` with `robocopy /MIR` and copies `SubModule.xml` to the Bannerlord module folder.
 
-## Mapa do projeto
+## Project Map
 
-- `MySubModule.cs`: ponto de entrada do mod. Aplica Harmony, registra UIExtenderEx, reseta stores/contextos e registra behaviors de campanha.
-- `SubModule.xml`: manifesto do modulo, dependencias, versao do mod e classe de submodulo.
-- `ArmyCommander.csproj`: referencias do Bannerlord, Harmony, UIExtenderEx, lista de fontes e regra de deploy.
-- `ACBehaviors/`: behaviors de campanha para persistencia de ordens e dialogos de permissao.
-- `ACBehaviors/Context/`: caches transientes usados por comandos de AI, como ultimo assentamento visitado e estado de ressuprimento.
-- `HarmonyPatches/`: patches que alteram regras de exercito, overlay, tela de gestao, AI, disband, chat log e politicas.
-- `UIExtension/`: mixins, contextos, ViewModels e patches de prefab para overlay e gestao de exercito.
-- `GUI/`: XMLs injetados ou substituidos via UIExtenderEx.
-- `Helpers/`: calculos auxiliares, checagens de disponibilidade, permissoes, comandos de AI e tooltips.
-- `Store/`: estado estatico usado pelos patches, incluindo ordens persistiveis e permissoes concedidas.
-- `Actions/`: acoes auxiliares como transferencia de influencia e itens.
-- `CalculationModels/`: utilitarios de calculo independentes.
-- `WatchAndMirror-GUI.ps1`: script auxiliar para espelhar alteracoes da pasta `GUI`.
+- `MySubModule.cs`: mod entry point. Applies Harmony, registers UIExtenderEx, resets stores/contexts, and registers campaign behaviors.
+- `SubModule.xml`: module manifest, dependencies, mod version, and submodule class.
+- `ArmyCommander.csproj`: Bannerlord, Harmony, UIExtenderEx references, source list, and deploy rule.
+- `ACBehaviors/`: campaign behaviors for order persistence and permission dialogues.
+- `ACBehaviors/Context/`: transient caches used by AI commands, such as last visited settlement and resupply state.
+- `HarmonyPatches/`: patches that change army rules, overlay, management screen, AI, disbanding, chat log, and policies.
+- `UIExtension/`: mixins, contexts, ViewModels, and prefab patches for the overlay and army management.
+- `GUI/`: XML files injected or replaced through UIExtenderEx.
+- `Helpers/`: helper calculations, availability checks, permissions, AI commands, and tooltips.
+- `Store/`: static state used by patches, including persistable orders and granted permissions.
+- `Actions/`: helper actions such as influence and item transfers.
+- `CalculationModels/`: independent calculation utilities.
+- `WatchAndMirror-GUI.ps1`: helper script for mirroring changes in the `GUI` folder.
 
-## Fluxo principal
+## Main Flow
 
-1. `MySubModule.OnSubModuleLoad` aplica todos os patches Harmony e habilita UIExtenderEx.
-2. `MySubModule.OnGameStart` valida `Campaign`, reseta `ArmyCommandsContext`, `ArmyCommandsBehaviorStore` e `ACPermissionsStore`, e registra os behaviors de persistencia/dialogo.
-3. O overlay de exercito vanilla e substituido por `GUI/ArmyOverlayWindow.xml`, que mantem o overlay original como placeholder e adiciona a lista customizada.
-4. `ArmyMenuOverlayVMMixin` cria linhas para os exercitos do reino, calcula os indicadores, atualiza totais e mantem a selecao.
-5. Ao clicar em uma linha, `ACArmyOverlayUIContext.SelectedArmy` passa a apontar para o exercito selecionado.
-6. Ao abrir a gestao de exercito, `ArmyManagementVMPatches` reconstrui a tela para usar a party lider do exercito selecionado como `currentMainParty`.
-7. `ArmyManagementVMMixIn` injeta controles de ordem: alvo, ponto de reuniao, comportamento, combate, ajuda a aliados, ressuprimento, fuga, e remocao de ordens.
-8. Ao confirmar, `ExecuteDonePrefix` cria/edita/desfaz exercitos, aplica custos, salva ordens em `ArmyCommandsBehaviorStore` e chama a recalculacao de AI quando necessario.
-9. `SetPartyAiActionPatch`, `DefaultMobilePartyAIModelPatch`, `AiPartyThinkBehaviorPatch` e `ACAIBehaviorHelpers` fazem a AI obedecer as ordens salvas e lidar com ressuprimento, fuga, combate e cerco.
+1. `MySubModule.OnSubModuleLoad` applies all Harmony patches and enables UIExtenderEx.
+2. `MySubModule.OnGameStart` validates `Campaign`, resets `ArmyCommandsContext`, `ArmyCommandsBehaviorStore`, and `ACPermissionsStore`, and registers the persistence/dialogue behaviors.
+3. The vanilla army overlay is replaced by `GUI/ArmyOverlayWindow.xml`, which keeps the original overlay as a placeholder and adds the custom list.
+4. `ArmyMenuOverlayVMMixin` creates rows for the kingdom's armies, calculates indicators, updates totals, and maintains selection.
+5. When a row is clicked, `ACArmyOverlayUIContext.SelectedArmy` points to the selected army.
+6. When army management is opened, `ArmyManagementVMPatches` rebuilds the screen to use the selected army leader party as `currentMainParty`.
+7. `ArmyManagementVMMixIn` injects order controls: target, gathering point, behavior, combat, allied support, resupply, fleeing, and order removal.
+8. On confirmation, `ExecuteDonePrefix` creates/edits/disbands armies, applies costs, saves orders in `ArmyCommandsBehaviorStore`, and triggers AI recalculation when needed.
+9. `SetPartyAiActionPatch`, `DefaultMobilePartyAIModelPatch`, `AiPartyThinkBehaviorPatch`, and `ACAIBehaviorHelpers` make the AI obey saved orders and handle resupply, fleeing, combat, and sieges.
 
-## Ordens de exercito
+## Army Orders
 
-As ordens persistidas ficam em `ArmyCommandsBehaviorStore.army_commands`. Cada entrada guarda:
+Persisted orders are stored in `ArmyCommandsBehaviorStore.army_commands`. Each entry stores:
 
-- tipo de comportamento (`Defender` ou `Besieger`);
-- assentamento alvo;
-- assentamento de reuniao enquanto o exercito espera membros;
-- se pode engajar inimigos;
-- se pode ajudar aliados quando combate geral esta bloqueado;
-- se pode ressuprir;
-- se pode fugir de perigo.
+- behavior type (`Defender` or `Besieger`);
+- target settlement;
+- gathering settlement while the army waits for members;
+- whether it can engage enemies;
+- whether it can help allies when general combat is blocked;
+- whether it can resupply;
+- whether it can flee from danger.
 
-`ACArmyCommanderBehavior` salva essas ordens em XML dentro do save usando ids estaveis de heroi e assentamento. Ao carregar, ele resolve o lider do exercito, o alvo e o ponto de reuniao, descartando entradas que nao existem mais.
+`ACArmyCommanderBehavior` saves these orders as XML inside the save using stable hero and settlement ids. On load, it resolves the army leader, target, and gathering point, discarding entries that no longer exist.
 
-## Permissoes
+## Permissions
 
-- Mercenario: pode pedir ao governante permissao para formar/liderar exercitos. Requer clan tier 3 e relacao 25.
-- Vassalo: pode pedir ao governante permissao para comandar exercitos do reino. Requer clan tier 4 e relacao 40.
-- Governante do reino: sempre passa em `HasPlayerPermissionForArmyCommand`.
-- Politica `Mercenary Army Leaders`: tambem libera lideranca mercenaria quando ativa.
+- Mercenary: can ask the ruler for permission to form/lead armies. Requires clan tier 3 and relation 25.
+- Vassal: can ask the ruler for permission to command kingdom armies. Requires clan tier 4 and relation 40.
+- Kingdom ruler: always passes `HasPlayerPermissionForArmyCommand`.
+- `Mercenary Army Leaders` policy: also enables mercenary army leadership when active.
 
-As permissoes concedidas sao salvas em `ACPermissionsStore` como ids de reino e sao limpas quando o contrato mercenario termina ou quando o clan do jogador sai do reino que concedeu a permissao de vassalo.
+Granted permissions are saved in `ACPermissionsStore` as kingdom ids and are cleared when the mercenary contract ends or when the player's clan leaves the kingdom that granted vassal permission.
 
-## Debug e testes
+## Debug And Tests
 
-O mod grava log principal em:
+The mod writes the main log to:
 
 `%LOCALAPPDATA%\ArmyCommander\ArmyCommander_Debug.log`
 
-`ACArmyCommanderBehavior` tambem tem log proprio em:
+`ACArmyCommanderBehavior` also has its own log at:
 
 `%LOCALAPPDATA%\ArmyCommander\ArmyCommander_Behavior.log`
 
-Procedimentos manuais de regressao ficam em:
+Manual regression procedures are kept in:
 
 `docs/ArmyCommander_InGame_Test_Procedures.md`
 
-## Documentacao tecnica
+## Technical Documentation
 
-Veja [docs/ARQUITETURA.md](docs/ARQUITETURA.md) para um mapa mais detalhado dos patches, fluxos de dados e pontos de manutencao.
+See [docs/ARQUITETURA.md](docs/ARQUITETURA.md) for a more detailed map of patches, data flows, and maintenance points.
