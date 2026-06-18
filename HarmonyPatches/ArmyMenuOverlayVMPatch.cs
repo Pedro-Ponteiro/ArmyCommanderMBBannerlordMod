@@ -16,7 +16,7 @@ namespace ArmyCommander.HarmonyPatches
     // ========================================================================
     // ArmyMenuOverlayVM Focused Harmony Patch
     // ------------------------------------------------------------------------
-    // Patches substituindo:
+    // Patches replacing:
     // - ArmyToUse getter
     // - OnFrameTick
     // - ExecuteOpenArmyManagement
@@ -105,8 +105,8 @@ namespace ArmyCommander.HarmonyPatches
 
         public static void SetContextMenuItemToNull(ArmyMenuOverlayVM instance)
         {
-            // Campo herdado de GameMenuOverlay. Se o nome/tipo variar entre versões,
-            // este é um dos primeiros pontos a conferir no dnSpy.
+            // Inherited field from GameMenuOverlay. If the name/type changes between versions,
+            // this is one of the first places to check in dnSpy.
             SetBaseField<object>(instance, "_contextMenuItem", null);
         }
 
@@ -172,9 +172,9 @@ namespace ArmyCommander.HarmonyPatches
     // ========================================================================
     // ReversePatch: ArmyMenuOverlayVM.Refresh
     // ------------------------------------------------------------------------
-    // Este patch cria uma forma segura de chamar o corpo original de:
+    // This patch creates a safe way to call the original body of:
     // ArmyMenuOverlayVM.Refresh()
-    // mesmo que você esteja em outro patch.
+    // even when you are inside another patch.
     // ========================================================================
 
     [HarmonyPatch]
@@ -205,11 +205,11 @@ namespace ArmyCommander.HarmonyPatches
         private static bool Prefix(ArmyMenuOverlayVM __instance, ref Army __result)
         {
 
-            // TODO: FAZER ISSO FICAR MAIS BONITO E ELEGANTE! (A INSTANCIA PODE NÃO EXISTIR QUANDO DEREM UM GET AQUI!)
+            // TODO: MAKE THIS PRETTIER AND MORE ELEGANT! (THE INSTANCE MAY NOT EXIST WHEN SOMETHING GETS IT HERE!)
 
-            // Ajustar conforme o ShouldShowArmyOverlayForPlayer?
+            // Adjust based on ShouldShowArmyOverlayForPlayer?
 
-            // Antes verificar se uma army já está selecionada (pode ser setada no disband ou army creation)
+            // First check whether an army is already selected (it may be set during disband or army creation)
             if (ACArmyOverlayUIContext.Instance?.SelectedArmy != null)
             {
                 __result = ACArmyOverlayUIContext.Instance.SelectedArmy;
