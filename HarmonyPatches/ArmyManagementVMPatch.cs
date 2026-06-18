@@ -132,14 +132,14 @@ namespace ArmyCommander.HarmonyPatches
 
 
 
-            // Se houver um selectedarmy, usar ele para popular esse início.
-            // Caso contrário, deixar todos os parties disponíveis na esquerda e 
-            // a direita fica vazia
+            // If there is a selectedArmy, use it to populate this initial state.
+            // Otherwise, leave all available parties on the left and
+            // keep the right side empty.
 
 
             bool canPlayerCommandArmies = ACHelpers.HasPlayerPermissionForArmyCommand();
 
-            // Atualiza o contexto ao setar esses caras abaixo
+            // This updates the context when setting the values below
             if (!canPlayerCommandArmies)
             {
                 ACArmyManagementUIContext.Instance.currentMainParty = Hero.MainHero.PartyBelongedTo;
@@ -154,16 +154,16 @@ namespace ArmyCommander.HarmonyPatches
             }
 
 
-            // Isso habilita botões como de boost cohesion, etc.
+            // This enables buttons like boost cohesion, etc.
             __instance.PlayerHasArmy = ACArmyManagementUIContext.Instance.currentMainParty.IsMainParty && ACArmyManagementUIContext.Instance.mainPartyHasArmy;
 
 
 
-            // quando selecionar a primeira party vindo da esquerda, definir essa party como a mainparty
+            // When selecting the first party from the left, set that party as the main party.
 
-            // quando retirar a última party da direita, desabilitar o "Done" e dizer que não há parties.
+            // When removing the last party from the right, disable "Done" and say there are no parties.
 
-            // o onreset vai funcionar em cima do currentlyselectedarmy do contexto, que vai ser setado quando o onadd for feito em uma party que é armyleader 
+            // OnReset will work from the context's currentlySelectedArmy, which is set when OnAdd runs on a party that is an army leader.
 
 
             MainPartyItemRef(__instance) = new ArmyManagementItemVM(onAddToCart, onRemove, onFocus, ACArmyManagementUIContext.Instance.currentMainParty)
@@ -222,7 +222,7 @@ namespace ArmyCommander.HarmonyPatches
 
             if (canPlayerCommandArmies)
             {
-                // disponibilizar do lado esquerdo.
+                // Make it available on the left side.
                 __instance.PartyList.Add(MainPartyItemRef(__instance));
             }
 
@@ -301,7 +301,7 @@ namespace ArmyCommander.HarmonyPatches
         {
             var party = item.Party;
 
-            // 1º MainHero / MainParty
+            // 1st MainHero / MainParty
 
 
             if (item.IsInCart)
@@ -318,19 +318,19 @@ namespace ArmyCommander.HarmonyPatches
                 return 2;
             }
 
-            // 2º Army Leaders
+            // 2nd Army Leaders
             if (party.Army != null && party.Army.LeaderParty == party)
             {
                 return 3;
             }
 
-            // 3º Parties que não têm army
+            // 3rd Parties that do not have an army
             if (item.IsEligible)
             {
                 return 4;
             }
 
-            // 4º Parties que têm army, mas não são army leaders
+            // 4th Parties that have an army, but are not army leaders
             return 5;
         }
 
@@ -357,7 +357,7 @@ namespace ArmyCommander.HarmonyPatches
             MobileParty partySelected = armyItem.Party;
             Army armySelected = partySelected.Army;
 
-            // Isso atualiza o contexto
+            // This updates the context
             ACArmyManagementUIContext.Instance.currentMainParty = armyItem.Party;
 
 
@@ -413,7 +413,7 @@ namespace ArmyCommander.HarmonyPatches
 
         private static void OnArmyLeaderRemoved(ArmyManagementVM __instance)
         {
-            // Isso atualiza o contexto
+            // This updates the context
             ACArmyManagementUIContext.Instance.currentMainParty = null;
 
             __instance.PlayerHasArmy = false;
@@ -464,11 +464,11 @@ namespace ArmyCommander.HarmonyPatches
             if (!__instance.PartiesInCart.Contains(armyItem))
             {
 
-                // Se for o primeiro a ser adicionado, ele vira o mainparty
-                // partiesToRemove é limpo (NO ONREMOVE)
-                // as propriedades do lado esquerdo precisam ser atualizadas
-                // mainPartyHasArmy = true se o líder já tem uma army
-                // e o lado direito é populado conforme IsAlreadyWithPlayer.
+                // If this is the first party added, it becomes the main party.
+                // partiesToRemove is cleared (IN ONREMOVE).
+                // The properties on the left side need to be updated.
+                // mainPartyHasArmy = true if the leader already has an army.
+                // The right side is populated based on IsAlreadyWithPlayer.
 
 
                 if (__instance.PartiesInCart.Count == 0)
@@ -518,9 +518,9 @@ namespace ArmyCommander.HarmonyPatches
 
             if (__instance.PartiesInCart.Contains(armyItem))
             {
-                // Se foi o army leader que foi retirado, limpa o lado direito 
-                // limpa o parties to remove
-                // atualiza as propriedades do lado esquerdo
+                // If the removed party was the army leader, clear the right side.
+                // Clear partiesToRemove.
+                // Update the properties on the left side.
                 // mainPartyHasArmy = false
 
                 if (armyItem.Party == ACArmyManagementUIContext.Instance.currentMainParty)
@@ -576,7 +576,7 @@ namespace ArmyCommander.HarmonyPatches
                 MBReadOnlyList<MobileParty> mbs = new MBReadOnlyList<MobileParty>(imbs);
                 if (armyToUse == null)
                 {
-                    // MBS IS NOT USED IF ITS A PLAYER LEADING THE ARMY!
+                    // MBS IS NOT USED IF THIS IS A PLAYER-LED ARMY!
                     ((Kingdom)MobileParty.MainParty.MapFaction).CreateArmy(
                         ACArmyManagementUIContext.Instance.currentMainParty.LeaderHero,
                         ACArmyManagementUIContext.Instance.targetSettlement,
@@ -648,7 +648,7 @@ namespace ArmyCommander.HarmonyPatches
                 }
                 else if (armyCreated && ACArmyManagementUIContext.Instance.currentMainParty.IsMainParty)
                 {
-                    // MANUAL ASSIGNMENT FOR PLAYER LEADED ARMY!
+                    // MANUAL ASSIGNMENT FOR PLAYER-LED ARMY!
                     foreach (var mb in mbs)
                     {
                         mb.Army = armyToUse;
