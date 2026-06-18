@@ -42,10 +42,10 @@ namespace ArmyCommander.UIExtension.Context
         // onpartyattached
         public int MenJoiningToday { get; set; }
 
-        // onpartyattached e ondaytick
+        // onpartyattached and ondaytick
         public float CurrentArmyFood { get; set; }
 
-        // onpartyattached e ondaytick
+        // onpartyattached and ondaytick
         public float TotalArmyFoodChange { get; set; }
 
         // ondaytick
@@ -60,7 +60,7 @@ namespace ArmyCommander.UIExtension.Context
         // ondaytick
         public float CurrentCohesion { get; set; }
 
-        // onpartyattached e ondaytick
+        // onpartyattached and ondaytick
         public float DailyCohesionChange { get; set; }
 
         // ondaytick
