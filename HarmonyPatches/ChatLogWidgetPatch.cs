@@ -3,7 +3,7 @@ using HarmonyLib;
 using System;
 using TaleWorlds.GauntletUI;
 using TaleWorlds.MountAndBlade.GauntletUI.Widgets.Chat;
-// ajuste o namespace do ChatLogWidget conforme o decompiled
+// Adjust the ChatLogWidget namespace to match the decompiled one
 
 
 
