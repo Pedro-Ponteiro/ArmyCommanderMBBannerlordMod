@@ -199,7 +199,7 @@ namespace ArmyCommander
             }
             catch
             {
-                // Não deixa erro de log derrubar o jogo.
+                // Do not let logging errors take the game down.
             }
         }
 
@@ -237,7 +237,7 @@ namespace ArmyCommander
             }
             catch
             {
-                // Não deixa erro de log derrubar o jogo.
+                // Do not let logging errors take the game down.
             }
         }
     }
