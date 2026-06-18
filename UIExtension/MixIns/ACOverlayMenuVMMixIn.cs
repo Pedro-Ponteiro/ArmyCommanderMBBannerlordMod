@@ -69,12 +69,12 @@ namespace ArmyCommander.UIExtension.MixIns
         public void OnArmyDisband(Army army)
         {
 
-            // RODA NO POSTFIX DE ARMYPATCH.CS
+            // RUNS IN ARMYPATCH.CS POSTFIX
 
-            // precisa verificar se é uma army do mesmo reino.
-            // se sim, renova a lista de armies (vai sobrescrever a original)
-            // verifica se a army selecionada era a que foi desbandada.
-            // se foi, muda a army selecionada para a primeira da nova lista OU null E força o refresh da ui original
+            // Check whether this is an army from the same kingdom.
+            // If so, renew the army list (overwriting the original one).
+            // Check whether the selected army was the one that got disbanded.
+            // If it was, set the selected army to the first one in the new list or null, then force the original UI to refresh.
 
             if (army.LeaderParty.ActualClan.Kingdom != Clan.PlayerClan.Kingdom)
             {
@@ -104,9 +104,9 @@ namespace ArmyCommander.UIExtension.MixIns
         public void OnArmyGathered(Army army)
         {
 
-            // se a army for do mesmo reino
-            // cria a linha, adiciona à lista de linhas (tem que sobrescrever ela com o novo obj)
-            // Se é a única army da lista nova, seleciona ela e força refresh da ui original
+            // If the army belongs to the same kingdom.
+            // Create the row and add it to the row list (must overwrite it with the new object).
+            // If this is the only army in the new list, select it and force the original UI to refresh.
 
             if (army.Kingdom != Clan.PlayerClan.Kingdom)
             {
