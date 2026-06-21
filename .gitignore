@@ -5,5 +5,5 @@ obj/*
 bkp_Behavior/*
 ArmyCommander.csproj.user
 Commit-TranslatedComments.ps1
-SteamWorkShopDeploy/steam_appid.txt
-SteamWorkShopDeploy/steam_workshop_uploader.txt
+steam_appid.txt
+steam_workshop_uploader.txt
