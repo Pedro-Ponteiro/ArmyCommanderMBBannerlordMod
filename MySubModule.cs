@@ -1,6 +1,7 @@
 ﻿using ArmyCommander.ACBehaviors;
 using ArmyCommander.ACBehaviors.Context;
 using ArmyCommander.Store;
+using ArmyCommander.UIExtension.Context;
 using Bannerlord.UIExtenderEx;
 using HarmonyLib;
 using System;
@@ -128,6 +129,25 @@ namespace ArmyCommander
             }
         }
 
+        private static void ClearCampaignContext()
+        {
+            ACArmyManagementUIContext.Instance?.UnregisterInstance();
+            ACArmyOverlayUIContext.Instance?.UnregisterInstance();
+            ArmyCommandsContext.Reset();
+            ArmyCommandsBehaviorStore.Reset();
+            ACPermissionsStore.Reset();
+        }
+
+        public override void OnGameEnd(Game game)
+        {
+            if (game.GameType is Campaign)
+            {
+                ClearCampaignContext();
+            }
+
+            base.OnGameEnd(game);
+        }
+
         protected override void OnGameStart(Game game, IGameStarter gameStarterObject)
         {
             try
@@ -158,9 +178,7 @@ namespace ArmyCommander
                         return;
                     }
 
-                    ArmyCommandsContext.Reset();
-                    ArmyCommandsBehaviorStore.Reset();
-                    ACPermissionsStore.Reset();
+                    ClearCampaignContext();
 
                     campaignGameStarter.AddBehavior(new ACArmyCommanderBehavior());
                     campaignGameStarter.AddBehavior(new ACMercenaryArmyLeadershipDialogueBehavior());
