@@ -28,7 +28,7 @@ namespace ArmyCommander.HarmonyPatches
 
             if (ArmyCommandsBehaviorStore.army_commands.ContainsKey(army))
             {
-                if (reason == Army.ArmyDispersionReason.Inactivity || reason == Army.ArmyDispersionReason.ObjectiveFinished)
+                if (reason == Army.ArmyDispersionReason.Inactivity || reason == Army.ArmyDispersionReason.ObjectiveFinished || reason == Army.ArmyDispersionReason.NoActiveWar)
                 {
                     return false;
                 }

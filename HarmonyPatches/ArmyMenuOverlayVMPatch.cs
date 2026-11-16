@@ -2,8 +2,10 @@
 using ArmyCommander.UIExtension.Context;
 using HarmonyLib;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Party;
@@ -225,7 +227,7 @@ namespace ArmyCommander.HarmonyPatches
             else
             {
 
-                Army army = Clan.PlayerClan.Kingdom.Armies.FirstOrDefault();
+                Army army = Clan.PlayerClan.Kingdom?.Armies.FirstOrDefault();
 
                 if (ACArmyOverlayUIContext.Instance != null)
                 {
@@ -306,4 +308,66 @@ namespace ArmyCommander.HarmonyPatches
             return false;
         }
     }
+
+
+    [HarmonyPatch]
+    public static class OriginalArmyLeaderCheck
+    {
+        [HarmonyReversePatch(HarmonyReversePatchType.Original)]
+        [HarmonyPatch(typeof(ArmyMenuOverlayVM), "GetIsPlayerArmyLeader")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public static bool Invoke(Army army)
+        {
+            throw new NotImplementedException("Reverse Patch não aplicado.");
+        }
+    }
+
+    [HarmonyPatch(
+        typeof(ArmyMenuOverlayVM),
+        "ExecuteOnSetAsActiveContextMenuItem",
+        new[] { typeof(GameMenuPartyItemVM) }
+    )]
+    public static class ArmyMenuOverlayVM_Transpiler
+    {
+        private static IEnumerable<CodeInstruction> Transpiler(
+            IEnumerable<CodeInstruction> instructions)
+        {
+            MethodInfo original = AccessTools.Method(
+                typeof(ArmyMenuOverlayVM),
+                "GetIsPlayerArmyLeader",
+                new[] { typeof(Army) }
+            );
+
+            MethodInfo replacement = AccessTools.Method(
+                typeof(OriginalArmyLeaderCheck),
+                nameof(OriginalArmyLeaderCheck.Invoke)
+            );
+
+            if (original == null || replacement == null)
+                throw new MissingMethodException(
+                    "Não foi possível localizar os métodos do patch."
+                );
+
+            int replacements = 0;
+
+            foreach (var instruction in instructions)
+            {
+                if (instruction.Calls(original))
+                {
+                    instruction.opcode = OpCodes.Call;
+                    instruction.operand = replacement;
+
+                    replacements++;
+                }
+
+                yield return instruction;
+            }
+
+            if (replacements != 1)
+                throw new InvalidOperationException(
+                    $"Esperada 1 substituição, encontradas {replacements}."
+                );
+        }
+    }
+
 }

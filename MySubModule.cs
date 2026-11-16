@@ -32,70 +32,36 @@ namespace ArmyCommander
             "ArmyCommander_Debug.log"
         );
 
+        private bool _harmonyPatched = false;
+
         protected override void OnSubModuleLoad()
         {
             try
             {
-
                 base.OnSubModuleLoad();
 
-
-
+                // Apenas cria a instância do Harmony.
                 _harmony = new Harmony(HarmonyId);
 
 
+                _harmony.PatchCategory(
+                    Assembly.GetExecutingAssembly(),
+                    "SubModuleLoad"
+                );
 
-                _harmony.PatchAll(Assembly.GetExecutingAssembly());
-
-
-
+                // Inicializa as extensões da interface.
                 _uiExtender = UIExtender.Create("ArmyCommander");
-
-
-
                 _uiExtender.Register(Assembly.GetExecutingAssembly());
-
-
-
                 _uiExtender.Enable();
-
-
-
-            }
-            catch (TargetInvocationException ex)
-            {
-
-                LogException(ex);
-
-                LogException(ex.InnerException);
-
-                throw;
-            }
-            catch (ReflectionTypeLoadException ex)
-            {
-
-                LogException(ex);
-
-                if (ex.LoaderExceptions != null)
-                {
-
-
-                    foreach (Exception loaderException in ex.LoaderExceptions)
-                    {
-                        LogException(loaderException);
-                    }
-                }
-
-                throw;
             }
             catch (Exception ex)
             {
-
-                LogException(ex);
-
+                System.Diagnostics.Debug.WriteLine(ex.ToString());
                 throw;
             }
         }
+
+
 
         protected override void OnSubModuleUnloaded()
         {
@@ -176,6 +142,13 @@ namespace ArmyCommander
                     {
 
                         return;
+                    }
+
+                    if (!_harmonyPatched)
+                    {
+                        _harmony.PatchAllUncategorized(Assembly.GetExecutingAssembly());
+
+                        _harmonyPatched = true;
                     }
 
                     ClearCampaignContext();

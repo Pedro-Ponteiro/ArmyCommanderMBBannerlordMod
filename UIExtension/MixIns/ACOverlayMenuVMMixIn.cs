@@ -91,13 +91,13 @@ namespace ArmyCommander.UIExtension.MixIns
             UpdateTopWidgets();
 
 
+            ACArmyOverlayUIContext.Instance.CurrentArmyOverlayVM.IsInitializationOver = true;
+
+
             if (ArmyOverlayArmiesList.ArmiesCount() == 0)
             {
                 OnFinalize();
             }
-
-
-            ACArmyOverlayUIContext.Instance.CurrentArmyOverlayVM.IsInitializationOver = true;
 
         }
 
@@ -214,9 +214,14 @@ namespace ArmyCommander.UIExtension.MixIns
             ACPartiesCountHint = ACHintHelpers.GetKingdomPartiesTooltipVM(ACArmyOverlayUIContext.Instance);
         }
 
-        // on day tick
+        // on hour tick
         public void UpdateLeftArmyOverlay()
         {
+            if (Hero.MainHero.Clan.Kingdom == null)
+            {
+                this.OnFinalize(); return;
+            }
+
             ACArmyOverlayUIContext.Instance.CurrentArmyOverlayVM.IsInitializationOver = false;
 
             ACArmyOverlayUIContext.Instance.ArmiesCount = 0;

@@ -66,6 +66,7 @@ namespace ArmyCommander.HarmonyPatches
         }
     }
 
+    [HarmonyPatchCategory("SubModuleLoad")]
     [HarmonyPatch(typeof(ChatLogWidget))]
     internal static class ChatLogWidget_Constructor_Patch
     {

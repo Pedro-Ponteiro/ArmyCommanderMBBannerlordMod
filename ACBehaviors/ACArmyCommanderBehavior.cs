@@ -1,3 +1,4 @@
+using ArmyCommander.ACBehaviors.Context;
 using ArmyCommander.Helpers;
 using ArmyCommander.Store;
 using System;
@@ -40,7 +41,16 @@ namespace ArmyCommander.ACBehaviors
             CampaignEvents.OnPeaceOfferResolvedEvent.AddNonSerializedListener(this, OnPeaceOfferResolved);
             CampaignEvents.PartyAttachedAnotherParty.AddNonSerializedListener(this, OnPartyAttachedAnotherParty);
             CampaignEvents.HourlyTickEvent.AddNonSerializedListener(this, ACPartyHourlyAiTick);
+            CampaignEvents.OnClanChangedKingdomEvent.AddNonSerializedListener(this, OnClanChangedKingdom);
+        }
 
+        private void OnClanChangedKingdom(Clan clan, Kingdom kingdom1, Kingdom kingdom2, ChangeKingdomAction.ChangeKingdomActionDetail detail, bool arg5)
+        {
+            if (clan.Leader.IsHumanPlayerCharacter)
+            {
+                ArmyCommandsContext.Reset();
+                ArmyCommandsBehaviorStore.Reset();
+            }
         }
 
         private void ACPartyHourlyAiTick()
